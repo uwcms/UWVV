@@ -1,0 +1,32 @@
+from UWVV.AnalysisTools.AnalysisFlowBase import AnalysisFlowBase
+
+import FWCore.ParameterSet.Config as cms
+
+
+class MuonBaseFlow(AnalysisFlowBase):
+    def __init__(self, *args, **kwargs):
+        super(MuonBaseFlow, self).__init__(*args, **kwargs)
+
+    def makeAnalysisStep(self, stepName, **inputs):
+        step = super(MuonBaseFlow, self).makeAnalysisStep(stepName, **inputs)
+
+        if stepName == 'preliminary':
+            self.addGhostCleaning(step)
+        
+        if stepName == 'selection':
+            step.addBasicSelector('m', 'pt > 5 && (isGlobalMuon || isTrackerMuon)')
+
+        return step
+
+
+    def addGhostCleaning(self, step):
+        '''
+        Add modules to resolve track ambiguities.
+        '''
+        mod = cms.EDProducer("PATMuonCleanerBySegments",
+                             src = cms.InputTag(step.getObjTag('m')),
+                             preselection = cms.string("track.isNonnull"),
+                             passthrough = cms.string("isGlobalMuon && numberOfMatches >= 2"),
+                             fractionOfSharedSegments = cms.double(0.499))
+
+        step.addModule("muonGhostCleaning", mod, 'm')            
