@@ -3,8 +3,11 @@
 <use name="DataFormats/RecoCandidate"/>
 <use name="DataFormats/PatCandidates"/>
 <use name="CommonTools/Utils"/>
+<use name="CommonTools/UtilAlgos"/>
 <use name="CommonTools/CandAlgos"/>
 <use name="CommonTools/CandUtils"/>
+<use name="FWCore/ServiceRegistry"/>
+<use name="FWCore/ParameterSet"/>
 
 <library file="*.cc" name="UWVVNtuplizerPlugins">
   <flags EDM_PLUGIN="1"/>
