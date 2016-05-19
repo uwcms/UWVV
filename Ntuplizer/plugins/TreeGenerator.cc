@@ -27,9 +27,10 @@
 
 // UWVV
 #include "UWVV/Ntuplizer/interface/BranchManager.h"
-//#include "UWVV/Ntuplizer/interface/BranchManagerFwd.h"
+#include "UWVV/Ntuplizer/interface/EventInfo.h"
 
 
+using namespace uwvv;
 
 template<class... Ts> 
 class TreeGenerator : public edm::one::EDAnalyzer<edm::one::SharedResources>//, 
@@ -47,6 +48,7 @@ class TreeGenerator : public edm::one::EDAnalyzer<edm::one::SharedResources>//,
   const edm::EDGetTokenT<edm::View<pat::CompositeCandidate> > candToken;
 
   TTree* const tree;
+  EventInfo evtInfo;
 
   std::unique_ptr<BranchManager<Ts...> > branches;
 };
@@ -55,12 +57,14 @@ class TreeGenerator : public edm::one::EDAnalyzer<edm::one::SharedResources>//,
 template<class... FSParticles>
 TreeGenerator<FSParticles...>::TreeGenerator(const edm::ParameterSet& config) :
   candToken(consumes<edm::View<pat::CompositeCandidate> >(config.getParameter<edm::InputTag>("src"))),
-  tree(makeTree())
+  tree(makeTree()),
+  evtInfo(consumesCollector(), config.getParameter<edm::ParameterSet>("eventParams"))
 {
   usesResource("TFileService");
 
+  const edm::ParameterSet& branchParams = config.getParameter<edm::ParameterSet>("branches");
   branches = 
-    std::unique_ptr<BranchManager<FSParticles...> >(new BranchManager<FSParticles...>("", tree));
+    std::unique_ptr<BranchManager<FSParticles...> >(new BranchManager<FSParticles...>("", tree, branchParams));
 }
 
 
@@ -80,9 +84,11 @@ TreeGenerator<FSParticles...>::analyze(const edm::Event &event,
   edm::Handle<edm::View<pat::CompositeCandidate> > cands;
   event.getByToken(candToken, cands);
 
+  evtInfo.setEvent(event);
+
   for(size_t i = 0; i < cands->size(); ++i)
     {
-      branches->fill(cands->ptrAt(i));
+      branches->fill(cands->ptrAt(i), evtInfo);
 
       tree->Fill();
     }
@@ -90,12 +96,22 @@ TreeGenerator<FSParticles...>::analyze(const edm::Event &event,
 
 
 typedef TreeGenerator<CompositeDaughter<CompositeDaughter<pat::Electron, pat::Electron>, 
+                                        CompositeDaughter<pat::Electron, pat::Electron> 
+                                        > 
+                      > TreeGeneratorEEEE;
+typedef TreeGenerator<CompositeDaughter<CompositeDaughter<pat::Electron, pat::Electron>, 
                                         CompositeDaughter<pat::Muon, pat::Muon> 
                                         > 
                       > TreeGeneratorEEMuMu;
+typedef TreeGenerator<CompositeDaughter<CompositeDaughter<pat::Muon, pat::Muon>, 
+                                        CompositeDaughter<pat::Muon, pat::Muon> 
+                                        > 
+                      > TreeGeneratorMuMuMuMu;
 
 #include "FWCore/Framework/interface/MakerMacros.h"
 
+DEFINE_FWK_MODULE(TreeGeneratorEEEE);
 DEFINE_FWK_MODULE(TreeGeneratorEEMuMu);
+DEFINE_FWK_MODULE(TreeGeneratorMuMuMuMu);
 
 

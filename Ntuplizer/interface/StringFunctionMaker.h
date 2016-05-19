@@ -13,6 +13,7 @@
 #include "CommonTools/Utils/interface/StringObjectFunction.h"
 
 
+
 namespace
 {
   template<typename T> T convertFromFloat(float x)
@@ -36,21 +37,25 @@ namespace
     }
 }
 
-class StringFunctionMaker
+
+namespace uwvv
 {
- public:
-  template<typename Return, class Obj, class... OtherArgs>
-    static std::function<Return(const edm::Ptr<Obj>, OtherArgs...)>
-    makeStringFunction(const std::string& fString)
+
+  class StringFunctionMaker
   {
-    StringObjectFunction<Obj> calculator(fString);
-    std::function<Return(const edm::Ptr<Obj>, OtherArgs...)> 
-      out([calculator](const edm::Ptr<Obj>& obj, OtherArgs... otherArgs)
-          {return ::convertFromFloat<Return>(calculator(*obj));});
-    return out;
-  }
-};
+   public:
+    template<typename Return, class Obj, class... OtherArgs>
+      static std::function<Return(const edm::Ptr<Obj>, OtherArgs...)>
+      makeStringFunction(const std::string& fString)
+    {
+      StringObjectFunction<Obj, true> calculator(fString);
+      std::function<Return(const edm::Ptr<Obj>, OtherArgs...)> 
+        out([calculator](const edm::Ptr<Obj>& obj, OtherArgs... otherArgs)
+            {return ::convertFromFloat<Return>(calculator(*obj));});
+      return out;
+    }
+  };
 
-
+}
 
 #endif // header guard

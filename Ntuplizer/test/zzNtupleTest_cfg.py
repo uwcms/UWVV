@@ -4,6 +4,8 @@ from UWVV.AnalysisTools.analysisFlowMaker import createFlow
 from UWVV.AnalysisTools.templates.ElectronBaseFlow import ElectronBaseFlow 
 from UWVV.AnalysisTools.templates.MuonBaseFlow import MuonBaseFlow
 from UWVV.AnalysisTools.templates.ZZFinalStateBaseFlow import ZZFinalStateBaseFlow
+from UWVV.Ntuplizer.makeBranchSet import makeBranchSet
+from UWVV.Ntuplizer.eventParams import makeEventParams
     
 
 process = cms.Process("TestNtuple")
@@ -38,11 +40,29 @@ FinalStateFlowClass = createFlow(ZZFinalStateBaseFlow)
 finalStateFlow = FinalStateFlowClass('finalStateFlow', process,
                                      **leptonFlow.outputs[-1])
 
-process.treeMaker = cms.EDAnalyzer(
+process.treeMakerEEEE = cms.EDAnalyzer(
+    'TreeGeneratorEEEE',
+    src = finalStateFlow.finalObjTag('zz4e'),
+    branches = makeBranchSet('eeee'),
+    eventParams = makeEventParams(finalStateFlow.finalTags()),
+    )
+process.treeMakerEEMuMu = cms.EDAnalyzer(
     'TreeGeneratorEEMuMu',
-    src = cms.InputTag(finalStateFlow.finalObjTag('zz2e2m')),
+    src = finalStateFlow.finalObjTag('zz2e2m'),
+    branches = makeBranchSet('eemm'),
+    eventParams = makeEventParams(finalStateFlow.finalTags()),
+    )
+process.treeMakerMuMuMuMu = cms.EDAnalyzer(
+    'TreeGeneratorMuMuMuMu',
+    src = finalStateFlow.finalObjTag('zz4m'),
+    branches = makeBranchSet('mmmm'),
+    eventParams = makeEventParams(finalStateFlow.finalTags()),
     )
 
-process.makeTree = cms.Path(process.treeMaker)
+process.makeTrees = cms.Path(
+    process.treeMakerEEEE
+    * process.treeMakerEEMuMu
+    * process.treeMakerMuMuMuMu
+    )
 
-process.schedule.append(process.makeTree)
+process.schedule.append(process.makeTrees)
