@@ -59,10 +59,16 @@ process.treeMakerMuMuMuMu = cms.EDAnalyzer(
     eventParams = makeEventParams(finalStateFlow.finalTags()),
     )
 
+process.metaTreeMaker = cms.EDAnalyzer(
+    'MetaTreeGenerator',
+    eventParams = makeEventParams(finalStateFlow.finalTags()),
+    )
+
 process.makeTrees = cms.Path(
     process.treeMakerEEEE
     * process.treeMakerEEMuMu
     * process.treeMakerMuMuMuMu
+    * process.metaTreeMaker
     )
 
 process.schedule.append(process.makeTrees)
