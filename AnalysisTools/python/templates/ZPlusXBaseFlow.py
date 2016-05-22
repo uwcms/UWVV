@@ -22,7 +22,7 @@ class ZPlusXBaseFlow(AnalysisFlowBase):
         '''
         zEEMod = cms.EDProducer(
             'PATCandViewShallowCloneCombiner',
-            decay = cms.string('{0}@+ {0}@-'.format(step.getObjTag('e'))),
+            decay = cms.string('{0}@+ {0}@-'.format(step.getObjTagString('e'))),
             roles = cms.vstring('e1', 'e2'),
             cut = cms.string('daughter("e1").masterClone.pt > 7 && '
                              'daughter("e2").masterClone.pt > 7 && '
@@ -34,7 +34,7 @@ class ZPlusXBaseFlow(AnalysisFlowBase):
 
         zMuMuMod = cms.EDProducer(
             'PATCandViewShallowCloneCombiner',
-            decay = cms.string('{0}@+ {0}@-'.format(step.getObjTag('m'))),
+            decay = cms.string('{0}@+ {0}@-'.format(step.getObjTagString('m'))),
             roles = cms.vstring('m1', 'm2'),
             cut = cms.string('daughter("m1").masterClone.pt > 5 && '
                              'daughter("m2").masterClone.pt > 5 && '

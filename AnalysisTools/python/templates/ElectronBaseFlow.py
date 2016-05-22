@@ -37,7 +37,7 @@ class ElectronBaseFlow(AnalysisFlowBase):
 
         embedIDs = cms.EDProducer(
             "PATElectronValueMapEmbedder",
-            src = cms.InputTag(step.getObjTag('e')),
+            src = step.getObjTag('e'),
             label = cms.string("MVAIDNonTrig"),
             valueSrc = cms.InputTag("electronMVAValueMapProducer:ElectronMVAEstimatorRun2Spring15NonTrig25nsV1Values"),
             )
@@ -48,7 +48,7 @@ class ElectronBaseFlow(AnalysisFlowBase):
     def addElectronEAEmbedding(self, step):
         mod = cms.EDProducer(
             'PATElectronEAEmbedder',
-            src = cms.InputTag(step.getObjTag('e')),
+            src = step.getObjTag('e'),
             label = cms.string('EffectiveArea'),
             configFile = cms.FileInPath('RecoEgamma/ElectronIdentification/data/Spring15/effAreaElectrons_cone03_pfNeuHadronsAndPhotons_25ns.txt'),
             )
@@ -58,7 +58,7 @@ class ElectronBaseFlow(AnalysisFlowBase):
     def addElectronRhoEmbedding(self, step):
         mod = cms.EDProducer(
             "PATElectronDoubleEmbedder",
-            src = cms.InputTag(step.getObjTag('e')),
+            src = step.getObjTag('e'),
             label = cms.string('rho_fastjet'),
             valueSrc = cms.InputTag("fixedGridRhoFastjetAll"),
             )

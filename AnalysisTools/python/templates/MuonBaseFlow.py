@@ -24,7 +24,7 @@ class MuonBaseFlow(AnalysisFlowBase):
         Add modules to resolve track ambiguities.
         '''
         mod = cms.EDProducer("PATMuonCleanerBySegments",
-                             src = cms.InputTag(step.getObjTag('m')),
+                             src = step.getObjTag('m'),
                              preselection = cms.string("track.isNonnull"),
                              passthrough = cms.string("isGlobalMuon && numberOfMatches >= 2"),
                              fractionOfSharedSegments = cms.double(0.499))

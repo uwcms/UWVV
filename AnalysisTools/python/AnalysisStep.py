@@ -28,6 +28,10 @@ class AnalysisStep(object):
         were run as-is. Basically, gives you the input tag for the next module
         that will use this collection.
         '''
+        return cms.InputTag(self.outputs[obj])
+
+
+    def getObjTagString(self, obj):
         return self.outputs[obj]
 
 
@@ -75,7 +79,7 @@ class AnalysisStep(object):
         '''
         mod = cms.EDFilter(
             'PAT{}RefSelector'.format(getObjName(obj, True)),
-            src = cms.InputTag(self.outputs[obj]),
+            src = self.getObjTag(obj),
             cut = cms.string(selection),
             filter = cms.bool(False),
             )
@@ -98,7 +102,7 @@ class AnalysisStep(object):
         overlapParams = cms.PSet()
         for obj2, params in otherObjects.iteritems():
             objParams = cms.PSet(
-                src=cms.InputTag(self.outputs[obj2]),
+                src=self.getObjTag(obj2),
                 algorithm=cms.string('byDeltaR'),
                 preselection=cms.string(params.get('selection','')),
                 deltaR=cms.double(params.get('deltaR',0.3)),
@@ -110,7 +114,7 @@ class AnalysisStep(object):
 
         mod = cms.EDProducer(
             "PAT{}Cleaner".format(getObjName(obj, True)),
-            src=cms.InputTag(self.outputs[obj]),
+            src=self.getObjTag(obj),
             preselection=cms.string(selection)
             )
 

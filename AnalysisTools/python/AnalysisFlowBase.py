@@ -104,10 +104,11 @@ class AnalysisFlowBase(object):
     def getProcess(self):
         return self.process
 
-
     def finalObjTag(self, obj):
         return cms.InputTag(self.outputs[-1][obj])
 
+    def finalObjTagString(self, obj):
+        return self.outputs[-1][obj]
     
     def finalTags(self):
         return self.outputs[-1]
