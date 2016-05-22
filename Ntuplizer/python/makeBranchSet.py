@@ -6,9 +6,11 @@ from UWVV.Ntuplizer.templates.zBranches import zBranches
 from UWVV.Ntuplizer.templates.objectBranches import objectBranches
 from UWVV.Ntuplizer.templates.electronBranches import electronBranches
 from UWVV.Ntuplizer.templates.muonBranches import muonBranches
+from UWVV.Ntuplizer.templates.crossDaughterBranches import makeCrossDaughterBranches
 
 from UWVV.Ntuplizer.helpers import pset2Dict, dict2PSet, \
-    recursiveMerge, combinePSets, mapObjects
+    recursiveMerge, combinePSets 
+from UWVV.AnalysisTools.helpers import mapObjects
 
 
 
@@ -69,6 +71,8 @@ def makeBranchSet(channel):
 
         assert channel[0] == channel[1], "Invalid channel {}".format(channel)
 
+        branches.append(makeCrossDaughterBranches(channel))
+
         daughterSets = [makeZBranchSet(channel[0], 1), makeLepBranchSet(channel[2])]
         daughterNames = [
             '_'.join(finalObjects[:2]+['']),
@@ -79,6 +83,8 @@ def makeBranchSet(channel):
         assert channel[0] == channel[1] and channel[2] == channel[3], \
             'Invalid channel {}'.format(channel)
 
+        branches.append(makeCrossDaughterBranches(channel))
+            
         daughterSets = [
             makeZBranchSet(channel[0], 1),
             makeZBranchSet(channel[2], int(finalObjects[3][1])/2),

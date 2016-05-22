@@ -12,6 +12,7 @@ class ZZFinalStateBaseFlow(ZPlusXBaseFlow):
 
         if stepName == 'embedding':
             self.addZZCreation(step)
+            self.addAlternatePairInfo(step)
 
         return step
 
@@ -56,3 +57,28 @@ class ZZFinalStateBaseFlow(ZPlusXBaseFlow):
         step.addModule("zz4MuCreation", zz4MuMod, 'zz4m')            
 
 
+    def addAlternatePairInfo(self, step):
+        '''
+        Add modules to embed alternate lepton pair (e.g. e1+m1) info.
+        '''
+        alternatePairInfo4E = cms.EDProducer(
+            'AlternateDaughterInfoEmbedder',
+            src = step.getObjTag('zz4e'),
+            names = cms.vstring('e{}'.format(i) for i in range(1,5)),
+            )
+
+        alternatePairInfo2E2Mu = cms.EDProducer(
+            'AlternateDaughterInfoEmbedder',
+            src = step.getObjTag('zz2e2m'),
+            names = cms.vstring('e1','e2','m1','m2'),
+            )
+
+        alternatePairInfo4Mu = cms.EDProducer(
+            'AlternateDaughterInfoEmbedder',
+            src = step.getObjTag('zz4m'),
+            names = cms.vstring('m{}'.format(i) for i in range(1,5)),
+            )
+
+        step.addModule("zz4EAlternatePairs", alternatePairInfo4E, 'zz4e')
+        step.addModule("zz2E2MuAlternatePairs", alternatePairInfo2E2Mu, 'zz2e2m')
+        step.addModule("zz4MuAlternatePairs", alternatePairInfo4Mu, 'zz4m')
