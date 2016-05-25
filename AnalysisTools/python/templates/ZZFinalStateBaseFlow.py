@@ -10,8 +10,10 @@ class ZZFinalStateBaseFlow(ZPlusXBaseFlow):
     def makeAnalysisStep(self, stepName, **inputs):
         step = super(ZZFinalStateBaseFlow, self).makeAnalysisStep(stepName, **inputs)
 
-        if stepName == 'embedding':
+        if stepName == 'finalStateCreation':
             self.addZZCreation(step)
+
+        if stepName == 'finalStateEmbedding':
             self.addAlternatePairInfo(step)
 
         return step

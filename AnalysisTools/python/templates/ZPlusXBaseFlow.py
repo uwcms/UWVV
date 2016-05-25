@@ -10,7 +10,7 @@ class ZPlusXBaseFlow(AnalysisFlowBase):
     def makeAnalysisStep(self, stepName, **inputs):
         step = super(ZPlusXBaseFlow, self).makeAnalysisStep(stepName, **inputs)
 
-        if stepName == 'preliminary':
+        if stepName == 'intermediateStateCreation':
             self.addZCreation(step)
 
         return step
@@ -24,10 +24,10 @@ class ZPlusXBaseFlow(AnalysisFlowBase):
             'PATCandViewShallowCloneCombiner',
             decay = cms.string('{0}@+ {0}@-'.format(step.getObjTagString('e'))),
             roles = cms.vstring('e1', 'e2'),
-            cut = cms.string('daughter("e1").masterClone.pt > 7 && '
-                             'daughter("e2").masterClone.pt > 7 && '
-                             'abs(daughter("e1").masterClone.eta) < 2.5 && '
-                             'abs(daughter("e2").masterClone.eta) < 2.5'),
+            cut = cms.string('daughter("e1").pt > 7 && '
+                             'daughter("e2").pt > 7 && '
+                             'abs(daughter("e1").eta) < 2.5 && '
+                             'abs(daughter("e2").eta) < 2.5'),
             checkCharge = cms.bool(True),
             setPdgId = cms.int32(23),
             )

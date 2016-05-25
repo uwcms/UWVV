@@ -68,7 +68,11 @@ class AnalysisFlowBase(object):
         '''
         self.inheritGuard('listSteps')
 
-        return ['preliminary', 'preselection', 'embedding', 'selection']
+        return ['preliminary', 'preselection', 'embedding', 'selection',
+                'intermediateStateCreation', 'intermediateStateEmbedding',
+                'intermediateStateSelection',
+                'finalStateCreation', 'finalStateEmbedding', 
+                'finalStateSelection']
 
 
     def makeAnalysisStep(self, step, **inputs):
