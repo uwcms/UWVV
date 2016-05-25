@@ -7,8 +7,8 @@ eventBranches = cms.PSet(
         pvZ = cms.string('pvZ'),
         pvRho = cms.string('pvRho'),
         nTruePU = cms.string('nTruePU'),
-        type1_pfMetEt = cms.string('type1_pfMetEt'),
-        type1_pfMetPhi = cms.string('type1_pfMetPhi'),
+        type1_pfMETEt = cms.string('type1_pfMETEt'),
+        type1_pfMETPhi = cms.string('type1_pfMETPhi'),
         genWeight = cms.string('genWeight'),
         ),
     bools = cms.PSet(
