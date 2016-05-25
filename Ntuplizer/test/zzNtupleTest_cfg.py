@@ -1,11 +1,12 @@
 import FWCore.ParameterSet.Config as cms
 
 from UWVV.AnalysisTools.analysisFlowMaker import createFlow
-from UWVV.AnalysisTools.templates.ElectronBaseFlow import ElectronBaseFlow 
-from UWVV.AnalysisTools.templates.MuonBaseFlow import MuonBaseFlow
+from UWVV.AnalysisTools.templates.ZZFlow import ZZFlow
+from UWVV.AnalysisTools.templates.VertexCleaning import VertexCleaning
 from UWVV.AnalysisTools.templates.ZZFinalStateBaseFlow import ZZFinalStateBaseFlow
 from UWVV.Ntuplizer.makeBranchSet import makeBranchSet
 from UWVV.Ntuplizer.eventParams import makeEventParams
+from UWVV.Ntuplizer.templates.triggerBranches import triggerBranches
     
 
 process = cms.Process("TestNtuple")
@@ -31,37 +32,36 @@ process.TFileService = cms.Service(
     fileName = cms.string("testNtuple.root"),
     )
 
-process.maxEvents = cms.untracked.PSet(input=cms.untracked.int32(1000))
+process.maxEvents = cms.untracked.PSet(input=cms.untracked.int32(10000))
 
-LeptonFlowClass = createFlow(ElectronBaseFlow, MuonBaseFlow)
-leptonFlow = LeptonFlowClass('leptonFlow', process)
-
-FinalStateFlowClass = createFlow(ZZFinalStateBaseFlow)
-finalStateFlow = FinalStateFlowClass('finalStateFlow', process,
-                                     **leptonFlow.outputs[-1])
+ZZFlowClass = createFlow(VertexCleaning, ZZFinalStateBaseFlow, ZZFlow)
+zzFlow = ZZFlowClass('zzFlow', process)
 
 process.treeMakerEEEE = cms.EDAnalyzer(
     'TreeGeneratorEEEE',
-    src = finalStateFlow.finalObjTag('zz4e'),
+    src = zzFlow.finalObjTag('zz4e'),
     branches = makeBranchSet('eeee'),
-    eventParams = makeEventParams(finalStateFlow.finalTags()),
+    eventParams = makeEventParams(zzFlow.finalTags()),
+    triggers = triggerBranches,
     )
 process.treeMakerEEMuMu = cms.EDAnalyzer(
     'TreeGeneratorEEMuMu',
-    src = finalStateFlow.finalObjTag('zz2e2m'),
+    src = zzFlow.finalObjTag('zz2e2m'),
     branches = makeBranchSet('eemm'),
-    eventParams = makeEventParams(finalStateFlow.finalTags()),
+    eventParams = makeEventParams(zzFlow.finalTags()),
+    triggers = triggerBranches,
     )
 process.treeMakerMuMuMuMu = cms.EDAnalyzer(
     'TreeGeneratorMuMuMuMu',
-    src = finalStateFlow.finalObjTag('zz4m'),
+    src = zzFlow.finalObjTag('zz4m'),
     branches = makeBranchSet('mmmm'),
-    eventParams = makeEventParams(finalStateFlow.finalTags()),
+    eventParams = makeEventParams(zzFlow.finalTags()),
+    triggers = triggerBranches,
     )
 
 process.metaTreeMaker = cms.EDAnalyzer(
     'MetaTreeGenerator',
-    eventParams = makeEventParams(finalStateFlow.finalTags()),
+    eventParams = makeEventParams(zzFlow.finalTags()),
     )
 
 process.makeTrees = cms.Path(

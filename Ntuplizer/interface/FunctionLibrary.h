@@ -60,11 +60,11 @@ namespace
                                         evt.puInfo()->at(1).getTrueNumInteractions() :
                                         -1.);});
 
-        addTo["type1_pfMetEt"] = 
+        addTo["type1_pfMETEt"] = 
           std::function<FType>([](const edm::Ptr<T>& obj, uwvv::EventInfo& evt)
                                {return evt.met().pt();});
 
-        addTo["type1_pfMetPhi"] = 
+        addTo["type1_pfMETPhi"] = 
           std::function<FType>([](const edm::Ptr<T>& obj, uwvv::EventInfo& evt)
                                {return evt.met().phi();});
 
@@ -72,6 +72,40 @@ namespace
           std::function<FType>([](const edm::Ptr<T>& obj, uwvv::EventInfo& evt)
                                {
                                  return (evt.genEventInfo().isValid() ? evt.genEventInfo()->weight() : 0.);
+                               });
+
+        addTo["ptFSR"] = 
+          std::function<FType>([](const edm::Ptr<T>& obj, uwvv::EventInfo& evt)
+                               {
+                                 if(obj->hasUserCand("fsr"))
+                                   return (obj->userCand("fsr")->p4() + obj->p4()).pt();
+                                 return obj->pt();
+                               });
+
+        addTo["etaFSR"] = 
+          std::function<FType>([](const edm::Ptr<T>& obj, uwvv::EventInfo& evt)
+                               {
+                                 if(obj->hasUserCand("fsr"))
+                                   return (obj->userCand("fsr")->p4() + obj->p4()).eta();
+                                 return obj->eta();
+                               });
+
+        addTo["phiFSR"] = 
+          std::function<FType>([](const edm::Ptr<T>& obj, uwvv::EventInfo& evt)
+                               {
+                                 if(obj->hasUserCand("fsr"))
+                                   return (obj->userCand("fsr")->p4() + obj->p4()).phi();
+                                 return obj->phi();
+                               });
+
+        addTo["mtToMET"] = 
+          std::function<FType>([](const edm::Ptr<T>& obj, uwvv::EventInfo& evt)
+                               {
+                                 float totalEt = obj->et() + evt.met().et();
+                                 float totalPt = obj->pt() + evt.met().pt();
+                                 float mtSqr = totalEt * totalEt - totalPt * totalPt;
+
+                                 return std::sqrt(std::abs(mtSqr));
                                });
       }
     };
@@ -301,6 +335,75 @@ namespace
                                  return reco::deltaR(obj->daughter(0)->p4(),
                                                      obj->daughter(1)->p4());
                                });
+
+        addTo["massFSR"] = 
+          std::function<FType>([](const edm::Ptr<T>& obj, uwvv::EventInfo& evt)
+                               {
+                                 if(obj->hasUserInt("nfsrCands"))
+                                   {
+                                     size_t nCands = (size_t)obj->userInt("nfsrCands");
+                                     if(nCands)
+                                       {
+                                         auto p4 = obj->p4();
+                                         for(size_t i = 0; i < nCands; ++i)
+                                           p4 += obj->userCand("fsr"+std::to_string(i))->p4();
+                                         return p4.mass();
+                                       }
+                                   }
+                                 return obj->mass();
+                               });
+
+        addTo["ptFSR"] = 
+          std::function<FType>([](const edm::Ptr<T>& obj, uwvv::EventInfo& evt)
+                               {
+                                 if(obj->hasUserInt("nfsrCands"))
+                                   {
+                                     size_t nCands = (size_t)obj->userInt("nfsrCands");
+                                     if(nCands)
+                                       {
+                                         auto p4 = obj->p4();
+                                         for(size_t i = 0; i < nCands; ++i)
+                                           p4 += obj->userCand("fsr"+std::to_string(i))->p4();
+                                         return p4.pt();
+                                       }
+                                   }
+                                 return obj->pt();
+                               });
+
+        addTo["etaFSR"] = 
+          std::function<FType>([](const edm::Ptr<T>& obj, uwvv::EventInfo& evt)
+                               {
+                                 if(obj->hasUserInt("nfsrCands"))
+                                   {
+                                     size_t nCands = (size_t)obj->userInt("nfsrCands");
+                                     if(nCands)
+                                       {
+                                         auto p4 = obj->p4();
+                                         for(size_t i = 0; i < nCands; ++i)
+                                           p4 += obj->userCand("fsr"+std::to_string(i))->p4();
+                                         return p4.eta();
+                                       }
+                                   }
+                                 return obj->eta();
+                               });
+
+        addTo["phiFSR"] = 
+          std::function<FType>([](const edm::Ptr<T>& obj, uwvv::EventInfo& evt)
+                               {
+                                 if(obj->hasUserInt("nfsrCands"))
+                                   {
+                                     size_t nCands = (size_t)obj->userInt("nfsrCands");
+                                     if(nCands)
+                                       {
+                                         auto p4 = obj->p4();
+                                         for(size_t i = 0; i < nCands; ++i)
+                                           p4 += obj->userCand("fsr"+std::to_string(i))->p4();
+                                         return p4.phi();
+                                       }
+                                   }
+                                 return obj->phi();
+                               });
+
       }
     };
   
@@ -351,6 +454,10 @@ namespace uwvv
           return functions.at(f);
         return StringFunctionMaker::makeStringFunction<B, T, uwvv::EventInfo&>(f);
       }
+
+    // for testing purposes
+    // const std::unordered_map<std::string, std::function<FType> >&
+    //   getAllFunctions() const {return functions;}
   
    private:
     std::unordered_map<std::string, 
@@ -363,177 +470,3 @@ namespace uwvv
 
 #endif // header guard
 
-
-// template<class T>
-// class FunctionLibrary
-// {
-//  public:
-//   FunctionLibrary()
-//     {
-//       setupGeneralFunctions();
-//       setupSpecificFunctions();
-//     }
-//   ~FunctionLibrary() {;}
-// 
-//   std::function<float(const edm::Ptr<T>&, EventInfo&)>
-//   getFunctionFloat(const std::string& f)
-//     {
-//       if(functionsFloat.find(f) != std::unordered_map::end)
-//         return functionsFloat.at(f);
-//       return StringFunctionMaker::makeStringFunction<float, T>(f);
-//     }
-//   std::function<bool(const edm::Ptr<T>&, EventInfo&)>
-//   getFunctionBool(const std::string& f)
-//     {
-//       if(functionsBool.find(f) != std::unordered_map::end)
-//         return functionsBool.at(f);
-//       return StringFunctionMaker::makeStringFunction<bool, T>(f);
-//     }
-//   std::function<int(const edm::Ptr<T>&, EventInfo&)>
-//   getFunctionInt(const std::string& f)
-//     {
-//       if(functionsInt.find(f) != std::unordered_map::end)
-//         return functionsInt.at(f);
-//       return StringFunctionMaker::makeStringFunction<int, T>(f);
-//     }
-//   std::function<unsigned(const edm::Ptr<T>&, EventInfo&)>
-//   getFunctionUInt(const std::string& f)
-//     {
-//       if(functionsUInt.find(f) != std::unordered_map::end)
-//         return functionsUInt.at(f);
-//       return StringFunctionMaker::makeStringFunction<unsigned, T>(f);
-//     }
-//   std::function<unsigned long long(const edm::Ptr<T>&, EventInfo&)>
-//   getFunctionULL(const std::string& f)
-//     {
-//       if(functionsULL.find(f) != std::unordered_map::end)
-//         return functionsULL.at(f);
-//       return StringFunctionMaker::makeStringFunction<unsigned long long, T>(f);
-//     }
-// 
-//  private:
-//   void setupGeneralFunctions();
-//   void setupSpecificFunctions();
-// 
-//   template<typename Ret>
-//   std::function<Ret(const edm::Ptr<T>&, EventInfo&)>
-//   makeFunction(Ret(const edm::Ptr<T>&,EventInfo&) f)
-//     {
-//       return std::function<Ret(const edm::Ptr<T>&,EventInfo&)>(f);
-//     }
-// 
-//   std::unordered_map<std::string, 
-//     std::function<float(const edm::Ptr<T>&, EventInfo&)> > functionsFloat;
-//   std::unordered_map<std::string, 
-//     std::function<bool(const edm::Ptr<T>&, EventInfo&)> > functionsBool;
-//   std::unordered_map<std::string, 
-//     std::function<int(const edm::Ptr<T>&, EventInfo&)> > functionsInt;
-//   std::unordered_map<std::string, 
-//     std::function<unsigned(const edm::Ptr<T>&, EventInfo&)> > functionsUInt;
-//   std::unordered_map<std::string, 
-//     std::function<unsigned long long(const edm::Ptr<T>&, EventInfo&)> > functionsULL;
-// };
-// 
-// 
-// template<class T> void
-// FunctionLibrary<T>::setupGeneralFunctions()
-// {
-//   functionsInt["Charge"] = 
-//     makeFunction<int> ([](const edm::Ptr<T>& obj, EventInfo& evt) {return obj->charge();});
-// 
-//   functionsInt["PdgId"] = 
-//     makeFunction<int> ([](const edm::Ptr<T>& obj, EventInfo& evt) {return obj->PdgId();});  
-// 
-//   functionsULL["evt"] = 
-//     makeFunction<unsigned long long>([](const edm::Ptr<T>& obj, EventInfo& evt)
-//                                      {return evt.id().event();});
-//   functionsUInt["lumi"] = 
-//     makeFunction<unsigned>([](const edm::Ptr<T>& obj, EventInfo& evt)
-//                            {return evt.id().luminosityBlock();});
-//   functionsUInt["run"] = 
-//     makeFunction<unsigned>([](const edm::Ptr<T>& obj, EventInfo& evt)
-//                            {return evt.id().run();});
-// 
-//   functionsUInt["nvtx"] = 
-//     makeFunction<unsigned>([](const edm::Ptr<T>& obj, EventInfo& evt)
-//                            {return evt.nVertices();});
-// 
-//   functionsUInt["nTruePU"] = 
-//     makeFunction<unsigned>([](const edm::Ptr<T>& obj, EventInfo& evt)
-//                            {return (evt.puInfo().isValid() && evt.puInfo()->size() > 0 ?
-//                                     evt.puInfo()->at(1).getTrueNumInteractions() :
-//                                     -1);});
-// }
-// 
-// 
-// template<class T> void
-// FunctionLibrary<T>::setupSpecificFunctions()
-// {;}
-// 
-// 
-// template<> void
-// FunctionLibrary<pat::Electron>::setupSpecificFunctions()
-// {
-//   functionsUInt["MissingHits"] = 
-//     makeFunction<unsigned>([](const edm::Ptr<T>& obj, EventInfo& evt)
-//                            {
-//                              return obj->gsfTrack()->hitPattern().numberOfHits(reco::HitPattern::MISSING_INNER_HITS);
-//                            });
-// 
-//   functionsFloat["SIP3D"] = 
-//     makeFunction<float>([](const edm::Ptr<T>& obj, EventInfo& evt)
-//                            {
-//                              return fabs(obj->dB(pat::Electron::PV3D)) / obj->edB(pat::Electron::PV3D);
-//                            });
-// 
-//   functionsFloat["PVDZ"] = 
-//     makeFunction<float>([](const edm::Ptr<T>& obj, EventInfo& evt)
-//                            {
-//                              return obj->gsfTrack()->dz(evt.pv()->position());
-//                            });
-// 
-//   functionsFloat["PVDXY"] = 
-//     makeFunction<float>([](const edm::Ptr<T>& obj, EventInfo& evt)
-//                            {
-//                              return obj->gsfTrack()->dxy(evt.pv()->position());
-//                            });
-//   
-// }
-// 
-// 
-// template<> void
-// FunctionLibrary<pat::Muon>::setupSpecificFunctions()
-// {
-//   functionsBool["isPFMuon"] = 
-//     makeFunction<bool>([](const edm::Ptr<T>& obj, EventInfo& evt){return obj->isPFMuon()};);
-// 
-//   functionsBool["isGlobal"] = 
-//     makeFunction<bool>([](const edm::Ptr<T>& obj, EventInfo& evt){return obj->isGlobalMuon()};);
-// 
-//   functionsBool["isTracker"] = 
-//     makeFunction<bool>([](const edm::Ptr<T>& obj, EventInfo& evt){return obj->isTrackerMuon()};);
-// 
-//   functionsUInt["BestTrackType"] = 
-//     makeFunction<unsigned>([](const edm::Ptr<T>& obj, EventInfo& evt){return obj->muonBestTrackType()};);
-// 
-//   functionsUInt["MatchedStations"] = 
-//     makeFunction<unsigned>([](const edm::Ptr<T>& obj, EventInfo& evt){return obj->numberOfMatchedStations()};);
-// 
-//   functionsFloat["SIP3D"] = 
-//     makeFunction<float>([](const edm::Ptr<T>& obj, EventInfo& evt)
-//                            {
-//                              return fabs(obj->dB(pat::Muon::PV3D)) / obj->edB(pat::Muon::PV3D);
-//                            });
-// 
-//   functionsFloat["PVDZ"] = 
-//     makeFunction<float>([](const edm::Ptr<T>& obj, EventInfo& evt)
-//                            {
-//                              return obj->muonBestTrack()->dz(evt.pv()->position());
-//                            });
-// 
-//   functionsFloat["PVDXY"] = 
-//     makeFunction<float>([](const edm::Ptr<T>& obj, EventInfo& evt)
-//                            {
-//                              return obj->muonBestTrack()->dxy(evt.pv()->position());
-//                            });
-  

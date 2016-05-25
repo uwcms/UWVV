@@ -4,6 +4,7 @@ from UWVV.Ntuplizer.templates.eventBranches import eventBranches
 from UWVV.Ntuplizer.templates.fsBranches import fsBranches
 from UWVV.Ntuplizer.templates.zBranches import zBranches
 from UWVV.Ntuplizer.templates.objectBranches import objectBranches
+from UWVV.Ntuplizer.templates.leptonBranches import leptonBranches
 from UWVV.Ntuplizer.templates.electronBranches import electronBranches
 from UWVV.Ntuplizer.templates.muonBranches import muonBranches
 from UWVV.Ntuplizer.templates.crossDaughterBranches import makeCrossDaughterBranches
@@ -84,6 +85,9 @@ def makeBranchSet(channel):
             'Invalid channel {}'.format(channel)
 
         branches.append(makeCrossDaughterBranches(channel))
+
+        # include FSR when ordering Zs
+        branches.append(cms.PSet(fsrLabel=cms.string("fsr")))
             
         daughterSets = [
             makeZBranchSet(channel[0], 1),
