@@ -2,6 +2,7 @@
 
 
 import FWCore.ParameterSet.Config as cms
+from FWCore.ParameterSet.SequenceTypes import _ModuleSequenceType
 
 from UWVV.AnalysisTools.helpers import getObjTypes, getObjName
 
@@ -39,6 +40,8 @@ class AnalysisStep(object):
         '''
         Add a module, give it this name, and update the tags of the collections
         listed in objectsOutput.
+        If the module is a sequence, the name of the last module is assumed to 
+        be the desired tag.
         If the module puts a suffix on the collection names (e.g. a module that
         outputs both someMod:muons and someMod:electrons), the suffixes for the 
         appropriate objects can be indicated with the keyword arguments,
@@ -46,8 +49,14 @@ class AnalysisStep(object):
         '''
         assert name not in self.modules, "Module {} already exists.".format(name)
         self.modules[name] = module
+
+        if isinstance(module, _ModuleSequenceType):
+            newTag = module._seq._collection[-1].__str__()
+        else:
+            newTag = name
+
         for obj in objectsOutput:
-            self.outputs[obj] = name
+            self.outputs[obj] = newTag
         for obj, suffix in tagSuffixes.iteritems():
             self.outputs[obj] = ':'.join([self.outputs[obj], suffix])
 
