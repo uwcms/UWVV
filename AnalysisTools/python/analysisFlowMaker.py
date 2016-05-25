@@ -5,10 +5,15 @@ def createFlow(*bases):
     '''
     Given a list of classes inheriting from AnalysisFlowBase, construct a class
     that inherits from all of them, and does all their things.
+    Arguments should be given in the order you want their modules to happen
+    within each step (but of course the steps are there to make that unlikely
+    to matter...)
     '''
     if not bases:
         return AnalysisFlowBase
     
+    # fail with a verbose message if any argument isn't an AnalysisFlow
+    # (or a not-so-verbose error message if one isn't even a class)
     try:
         basesOk = all(issubclass(b, AnalysisFlowBase) for b in bases)
     except TypeError:
@@ -27,6 +32,7 @@ def createFlow(*bases):
 
     newClassName = '_'.join(b.__name__ for b in bases)
 
-    C = type(newClassName, bases, {})
+    # reverse argument list for proper inheritance tree traversal
+    C = type(newClassName, tuple(reversed(bases)), {})
 
     return C
