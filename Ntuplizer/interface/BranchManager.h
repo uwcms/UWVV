@@ -78,12 +78,21 @@ namespace uwvv
     void fill(const edm::Ptr<pat::CompositeCandidate> & obj, EventInfo& evt);
   
    private:
+    const std::string& extractDaughterName(const size_t i, 
+                                           const std::vector<std::string>& names) const;
+
+    bool daughtersNeedReorder(const edm::Ptr<pat::CompositeCandidate>& cand) const;
+    
     std::unique_ptr<BranchManager<T1> > daughterBranches1;
     std::unique_ptr<BranchManager<T2> > daughterBranches2;
+
+    const std::string daughterName1;
+    const std::string daughterName2;
+    const std::string fsrLabel;
   };
+
   
-  
-  
+    
   template<class T>
   BranchManager<T>::BranchManager(const std::string& name, TTree* const tree,
                                   const edm::ParameterSet& config) :
@@ -177,23 +186,48 @@ namespace uwvv
   BranchManager<CompositeDaughter<T1, T2> >::BranchManager(const std::string& name, 
                                                            TTree* const tree,
                                                            const edm::ParameterSet& config) :
-    BranchManager<pat::CompositeCandidate>(name, tree, config)
+    BranchManager<pat::CompositeCandidate>(name, tree, config),
+    daughterName1(extractDaughterName(0,
+                                      config.getParameter<std::vector<std::string> >("daughterNames"))),
+    daughterName2(extractDaughterName(1,
+                                      config.getParameter<std::vector<std::string> >("daughterNames"))),
+    fsrLabel(config.exists("fsrLabel") ? 
+             config.getParameter<std::string>("fsrLabel") :
+             "")
   {
     std::vector<edm::ParameterSet> daughterParams = 
       config.getParameter<std::vector<edm::ParameterSet> >("daughterParams");
     
-    std::vector<std::string> daughterNames = 
-      config.getParameter<std::vector<std::string> >("daughterNames");
-  
+    if(daughterParams.size() < 2)
+      throw cms::Exception("InvalidParams")
+        << "You must provide two sets of daughter parameters for a composite "
+        << "candidate with two daughters." << std::endl;
+
     daughterBranches1 = 
-      std::unique_ptr<BranchManager<T1> >(new BranchManager<T1>(daughterNames.at(0), 
+      std::unique_ptr<BranchManager<T1> >(new BranchManager<T1>(daughterName1,
                                                                 tree, 
                                                                 daughterParams.at(0)));
     daughterBranches2 = 
-      std::unique_ptr<BranchManager<T2> >(new BranchManager<T2>(daughterNames.at(1), 
+      std::unique_ptr<BranchManager<T2> >(new BranchManager<T2>(daughterName2,
                                                                 tree,
                                                                 daughterParams.at(1)));
   }
+    
+
+  template<>
+  template<class T1, class T2>
+  const std::string&
+  BranchManager<CompositeDaughter<T1,T2> >::extractDaughterName(const size_t i,
+                                                                const std::vector<std::string>& names) const
+    {
+      if(names.size() < i+1)
+        throw cms::Exception("InvalidNames")
+          << "You must provide at least " << i+1
+          << " names for a composite candidate with "
+          << i+1 << " daughters." << std::endl;
+
+      return names.at(i);      
+    }
   
   
   template<>
@@ -219,9 +253,86 @@ namespace uwvv
   
     BranchManager<pat::CompositeCandidate>::fill(obj, evt);
   
-    daughterBranches1->fill(obj->daughter(0), evt);
-    daughterBranches2->fill(obj->daughter(1), evt);
+    size_t iDau1 = 0;
+    size_t iDau2 = 1;
+
+    if(daughtersNeedReorder(obj))
+      {
+        iDau1 = 1;
+        iDau2 = 0;
+      }
+
+    daughterBranches1->fill(obj->daughter(iDau1), evt);
+    daughterBranches2->fill(obj->daughter(iDau2), evt);
   }
+
+  
+  // Just need this function here
+  namespace
+    {
+      template<class T>
+        bool zsNeedReorder(const edm::Ptr<pat::CompositeCandidate>& cand, const std::string& fsrLabel)
+      {
+        math::XYZTLorentzVector p4a = cand->daughter(0)->p4();
+        math::XYZTLorentzVector p4b = cand->daughter(1)->p4();
+          
+        if(!fsrLabel.empty())
+          {
+            const T* z1l1 = static_cast<const T*>(cand->daughter(0)->daughter(0)->masterClone().get());
+            if(z1l1->hasUserCand(fsrLabel))
+              p4a += z1l1->userCand(fsrLabel)->p4();
+            
+            const T* z1l2 = static_cast<const T*>(cand->daughter(0)->daughter(1)->masterClone().get());
+            if(z1l2->hasUserCand(fsrLabel))
+              p4a += z1l2->userCand(fsrLabel)->p4();
+            
+            const T* z2l1 = static_cast<const T*>(cand->daughter(1)->daughter(0)->masterClone().get());
+            if(z2l1->hasUserCand(fsrLabel))
+              p4b += z2l1->userCand(fsrLabel)->p4();
+            
+            const T* z2l2 = static_cast<const T*>(cand->daughter(1)->daughter(1)->masterClone().get());
+            if(z2l2->hasUserCand(fsrLabel))
+              p4b += z2l2->userCand(fsrLabel)->p4();
+          }
+        
+        return std::abs(p4b.mass() - 91.1876) < std::abs(p4a.mass() - 91.1876);
+      }
+    }
+
+  
+  // Most things don't need to be reordered
+  template<>
+  template<class T1, class T2> bool
+    BranchManager<CompositeDaughter<T1,T2> >::daughtersNeedReorder(const edm::Ptr<pat::CompositeCandidate>& cand) const
+    {
+      return false;
+    }
+
+  // within a Z, leptons should be ordered in pt
+  template<> bool
+    BranchManager<CompositeDaughter<pat::Electron, pat::Electron> >::daughtersNeedReorder(const edm::Ptr<pat::CompositeCandidate>& cand) const
+    {
+      return cand->daughter(1)->pt() > cand->daughter(0)->pt();
+    }
+  template<> bool
+    BranchManager<CompositeDaughter<pat::Muon, pat::Muon> >::daughtersNeedReorder(const edm::Ptr<pat::CompositeCandidate>& cand) const
+    {
+      return cand->daughter(1)->pt() > cand->daughter(0)->pt();
+    }
+
+  // 4e and 4mu candidates should be ordered by Z compatibility
+  template<> bool
+    BranchManager<CompositeDaughter<CompositeDaughter<pat::Electron, pat::Electron>, 
+    CompositeDaughter<pat::Electron, pat::Electron> > >::daughtersNeedReorder(const edm::Ptr<pat::CompositeCandidate>& cand) const
+    {
+      return zsNeedReorder<pat::Electron>(cand, fsrLabel);
+    }
+  template<> bool
+    BranchManager<CompositeDaughter<CompositeDaughter<pat::Muon, pat::Muon>, 
+    CompositeDaughter<pat::Muon, pat::Muon> > >::daughtersNeedReorder(const edm::Ptr<pat::CompositeCandidate>& cand) const
+    {
+      return zsNeedReorder<pat::Muon>(cand, fsrLabel);
+    }
 
 } // namespace
 
