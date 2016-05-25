@@ -28,13 +28,13 @@
 // UWVV
 #include "UWVV/Ntuplizer/interface/BranchManager.h"
 #include "UWVV/Ntuplizer/interface/EventInfo.h"
+#include "UWVV/Ntuplizer/interface/TriggerBranches.h"
 
 
 using namespace uwvv;
 
 template<class... Ts> 
-class TreeGenerator : public edm::one::EDAnalyzer<edm::one::SharedResources>//, 
-                      //edm::one::WatchLuminosityBlocks>
+class TreeGenerator : public edm::one::EDAnalyzer<edm::one::SharedResources>
 {
  public:
   explicit TreeGenerator(const edm::ParameterSet&);
@@ -51,6 +51,7 @@ class TreeGenerator : public edm::one::EDAnalyzer<edm::one::SharedResources>//,
   EventInfo evtInfo;
 
   std::unique_ptr<BranchManager<Ts...> > branches;
+  std::unique_ptr<TriggerBranches> triggerBranches;
 };
 
 
@@ -65,6 +66,10 @@ TreeGenerator<FSParticles...>::TreeGenerator(const edm::ParameterSet& config) :
   const edm::ParameterSet& branchParams = config.getParameter<edm::ParameterSet>("branches");
   branches = 
     std::unique_ptr<BranchManager<FSParticles...> >(new BranchManager<FSParticles...>("", tree, branchParams));
+
+  const edm::ParameterSet& triggers = config.getParameter<edm::ParameterSet>("triggers");  
+  triggerBranches = std::unique_ptr<TriggerBranches>(new TriggerBranches(consumesCollector(),
+                                                                         triggers, tree));
 }
 
 
@@ -85,10 +90,12 @@ TreeGenerator<FSParticles...>::analyze(const edm::Event &event,
   event.getByToken(candToken, cands);
 
   evtInfo.setEvent(event);
+  triggerBranches->setEvent(event);
 
   for(size_t i = 0; i < cands->size(); ++i)
     {
       branches->fill(cands->ptrAt(i), evtInfo);
+      triggerBranches->fill();
 
       tree->Fill();
     }
