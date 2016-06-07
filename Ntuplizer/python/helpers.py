@@ -56,5 +56,36 @@ def combinePSets(ps, *more):
 
     return dict2PSet(params)
 
+def parseChannels(channels):
+    '''
+    Take a string or list of strings and return a list of channels.
+    '''
+    if type(channels) == str:
+        channels = channels.lower()
+        if channels in ['4l', 'zz']:
+            return ['eeee', 'eemm', 'mmmm']
+        elif channels in ['3l', 'zl', 'z+l']:
+            return ['eee', 'eem', 'emm', 'mmm']
+        elif channels in ['z', '2l', 'll']:
+            return ['ee', 'mm']
+        else:
+            chanList = channels.split(',')
+            assert all(all(letter in ['e','m','t','g','j'] for letter in ch) and len(ch) <= 4 for ch in chanList),\
+                'Invalid channel ' + channels
+            return chanList
+    else:
+        assert hasattr(channels, '__iter__'), 'Channels must be a list or a string'
+        out = []
+        for ch in channels:
+            out += parseChannels(ch)
+        return out
 
-
+_expandedObjNames = {
+    'e' : 'E',
+    'm' : 'Mu',
+    't' : 'Tau',
+    'g' : 'Pho',
+    'j' : 'Jet',
+    }
+def expandChannelName(channel):
+    return ''.join([_expandedObjNames[ob] for ob in channel.lower()])

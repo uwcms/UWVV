@@ -24,6 +24,8 @@
 #include "FWCore/Framework/interface/MakerMacros.h"
 #include "FWCore/ParameterSet/interface/ParameterSet.h"
 #include "DataFormats/PatCandidates/interface/CompositeCandidate.h"
+#include "DataFormats/PatCandidates/interface/Electron.h"
+#include "DataFormats/PatCandidates/interface/Muon.h"
 #include "DataFormats/Common/interface/View.h"
 #include "DataFormats/Math/interface/deltaR.h"
 
@@ -50,6 +52,17 @@ private:
   const std::vector<std::string> names;
   const std::vector<std::string> pairNames;
   const size_t nDaughters;
+  
+  const std::string fsrLabel;
+
+  // have to do some stupid crap to cast to the right pat object type to get
+  // user cands
+  template<class T>
+  const edm::Ptr<reco::Candidate>
+  getFSRCand(const edm::Ptr<T>& obj) const;
+
+  typedef const edm::Ptr<reco::Candidate> (FType) (const reco::Candidate* const);
+  std::vector<std::function<FType> > fsrGetters;
 };
 
 
@@ -57,13 +70,44 @@ AlternateDaughterInfoEmbedder::AlternateDaughterInfoEmbedder(const edm::Paramete
   srcToken(consumes<edm::View<CCand> >(iConfig.getParameter<edm::InputTag>("src"))),
   names(iConfig.getParameter<std::vector<std::string> >("names")),
   pairNames(makePairNames(names)),
-  nDaughters(names.size())
+  nDaughters(names.size()),
+  fsrLabel(iConfig.exists("fsrLabel") ? 
+           iConfig.getParameter<std::string>("fsrLabel") :
+           "")
 {
   if(nDaughters < 3)
     throw cms::Exception("InvalidChannel") << "AlternateDaughterEmbedder "
                                            << "can't do anything with fewer "
                                            << "than 3 particles in the final "
                                            << "state!";
+
+  for(auto& name : names)
+    {
+      if(fsrLabel.empty())
+        fsrGetters.push_back(std::function<FType>([](const reco::Candidate* const obj){return edm::Ptr<reco::Candidate>(NULL, 0);}));
+      else if(name.find('e') != std::string::npos)
+        {
+          fsrGetters.push_back(std::function<FType>([this](const reco::Candidate* const obj)
+            {
+              edm::Ptr<pat::Electron> e = obj->masterClone().castTo<edm::Ptr<pat::Electron> >();
+              return getFSRCand(e);
+            }));
+        }
+      else
+        {
+          // this better be a muon...
+          if(name.find('m') == std::string::npos)
+            throw cms::Exception("BadInput")
+              << "Alternate DaughterInfoEmbedder currently only supports e and mu"
+              << std::endl;
+
+          fsrGetters.push_back(std::function<FType>([this](const reco::Candidate* const obj)
+            {
+              edm::Ptr<pat::Muon> m = obj->masterClone().castTo<edm::Ptr<pat::Muon> >();
+              return getFSRCand(m);
+            }));
+        }
+    }
 
   produces<std::vector<CCand> >();
 }
@@ -100,13 +144,28 @@ void AlternateDaughterInfoEmbedder::produce(edm::Event& iEvent,
       size_t iName = 0;
       for(size_t d1 = 0; d1 < nDaughters - 1; ++d1)
         {
+          edm::Ptr<reco::Candidate> d1FSR = fsrGetters.at(d1)(daughters.at(d1));
           for(size_t d2 = d1 + 1; d2 < nDaughters; ++d2)
             {
+              edm::Ptr<reco::Candidate> d2FSR = fsrGetters.at(d2)(daughters.at(d2));
+
               const std::string& name = pairNames.at(iName);
               iName++;
 
+              auto p4 = daughters.at(d1)->p4() + daughters.at(d2)->p4();
+              out->back().addUserFloat(name+"Mass", p4.M());
+              
+              if(!fsrLabel.empty())
+                {
+                  if(d1FSR.isNonnull())
+                    p4 += d1FSR->p4();
+                  if(d2FSR.isNonnull())
+                    p4 += d2FSR->p4();
+
+                  out->back().addUserFloat(name+"MassFSR", p4.M());
+                }
+
               out->back().addUserFloat(name+"DR",  deltaR(daughters.at(d1)->p4(), daughters.at(d2)->p4()));
-              out->back().addUserFloat(name+"Mass",  (daughters.at(d1)->p4()+daughters.at(d2)->p4()).M());
               out->back().addUserFloat(name+"SS",  (daughters.at(d1)->charge() == daughters.at(d2)->charge() ? 1. : 0.));
             }
         }
@@ -136,6 +195,16 @@ AlternateDaughterInfoEmbedder::makePairNames(const std::vector<std::string>& dau
     }
 
   return out;
+}
+
+
+template<class T>
+const edm::Ptr<reco::Candidate>
+AlternateDaughterInfoEmbedder::getFSRCand(const edm::Ptr<T>& obj) const
+{
+  if(obj->hasUserCand(fsrLabel))
+    return obj->userCand(fsrLabel);
+  return edm::Ptr<reco::Candidate>(NULL, 0);
 }
 
 

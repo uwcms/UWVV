@@ -17,7 +17,7 @@ from UWVV.AnalysisTools.helpers import mapObjects
 
 
 def makeLepBranchSet(lep):
-    branches = [objectBranches]
+    branches = [objectBranches, leptonBranches]
     
     if lep[0] == 'e':
         branches.append(electronBranches)

@@ -45,6 +45,8 @@ private:
   bool passKinematics(const edm::Ptr<pat::Muon>& mu) const;
   bool passVertex(const edm::Ptr<pat::Muon>& mu) const;
   bool passType(const edm::Ptr<pat::Muon>& mu) const;
+  bool passHighPtID(const edm::Ptr<pat::Muon>& mu) const;
+  bool passTrackerHighPtID(const edm::Ptr<pat::Muon>& mu) const;
 
   // Data
   edm::EDGetTokenT<edm::View<pat::Muon> > muonCollectionToken_;
@@ -75,7 +77,9 @@ PATMuonZZIDEmbedder::PATMuonZZIDEmbedder(const edm::ParameterSet& iConfig):
   isoLabel_(iConfig.exists("isoLabel") ?
 	   iConfig.getParameter<std::string>("isoLabel") :
 	   std::string("HZZ4lIsoPass")),
-  vtxSrcToken_(consumes<reco::VertexCollection>(iConfig.exists("vtxSrc") ? iConfig.getParameter<edm::InputTag>("vtxSrc") : edm::InputTag("selectedPrimaryVertex"))),
+  vtxSrcToken_(consumes<reco::VertexCollection>(iConfig.exists("vtxSrc") ? 
+                                                iConfig.getParameter<edm::InputTag>("vtxSrc") : 
+                                                edm::InputTag("selectedPrimaryVertex"))),
   ptCut(iConfig.exists("ptCut") ? iConfig.getParameter<double>("ptCut") : 5.),
   etaCut(iConfig.exists("etaCut") ? iConfig.getParameter<double>("etaCut") : 2.4),
   sipCut(iConfig.exists("sipCut") ? iConfig.getParameter<double>("sipCut") : 4.),
@@ -107,6 +111,9 @@ void PATMuonZZIDEmbedder::produce(edm::Event& iEvent, const edm::EventSetup& iSe
       out->back().addUserFloat(idLabel_, float(idResult)); // 1 for true, 0 for false
 
       out->back().addUserFloat(idLabel_+"Tight", float(idResult && mi->isPFMuon())); // 1 for true, 0 for false
+
+      out->back().addUserFloat("highPtIDPass", float(idResult && passHighPtID(mptr)));
+      out->back().addUserFloat("trackerHighPtIDPass", float(idResult && passTrackerHighPtID(mptr)));
     }
 
   iEvent.put(out);
@@ -136,6 +143,28 @@ bool PATMuonZZIDEmbedder::passType(const edm::Ptr<pat::Muon>& mu) const
 {
   // Global muon or (arbitrated) tracker muon
   return (mu->isGlobalMuon() || (mu->isTrackerMuon() && mu->numberOfMatchedStations() > 0)) && mu->muonBestTrackType() != 2;
+}
+
+
+bool PATMuonZZIDEmbedder::passHighPtID(const edm::Ptr<pat::Muon>& mu) const
+{
+  return (passTrackerHighPtID(mu) &&
+          mu->isGlobalMuon() &&
+          mu->globalTrack()->hitPattern().numberOfValidMuonHits() > 0);
+}
+
+
+bool PATMuonZZIDEmbedder::passTrackerHighPtID(const edm::Ptr<pat::Muon>& mu) const
+{
+  if(!vertices->size())
+    return false;
+
+  return (mu->isTrackerMuon() &&
+          mu->numberOfMatchedStations() > 1 &&
+          mu->dB() < 0.2 &&
+          fabs(mu->muonBestTrack()->dz(vertices->at(0).position())) < 0.5 &&
+          mu->innerTrack()->hitPattern().numberOfValidPixelHits() > 0 &&
+          mu->innerTrack()->hitPattern().trackerLayersWithMeasurement() > 5);
 }
 
 

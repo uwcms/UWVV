@@ -1,10 +1,9 @@
-from UWVV.AnalysisTools.templates.ElectronBaseFlow import ElectronBaseFlow
-from UWVV.AnalysisTools.templates.MuonBaseFlow import MuonBaseFlow
+from UWVV.AnalysisTools.AnalysisFlowBase import AnalysisFlowBase
 
 import FWCore.ParameterSet.Config as cms
 
 
-class ZZID(ElectronBaseFlow, MuonBaseFlow):
+class ZZID(AnalysisFlowBase):
     def __init__(self, *args, **kwargs):
         super(ZZID, self).__init__(*args, **kwargs)
 
@@ -17,7 +16,7 @@ class ZZID(ElectronBaseFlow, MuonBaseFlow):
                 src = step.getObjTag('e'),
                 idLabel = cms.string(self.getZZIDLabel()),
                 vtxSrc = step.getObjTag('v'),
-                bdtLabel = cms.string('MVAIDNonTrig'),
+                bdtLabel = cms.string('ElectronMVAEstimatorRun2Spring15NonTrig25nsV1Values'),
                 idCutLowPtLowEta = cms.double(-.265),
                 idCutLowPtMedEta = cms.double(-.556),
                 idCutLowPtHighEta = cms.double(-.551),

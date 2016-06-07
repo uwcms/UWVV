@@ -12,16 +12,6 @@ muonBranches = cms.PSet(
         PFPhotonIso = cms.string('pfIsolationR03.sumPhotonEt'),
         PFNeutralIso = cms.string('pfIsolationR03.sumNeutralHadronEt'),
         PFPUIso = cms.string('pfIsolationR03.sumPUPt'),
-        SIP3D = cms.string('SIP3D'),
-        PVDXY = cms.string('PVDXY'),
-        PVDZ = cms.string('PVDZ'),
-        GenPt = cms.string('? genParticleRef.isNull ? -999. : genParticleRef.pt'),
-        GenEta = cms.string('? genParticleRef.isNull ? -999. : genParticleRef.eta'),
-        GenPhi = cms.string('? genParticleRef.isNull ? -999. : genParticleRef.phi'),
-        ),
-    ints = cms.PSet(
-        GenPdgId = cms.string('? genParticleRef.isNull ? -999 : genParticleRef.pdgId'),
-        GenCharge = cms.string('? genParticleRef.isNull ? -999 : genParticleRef.charge'),
         ),
     uints = cms.PSet(
         MatchedStations = cms.string('MatchedStations'),
@@ -31,5 +21,13 @@ muonBranches = cms.PSet(
         IsPFMuon = cms.string('IsPFMuon'),
         IsGlobal = cms.string('IsGlobal'),
         IsTracker = cms.string('IsTracker'),
+
+        HighPtID = cms.string('? hasUserFloat("highPtIDPass") ? '
+                              'userFloat("highPtIDPass") : 0.'),
+        TrackerHighPtID = cms.string('? hasUserFloat("trackerHighPtIDPass") ? '
+                                     'userFloat("trackerHighPtIDPass") : 0.'),
+        ZZHighPtID = cms.string('? hasUserFloat("highPtIDPass") && hasUserFloat("ZZIDPass") ? '
+                                '(? userFloat("ZZIDPass") > 0. || (pt > 200. && userFloat("trackerHighPtIDPass") > 0.) ? '
+                                ' 1. : 0.) : 0.'), 
         ),
     )

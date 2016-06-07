@@ -44,5 +44,5 @@ class ZPlusXBaseFlow(AnalysisFlowBase):
             setPdgId = cms.int32(23),
             )
 
-        step.addModule("zEECreation", zEEMod, 'ze')
-        step.addModule("zMuMuCreation", zMuMuMod, 'zm')
+        step.addModule("zEECreation", zEEMod, 'ee')
+        step.addModule("zMuMuCreation", zMuMuMod, 'mm')

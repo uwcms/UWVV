@@ -26,4 +26,7 @@ def makeCrossDaughterBranches(channel):
 
         params['bools'][name + 'SS'] = cms.string('userFloat("{}")'.format(name+'SS'))
 
+        params['floats'][name + 'MassFSR'] = cms.string('? hasUserFloat("{0}") ? '
+                                                        'userFloat("{0}") : -999.'.format(name+'MassFSR'))
+
     return dict2PSet(params)

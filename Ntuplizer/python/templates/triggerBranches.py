@@ -16,7 +16,7 @@ triggerBranches = cms.PSet(
     doubleESingleMuPaths = cms.vstring('HLT_Mu8_DiEle12_CaloIdL_TrackIdL_v\\[0-9]+'),
     doubleMuSingleEPaths = cms.vstring('HLT_DiMu9_Ele9_CaloIdL_TrackIdL_v\\[0-9]+'),
     tripleMuPaths = cms.vstring('HLT_TripleMu_12_10_5_v\\[0-9]+'),
-    singleEPaths = cms.vstring('HLT_Ele27_WPLoose_Gsf_v\\[0-9]+'),
+    singleEPaths = cms.vstring('HLT_Ele23_WPLoose_Gsf_v\\[0-9]+'),
 
     trigResultsSrc = cms.InputTag("TriggerResults", "", "HLT"),
     trigPrescaleSrc = cms.InputTag("patTrigger"),

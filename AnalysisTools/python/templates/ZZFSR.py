@@ -57,38 +57,38 @@ class ZZFSR(AnalysisFlowBase):
             if isinstance(self, ZPlusXBaseFlow):
                 zeFSREmbedder = cms.EDProducer(
                     'PATElectronCompositeUserCandPromoter',
-                    src = step.getObjTag('ze'),
+                    src = step.getObjTag('ee'),
                     label = cms.string(self.getFSRLabel()),
                     )
                 zmFSREmbedder = cms.EDProducer(
                     'PATMuonCompositeUserCandPromoter',
-                    src = step.getObjTag('zm'),
+                    src = step.getObjTag('mm'),
                     label = cms.string(self.getFSRLabel()),
                     )
 
-                step.addModule('zeFSREmbedder', zeFSREmbedder, 'ze')
-                step.addModule('zmFSREmbedder', zmFSREmbedder, 'zm')
+                step.addModule('zeFSREmbedder', zeFSREmbedder, 'ee')
+                step.addModule('zmFSREmbedder', zmFSREmbedder, 'mm')
 
         if stepName == 'finalStateEmbedding':
             if isinstance(self, ZZFinalStateBaseFlow):
                 zz4eFSREmbedder = cms.EDProducer(
                     'PATCompositeCompositeUserCandPromoter',
-                    src = step.getObjTag('zz4e'),
+                    src = step.getObjTag('eeee'),
                     label = cms.string(self.getFSRLabel()),
                     )
                 zz2e2mFSREmbedder = cms.EDProducer(
                     'PATCompositeCompositeUserCandPromoter',
-                    src = step.getObjTag('zz2e2m'),
+                    src = step.getObjTag('eemm'),
                     label = cms.string(self.getFSRLabel()),
                     )
                 zz4mFSREmbedder = cms.EDProducer(
                     'PATCompositeCompositeUserCandPromoter',
-                    src = step.getObjTag('zz4m'),
+                    src = step.getObjTag('mmmm'),
                     label = cms.string(self.getFSRLabel()),
                     )
-                step.addModule('zz4eFSREmbedder', zz4eFSREmbedder, 'zz4e')
-                step.addModule('zz2e2mFSREmbedder', zz2e2mFSREmbedder, 'zz2e2m')
-                step.addModule('zz4mFSREmbedder', zz4mFSREmbedder, 'zz4m')
+                step.addModule('zz4eFSREmbedder', zz4eFSREmbedder, 'eeee')
+                step.addModule('zz2e2mFSREmbedder', zz2e2mFSREmbedder, 'eemm')
+                step.addModule('zz4mFSREmbedder', zz4mFSREmbedder, 'mmmm')
 
         return step
 

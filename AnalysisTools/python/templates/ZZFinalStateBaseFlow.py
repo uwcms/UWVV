@@ -1,4 +1,6 @@
 from UWVV.AnalysisTools.templates.ZPlusXBaseFlow import ZPlusXBaseFlow
+from UWVV.AnalysisTools.helpers import mapObjects
+from UWVV.Ntuplizer.helpers import parseChannels
 
 import FWCore.ParameterSet.Config as cms
 
@@ -23,64 +25,32 @@ class ZZFinalStateBaseFlow(ZPlusXBaseFlow):
         '''
         Add modules to combine Zs into 4l candidates
         '''
-        zz4EMod = cms.EDProducer(
-            'PATCandViewShallowCloneCombiner',
-            decay = cms.string('{0} {0}'.format(step.getObjTagString('ze'))),
-            roles = cms.vstring('ze1', 'ze2'),
-            cut = cms.string('4. < daughter("ze1").masterClone.mass < 120. && '
-                             '4. < daughter("ze2").masterClone.mass < 120.'),
-            checkCharge = cms.bool(False),
-            setPdgId = cms.int32(25),
-            )
-
-        zz2E2MuMod = cms.EDProducer(
-            'PATCandViewShallowCloneCombiner',
-            decay = cms.string('{0} {1}'.format(step.getObjTagString('ze'), 
-                                                step.getObjTagString('zm'))),
-            roles = cms.vstring('ze1', 'zm1'),
-            cut = cms.string('4. < daughter("ze1").masterClone.mass < 120. && '
-                             '4. < daughter("zm1").masterClone.mass < 120.'),
-            checkCharge = cms.bool(False),
-            setPdgId = cms.int32(25),
-            )
-
-        zz4MuMod = cms.EDProducer(
-            'PATCandViewShallowCloneCombiner',
-            decay = cms.string('{0} {0}'.format(step.getObjTagString('zm'))),
-            roles = cms.vstring('zm1', 'zm2'),
-            cut = cms.string('4. < daughter("zm1").masterClone.mass < 120. && '
-                             '4. < daughter("zm2").masterClone.mass < 120.'),
-            checkCharge = cms.bool(False),
-            setPdgId = cms.int32(25),
-            )
-
-        step.addModule("zz4ECreation", zz4EMod, 'zz4e')            
-        step.addModule("zz2E2MuCreation", zz2E2MuMod, 'zz2e2m')            
-        step.addModule("zz4MuCreation", zz4MuMod, 'zz4m')            
+        for chan in parseChannels('zz'):
+            z1Name = 'z{}1'.format(chan[0])
+            z2Name = 'z{}{}'.format(chan[2], 2 if chan[0] == chan[2] else 1)
+            mod = cms.EDProducer(
+                'PATCandViewShallowCloneCombiner',
+                decay = cms.string('{0} {1}'.format(step.getObjTagString(chan[:2]),
+                                                    step.getObjTagString(chan[2:]))),
+                roles = cms.vstring(z1Name, z2Name),
+                cut = cms.string(('daughter("{}").masterClone.mass < 150. && '
+                                  'daughter("{}").masterClone.mass < 150.').format(z1Name, z2Name)),
+                checkCharge = cms.bool(False),
+                setPdgId = cms.int32(25),
+                )
+            
+            step.addModule(chan+'Producer', mod, chan)
 
 
     def addAlternatePairInfo(self, step):
         '''
         Add modules to embed alternate lepton pair (e.g. e1+m1) info.
         '''
-        alternatePairInfo4E = cms.EDProducer(
-            'AlternateDaughterInfoEmbedder',
-            src = step.getObjTag('zz4e'),
-            names = cms.vstring('e{}'.format(i) for i in range(1,5)),
-            )
-
-        alternatePairInfo2E2Mu = cms.EDProducer(
-            'AlternateDaughterInfoEmbedder',
-            src = step.getObjTag('zz2e2m'),
-            names = cms.vstring('e1','e2','m1','m2'),
-            )
-
-        alternatePairInfo4Mu = cms.EDProducer(
-            'AlternateDaughterInfoEmbedder',
-            src = step.getObjTag('zz4m'),
-            names = cms.vstring('m{}'.format(i) for i in range(1,5)),
-            )
-
-        step.addModule("zz4EAlternatePairs", alternatePairInfo4E, 'zz4e')
-        step.addModule("zz2E2MuAlternatePairs", alternatePairInfo2E2Mu, 'zz2e2m')
-        step.addModule("zz4MuAlternatePairs", alternatePairInfo4Mu, 'zz4m')
+        for chan in parseChannels('zz'):
+            mod = cms.EDProducer(
+                'AlternateDaughterInfoEmbedder',
+                src = step.getObjTag(chan),
+                names = cms.vstring(*mapObjects(chan)),
+                fsrLabel = cms.string("fsr"),
+                )
+            step.addModule(chan+'AlternatePairs', mod, chan)
