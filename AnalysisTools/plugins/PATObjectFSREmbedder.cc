@@ -29,10 +29,11 @@
 #include "DataFormats/Candidate/interface/CandidateFwd.h"
 #include "DataFormats/ParticleFlowCandidate/interface/PFCandidate.h"
 #include "DataFormats/ParticleFlowCandidate/interface/PFCandidateFwd.h"
-#include <DataFormats/PatCandidates/interface/PFParticle.h>
-#include <DataFormats/PatCandidates/interface/Muon.h>
-#include <DataFormats/PatCandidates/interface/Electron.h>
+#include "DataFormats/PatCandidates/interface/PFParticle.h"
+#include "DataFormats/PatCandidates/interface/Muon.h"
+#include "DataFormats/PatCandidates/interface/Electron.h"
 #include "CommonTools/Utils/interface/StringCutObjectSelector.h"
+#include "DataFormats/Common/interface/RefToPtr.h"
 
 
 typedef reco::Candidate Cand;
@@ -57,8 +58,6 @@ private:
   edm::EDGetTokenT<ElecView> electrons_;
   edm::EDGetTokenT<MuonView> muons_;
 
-  bool isInSuperCluster(const CandPtr& cand, const std::vector<ElecPtr>& elecs) const;
-  
   StringCutObjectSelector<Cand> phoSelection_;
   StringCutObjectSelector<Elec> eSelection_;
   StringCutObjectSelector<Muon> mSelection_;
@@ -67,9 +66,6 @@ private:
   
   const float cut_; // the actual cut on deltaR/eT^n
 
-  const float scVetoDR_;
-  const float scVetoDEta_;
-  const float scVetoDPhi_;
   const float etPower_;
   const float maxDR_;
 };
@@ -94,15 +90,6 @@ PATObjectFSREmbedder::PATObjectFSREmbedder(const edm::ParameterSet& iConfig):
   cut_(iConfig.exists("cut") ?
        float(iConfig.getParameter<double>("cut")) :
        0.012), // cut on dR/eT^2 as of 21 October 2015
-  scVetoDR_(iConfig.exists("scVetoDR") ?
-            float(iConfig.getParameter<double>("scVetoDR")) :
-            0.15),
-  scVetoDEta_(iConfig.exists("scVetoDEta") ?
-              float(iConfig.getParameter<double>("scVetoDEta")) :
-              0.05),
-  scVetoDPhi_(iConfig.exists("scVetoDPhi") ?
-              float(iConfig.getParameter<double>("scVetoDPhi")) :
-              2.),
   etPower_(iConfig.exists("etPower") ?
 	   float(iConfig.getParameter<double>("etPower")) :
 	   1.),
@@ -132,13 +119,16 @@ void PATObjectFSREmbedder::produce(edm::Event& iEvent, const edm::EventSetup& iS
   edm::Handle<edm::View<Muon> > mus;
   iEvent.getByToken(muons_, mus);
 
-  // get a cleaned electron collection because we need it for the SC veto anyway
-  std::vector<ElecPtr> cleanedElectrons;
+  // Get Ptrs for all packedPFCands in the electron footprints
+  std::vector<CandPtr> footprintCands;
   for(size_t iE = 0; iE < elecs->size(); ++iE)
     {
       ElecPtr elec = elecs->ptrAt(iE);
       if(eSelection_(*elec))
-        cleanedElectrons.push_back(elec);
+        {
+          for(auto& cand : elec->associatedPackedPFCandidates())
+            footprintCands.push_back(edm::refToPtr(cand));
+        }
     }
 
   // associate photons to their closest leptons
@@ -154,7 +144,16 @@ void PATObjectFSREmbedder::produce(edm::Event& iEvent, const edm::EventSetup& iS
         continue;
 
       // supercluster veto
-      if(isInSuperCluster(pho, cleanedElectrons))
+      bool scVeto = false;
+      for(auto& fc : footprintCands)
+        {
+          if(pho == fc)
+            {
+              scVeto = true;
+              break;
+            }
+        }
+      if(scVeto)
         continue;
 
       size_t iBestEle = 9999;
@@ -256,25 +255,6 @@ void PATObjectFSREmbedder::produce(edm::Event& iEvent, const edm::EventSetup& iS
 
   iEvent.put( eOut );
   iEvent.put( mOut );
-}
-
-
-bool PATObjectFSREmbedder::isInSuperCluster(const CandPtr& cand, 
-                                               const std::vector<ElecPtr>& elecs) const
-{
-  for(auto elec = elecs.begin(); elec != elecs.end(); ++elec)
-    {
-      float dR = reco::deltaR(cand->eta(), cand->phi(), (*elec)->superCluster()->eta(), (*elec)->superCluster()->phi());
-      if(dR < scVetoDR_)
-        return true;
-
-      float dEta = fabs((*elec)->superCluster()->eta() - cand->eta());
-      float dPhi = fabs(reco::deltaPhi((*elec)->superCluster()->phi(), cand->phi()));
-      if(dEta < scVetoDEta_ && dPhi < scVetoDPhi_)
-        return true;
-    }
-
-  return false;
 }
 
 
