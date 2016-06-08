@@ -12,8 +12,6 @@ class MuonBaseFlow(AnalysisFlowBase):
 
         if stepName == 'preselection':
             self.addGhostCleaning(step)
-        
-        if stepName == 'selection':
             step.addBasicSelector('m', 'pt > 5 && (isGlobalMuon || isTrackerMuon)')
 
         return step

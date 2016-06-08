@@ -61,23 +61,20 @@ class AnalysisStep(object):
             self.outputs[obj] = ':'.join([self.outputs[obj], suffix])
 
 
-    def setToRun(self, process):
+    def makeSequence(self, process):
         '''
-        Add all modules, and a path to the process that calls them, and 
-        schedule the path
+        Add all modules, and a Sequence that calls them, to the process, and
+        return the Sequence
         '''
-        if not self.modules:
-            return
-
-        p = cms.Path()
+        seq = cms.Sequence()
+        setattr(process, self.name+"Sequence", seq)
 
         for name, mod in self.modules.iteritems():
             if not hasattr(process, name):
                 setattr(process, name, mod)
-            p *= mod
+            seq *= mod
 
-        setattr(process, self.name+"Path", p)
-        process.schedule.append(p)
+        return seq
 
 
     def addBasicSelector(self, obj, selection, name=''):

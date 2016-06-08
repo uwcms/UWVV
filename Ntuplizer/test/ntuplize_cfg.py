@@ -29,11 +29,11 @@ options.register('isMC', 1,
                  VarParsing.VarParsing.multiplicity.singleton,
                  VarParsing.VarParsing.varType.int,
                  "1 if simulation, 0 if data")
-options.register('eCalib', 1,
+options.register('eCalib', 0,
                  VarParsing.VarParsing.multiplicity.singleton,
                  VarParsing.VarParsing.varType.int,
                  "1 if electron energy corrections are desired")
-options.register('muCalib', 1,
+options.register('muCalib', 0,
                  VarParsing.VarParsing.multiplicity.singleton,
                  VarParsing.VarParsing.varType.int,
                  "1 if muon momentum corrections are desired")
@@ -41,6 +41,10 @@ options.register('isSync', 0,
                  VarParsing.VarParsing.multiplicity.singleton,
                  VarParsing.VarParsing.varType.int,
                  "1 if this is for synchronization purposes")
+options.register('skipEvents', 0,
+                 VarParsing.VarParsing.multiplicity.singleton,
+                 VarParsing.VarParsing.varType.int,
+                 "Number of events to skip (for debugging).")
 
 options.parseArguments()
 
@@ -75,6 +79,7 @@ process.MessageLogger.cerr.FwkReport.reportEvery = 100
 process.source = cms.Source(
     "PoolSource",
     fileNames = cms.untracked.vstring(options.inputFiles),
+    skipEvents = cms.untracked.uint32(options.skipEvents),
     )
 
 process.TFileService = cms.Service(
@@ -118,10 +123,14 @@ FlowSteps.append(ZZFlow)
 
 # Lepton calibrations
 if options.eCalib:
+    raise ValueError("Electron calibrations are not yet available in 80X")
+
     from UWVV.AnalysisTools.templates.ElectronCalibration import ElectronCalibration
     FlowSteps.append(ElectronCalibration)
 
 if options.muCalib:
+    raise ValueError("Muon calibrations are not yet available in 80X")
+
     from UWVV.AnalysisTools.templates.MuonCalibration import MuonCalibration
     FlowSteps.append(MuonCalibration)
 
@@ -137,7 +146,7 @@ process.metaInfo = cms.EDAnalyzer(
     'MetaTreeGenerator',
     eventParams = makeEventParams(flow.finalTags()),
     )
-process.treePath = cms.Path(process.metaInfo)
+process.treeSequence = cms.Sequence(process.metaInfo)
 
 # then the ntuples
 for chan in channels:
@@ -150,6 +159,9 @@ for chan in channels:
         )
 
     setattr(process, chan, mod)
-    process.treePath += mod
+    process.treeSequence += mod
 
-process.schedule.append(process.treePath)
+p = flow.getPath()
+p += process.treeSequence
+
+process.schedule.append(p)

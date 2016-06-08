@@ -39,7 +39,7 @@ class AnalysisFlowBase(object):
 
             self.outputs.append(self.steps[step].outputs.copy())
 
-        self.setupProcess()
+        self.path = self.setupPath()
 
 
     def getInitialInputs(self, **tags):
@@ -84,14 +84,28 @@ class AnalysisFlowBase(object):
         return AnalysisStep(self.name + step, **inputs)
 
     
-    def setupProcess(self):
+    def setupPath(self):
         '''
-        Set up a cms.Process with all analysis steps in its schedule.
+        Set up a cms.Path with all analysis steps, add it to the Process, and
+        return it
         '''
+        p = cms.Path()
         for stepName, step in self.steps.iteritems():
-            step.setToRun(self.process)
+            p *= step.makeSequence(self.process)
 
+
+        self.process.schedule.append(p)
+        setattr(self.process, self.name+'FlowPath', p)
+
+        return p
+
+
+    def getProcess(self):
         return self.process
+
+
+    def getPath(self):
+        return self.path
     
 
     def inheritGuard(self, fName):
