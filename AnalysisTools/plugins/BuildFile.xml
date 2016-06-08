@@ -6,7 +6,6 @@
 <use name="CommonTools/CandAlgos"/>
 <use name="CommonTools/CandUtils"/>
 <use name="RecoEgamma/EgammaTools"/>
-<use name="KaMuCa/Calibration"/>
 
 <library file="*.cc" name="UWVVAnalysisToolsPlugins">
   <flags EDM_PLUGIN="1"/>

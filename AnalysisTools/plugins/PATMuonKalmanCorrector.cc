@@ -1,6 +1,6 @@
 //////////////////////////////////////////////////////////////////////////////
 //                                                                          //
-//    PATMuonKalmanCorrector                                            //
+//    PATMuonKalmanCorrector                                                //
 //                                                                          //
 //    Takes PAT muons, corrects their pt with the Kalman method.            //
 //                                                                          //
@@ -9,7 +9,7 @@
 //////////////////////////////////////////////////////////////////////////////
 
 
-
+#ifdef KALMAN
 
 #include <vector>
 #include <string>
@@ -101,3 +101,5 @@ PATMuonKalmanCorrector::produce(edm::Event& event, const edm::EventSetup& setup)
 
 #include "FWCore/Framework/interface/MakerMacros.h"
 DEFINE_FWK_MODULE(PATMuonKalmanCorrector);
+
+#endif // KALMAN
