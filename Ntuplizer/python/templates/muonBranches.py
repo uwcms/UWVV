@@ -22,12 +22,9 @@ muonBranches = cms.PSet(
         IsGlobal = cms.string('IsGlobal'),
         IsTracker = cms.string('IsTracker'),
 
-        HighPtID = cms.string('? hasUserFloat("highPtIDPass") ? '
-                              'userFloat("highPtIDPass") : 0.'),
-        TrackerHighPtID = cms.string('? hasUserFloat("trackerHighPtIDPass") ? '
-                                     'userFloat("trackerHighPtIDPass") : 0.'),
-        ZZHighPtID = cms.string('? hasUserFloat("highPtIDPass") && hasUserFloat("ZZIDPass") ? '
-                                '(? userFloat("ZZIDPass") > 0. || (pt > 200. && userFloat("trackerHighPtIDPass") > 0.) ? '
-                                ' 1. : 0.) : 0.'), 
+        HighPtID = cms.string('? hasUserFloat("ZZIDPassHighPt") ? '
+                              'userFloat("ZZIDPassHighPt") : 0.'),
+        PFID = cms.string('? hasUserFloat("ZZIDPassPF") ? '
+                          'userFloat("ZZIDPassPF") : 0.'),
         ),
     )

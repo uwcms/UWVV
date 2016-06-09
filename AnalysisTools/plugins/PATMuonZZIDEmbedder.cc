@@ -1,6 +1,6 @@
 //////////////////////////////////////////////////////////////////////////////
 //                                                                          //
-//   PATMuonZZIDEmbedder.cc                                             //
+//   PATMuonZZIDEmbedder.cc                                                 //
 //                                                                          //
 //   Embeds muon ID and isolation decisions as userfloats                   //
 //       (1 for true, 0 for false), for use in other modules using          //
@@ -45,7 +45,6 @@ private:
   bool passKinematics(const edm::Ptr<pat::Muon>& mu) const;
   bool passVertex(const edm::Ptr<pat::Muon>& mu) const;
   bool passType(const edm::Ptr<pat::Muon>& mu) const;
-  bool passHighPtID(const edm::Ptr<pat::Muon>& mu) const;
   bool passTrackerHighPtID(const edm::Ptr<pat::Muon>& mu) const;
 
   // Data
@@ -110,10 +109,12 @@ void PATMuonZZIDEmbedder::produce(edm::Event& iEvent, const edm::EventSetup& iSe
       bool idResult = (passKinematics(mptr) && passVertex(mptr) && passType(mptr));
       out->back().addUserFloat(idLabel_, float(idResult)); // 1 for true, 0 for false
 
-      out->back().addUserFloat(idLabel_+"Tight", float(idResult && mi->isPFMuon())); // 1 for true, 0 for false
+      out->back().addUserFloat(idLabel_+"PF", float(idResult && mi->isPFMuon())); // 1 for true, 0 for false
 
-      out->back().addUserFloat("highPtIDPass", float(idResult && passHighPtID(mptr)));
-      out->back().addUserFloat("trackerHighPtIDPass", float(idResult && passTrackerHighPtID(mptr)));
+      bool trackerHighPtID = passTrackerHighPtID(mptr);
+
+      out->back().addUserFloat(idLabel_+"HighPt", float(idResult && trackerHighPtID));
+      out->back().addUserFloat(idLabel_+"Tight", float(idResult && (mi->isPFMuon() || trackerHighPtID)));
     }
 
   iEvent.put(out);
@@ -146,20 +147,13 @@ bool PATMuonZZIDEmbedder::passType(const edm::Ptr<pat::Muon>& mu) const
 }
 
 
-bool PATMuonZZIDEmbedder::passHighPtID(const edm::Ptr<pat::Muon>& mu) const
-{
-  return (passTrackerHighPtID(mu) &&
-          mu->isGlobalMuon() &&
-          mu->globalTrack()->hitPattern().numberOfValidMuonHits() > 0);
-}
-
-
 bool PATMuonZZIDEmbedder::passTrackerHighPtID(const edm::Ptr<pat::Muon>& mu) const
 {
   if(!vertices->size())
     return false;
 
-  return (mu->isTrackerMuon() &&
+  return (mu->pt() > 200. &&
+          mu->isTrackerMuon() &&
           mu->numberOfMatchedStations() > 1 &&
           mu->dB() < 0.2 &&
           fabs(mu->muonBestTrack()->dz(vertices->at(0).position())) < 0.5 &&
