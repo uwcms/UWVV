@@ -4,8 +4,10 @@ import FWCore.ParameterSet.Config as cms
 
 class ElectronCalibration(AnalysisFlowBase):
     def __init__(self, *args, **kwargs):
-        self.isMC = kwargs.get('isMC', True)
-        self.isSync = self.isMC and kwargs.get('isSync', False)
+        if not hasattr(self, 'isMC'):
+            self.isMC = kwargs.get('isMC', True)
+        if not hasattr(self, 'isSync'):
+            self.isSync = self.isMC and kwargs.get('isSync', False)
         super(ElectronCalibration, self).__init__(*args, **kwargs)
 
     def makeAnalysisStep(self, stepName, **inputs):

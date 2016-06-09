@@ -108,6 +108,10 @@ FlowSteps.append(ElectronBaseFlow)
 from UWVV.AnalysisTools.templates.MuonBaseFlow import MuonBaseFlow
 FlowSteps.append(MuonBaseFlow)
 
+# jet energy corrections and basic preselection
+from UWVV.AnalysisTools.templates.JetBaseFlow import JetBaseFlow
+FlowSteps.append(JetBaseFlow)
+
 # make final states
 if zz:
     from UWVV.AnalysisTools.templates.ZZFinalStateBaseFlow import ZZFinalStateBaseFlow
