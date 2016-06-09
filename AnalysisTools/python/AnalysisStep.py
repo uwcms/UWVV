@@ -121,7 +121,9 @@ class AnalysisStep(object):
         mod = cms.EDProducer(
             "PAT{}Cleaner".format(getObjName(obj, True)),
             src=self.getObjTag(obj),
-            preselection=cms.string(selection)
+            preselection=cms.string(selection),
+            checkOverlaps = overlapParams,
+            finalCut = cms.string(''),
             )
 
         self.addModule(''.join([obj, name if name else 'crossCleaning', 
