@@ -54,6 +54,7 @@ class AnalysisFlowBase(object):
             'm' : 'slimmedMuons',
             'j' : 'slimmedJets',
             'v' : 'offlineSlimmedPrimaryVertices',
+            'pfCands' : 'packedPFCandidates',
             }
 
         out.update(tags)

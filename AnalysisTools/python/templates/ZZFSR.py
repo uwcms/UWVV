@@ -12,32 +12,24 @@ class ZZFSR(AnalysisFlowBase):
     def makeAnalysisStep(self, stepName, **inputs):
         step = super(ZZFSR, self).makeAnalysisStep(stepName, **inputs)
 
-        if stepName == 'preliminary':
-            # make FSR photons and isolation for them
-            self.process.load("UWVV.AnalysisTools.fsrPhotons_cff")
-            step.addModule('fsrPhotonSequence', self.process.fsrPhotonSequence, 'fsr')
-            
-            fsrCandSelection = cms.EDFilter(
-                "CandPtrSelector",
-                src = step.getObjTag("fsr"),
-                cut = cms.string('pt > 2 && abs(eta) < 2.4 && '
-                                 '((userFloat("fsrPhotonPFIsoChHadPUNoPU03pt02") + '
-                                 'userFloat("fsrPhotonPFIsoNHadPhoton03")) / pt < 1.8)'),
-                )
-            step.addModule('fsrCandSelection', fsrCandSelection, 'fsr')
-
         if stepName == 'embedding':
             leptonFSREmbedder = cms.EDProducer(
                 "PATObjectFSREmbedder",
                 muSrc = step.getObjTag('m'),
                 eSrc = step.getObjTag('e'),
-                phoSrc = step.getObjTag('fsr'),
-                phoSelection = cms.string(""),
+                candSrc = step.getObjTag('pfCands'),
+                phoSelection = cms.string("pt > 2 && abs(eta) < 2.4"),
+                nIsoSelection = cms.string("pt > 0.5"),
+                chIsoSelection = cms.string("pt > 0.2"),
                 eSelection = cms.string('userFloat("%s") > 0.5'%self.getZZIDLabel()),
                 muSelection = cms.string('userFloat("%s") > 0.5'%self.getZZIDLabel()),
                 fsrLabel = cms.string(self.getFSRLabel()),
                 etPower = cms.double(2.),
                 maxDR = cms.double(0.5),
+                isoDR = cms.double(0.3),
+                nIsoVetoDR = cms.double(0.01),
+                chIsoVetoDR = cms.double(0.0001),
+                relIsoCut = cms.double(1.8),
                 )
             step.addModule('fsrEmbedder', leptonFSREmbedder, 'e', 'm')
 
