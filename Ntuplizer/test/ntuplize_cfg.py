@@ -1,5 +1,7 @@
 import FWCore.ParameterSet.Config as cms
 import FWCore.ParameterSet.VarParsing as VarParsing
+import FWCore.PythonUtilities.LumiList as LumiList
+import FWCore.ParameterSet.Types as CfgTypes
 
 from UWVV.AnalysisTools.analysisFlowMaker import createFlow
 
@@ -8,6 +10,7 @@ from UWVV.Ntuplizer.makeBranchSet import makeBranchSet
 from UWVV.Ntuplizer.eventParams import makeEventParams
 from UWVV.Ntuplizer.templates.triggerBranches import triggerBranches    
 
+import os
 
 process = cms.Process("Ntuple")
 
@@ -45,6 +48,10 @@ options.register('skipEvents', 0,
                  VarParsing.VarParsing.multiplicity.singleton,
                  VarParsing.VarParsing.varType.int,
                  "Number of events to skip (for debugging).")
+options.register('lumiMask', '',
+                 VarParsing.VarParsing.multiplicity.singleton,
+                 VarParsing.VarParsing.varType.string,
+                 "Lumi mask (for data only).")
 
 options.parseArguments()
 
@@ -81,6 +88,16 @@ process.source = cms.Source(
     fileNames = cms.untracked.vstring(options.inputFiles),
     skipEvents = cms.untracked.uint32(options.skipEvents),
     )
+
+if options.lumiMask:
+    lumiJSON = options.lumiMask
+    if not os.path.exists(lumiJSON):
+        raise IOError("Lumi mask file {} not found.".format(lumiJSON))
+    lumiList = LumiList.LumiList(filename = lumiJSON)
+    runs = lumiList.getRuns()
+    lumisToProcess = CfgTypes.untracked(CfgTypes.VLuminosityBlockRange())
+    lumisToProcess.extend(lumiList.getCMSSWString().split(','))
+    process.source.lumisToProcess = lumisToProcess
 
 process.TFileService = cms.Service(
     "TFileService",
