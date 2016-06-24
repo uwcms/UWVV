@@ -11,6 +11,7 @@
   <use name="FWCore/ParameterSet"/>
   
   <use   name="UWVV/Ntuplizer"/>
+  <use   name="UWVV/Utilities"/>
 
   <flags EDM_PLUGIN="1"/>
 </library>

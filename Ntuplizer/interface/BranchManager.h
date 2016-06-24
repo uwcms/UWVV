@@ -21,7 +21,7 @@
 #include "UWVV/Ntuplizer/interface/EventInfo.h"
 #include "UWVV/Ntuplizer/interface/BranchHolder.h"
 #include "UWVV/Ntuplizer/interface/FunctionLibrary.h"
-
+#include "UWVV/Utilities/interface/helpers.h"
 
 namespace uwvv
 {
@@ -267,39 +267,6 @@ namespace uwvv
   }
 
   
-  // Just need this function here
-  namespace
-    {
-      template<class T>
-        bool zsNeedReorder(const edm::Ptr<pat::CompositeCandidate>& cand, const std::string& fsrLabel)
-      {
-        math::XYZTLorentzVector p4a = cand->daughter(0)->p4();
-        math::XYZTLorentzVector p4b = cand->daughter(1)->p4();
-          
-        if(!fsrLabel.empty())
-          {
-            const T* z1l1 = static_cast<const T*>(cand->daughter(0)->daughter(0)->masterClone().get());
-            if(z1l1->hasUserCand(fsrLabel))
-              p4a += z1l1->userCand(fsrLabel)->p4();
-            
-            const T* z1l2 = static_cast<const T*>(cand->daughter(0)->daughter(1)->masterClone().get());
-            if(z1l2->hasUserCand(fsrLabel))
-              p4a += z1l2->userCand(fsrLabel)->p4();
-            
-            const T* z2l1 = static_cast<const T*>(cand->daughter(1)->daughter(0)->masterClone().get());
-            if(z2l1->hasUserCand(fsrLabel))
-              p4b += z2l1->userCand(fsrLabel)->p4();
-            
-            const T* z2l2 = static_cast<const T*>(cand->daughter(1)->daughter(1)->masterClone().get());
-            if(z2l2->hasUserCand(fsrLabel))
-              p4b += z2l2->userCand(fsrLabel)->p4();
-          }
-        
-        return std::abs(p4b.mass() - 91.1876) < std::abs(p4a.mass() - 91.1876);
-      }
-    }
-
-  
   // Most things don't need to be reordered
   template<>
   template<class T1, class T2> bool
@@ -325,13 +292,13 @@ namespace uwvv
     BranchManager<CompositeDaughter<CompositeDaughter<pat::Electron, pat::Electron>, 
     CompositeDaughter<pat::Electron, pat::Electron> > >::daughtersNeedReorder(const edm::Ptr<pat::CompositeCandidate>& cand) const
     {
-      return zsNeedReorder<pat::Electron>(cand, fsrLabel);
+      return helpers::zsNeedReorder<pat::Electron, pat::Electron>(cand, fsrLabel);
     }
   template<> bool
     BranchManager<CompositeDaughter<CompositeDaughter<pat::Muon, pat::Muon>, 
     CompositeDaughter<pat::Muon, pat::Muon> > >::daughtersNeedReorder(const edm::Ptr<pat::CompositeCandidate>& cand) const
     {
-      return zsNeedReorder<pat::Muon>(cand, fsrLabel);
+      return helpers::zsNeedReorder<pat::Muon, pat::Muon>(cand, fsrLabel);
     }
 
 } // namespace
