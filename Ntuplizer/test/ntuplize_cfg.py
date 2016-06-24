@@ -121,6 +121,8 @@ FlowSteps.append(VertexCleaning)
 # everybody needs basic lepton stuff
 from UWVV.AnalysisTools.templates.ElectronBaseFlow import ElectronBaseFlow
 FlowSteps.append(ElectronBaseFlow)
+from UWVV.AnalysisTools.templates.RecomputeElectronID import RecomputeElectronID
+FlowSteps.append(RecomputeElectronID)
 
 from UWVV.AnalysisTools.templates.MuonBaseFlow import MuonBaseFlow
 FlowSteps.append(MuonBaseFlow)
@@ -133,6 +135,11 @@ FlowSteps.append(JetBaseFlow)
 if zz:
     from UWVV.AnalysisTools.templates.ZZFinalStateBaseFlow import ZZFinalStateBaseFlow
     FlowSteps.append(ZZFinalStateBaseFlow)
+
+    # HZZ discriminants and categorization
+    from UWVV.AnalysisTools.templates.ZZClassification import ZZClassification
+    FlowSteps.append(ZZClassification)
+
     
 elif zl or z:
     from UWVV.AnalysisTools.templates.ZPlusXBaseFlow import ZPlusXBaseFlow
@@ -169,6 +176,17 @@ process.metaInfo = cms.EDAnalyzer(
     )
 process.treeSequence = cms.Sequence(process.metaInfo)
 
+# no triggers in MC for now
+if options.isMC:
+    trgBranches = cms.PSet(
+        trigNames=cms.vstring(),
+        trigResultsSrc = cms.InputTag("TriggerResults", "", "HLT"),
+        trigPrescaleSrc = cms.InputTag("patTrigger"),
+        )
+else:
+    trgBranches = triggerBranches
+
+
 # then the ntuples
 for chan in channels:
     mod = cms.EDAnalyzer(
@@ -176,7 +194,7 @@ for chan in channels:
         src = flow.finalObjTag(chan),
         branches = makeBranchSet(chan),
         eventParams = makeEventParams(flow.finalTags()),
-        triggers = triggerBranches,
+        triggers = trgBranches,
         )
 
     setattr(process, chan, mod)

@@ -107,6 +107,22 @@ namespace
 
                                  return std::sqrt(std::abs(mtSqr));
                                });
+
+        addTo["jet1Pt"] = 
+          std::function<FType>([](const edm::Ptr<T>& obj, uwvv::EventInfo& evt)
+                               {
+                                 return (evt.jets()->size() >= 1 ? 
+                                         evt.jets()->at(0).pt() :
+                                         -1.);
+                               });
+
+        addTo["jet2Pt"] = 
+          std::function<FType>([](const edm::Ptr<T>& obj, uwvv::EventInfo& evt)
+                               {
+                                 return (evt.jets()->size() >= 2 ? 
+                                         evt.jets()->at(1).pt() :
+                                         -1.);
+                               });
       }
     };
         
@@ -167,6 +183,10 @@ namespace
         addTo["nvtx"] = 
           std::function<FType>([](const edm::Ptr<T>& obj, uwvv::EventInfo& evt)
                                {return evt.nVertices();});
+
+        addTo["nJets"] = 
+          std::function<FType>([](const edm::Ptr<T>& obj, uwvv::EventInfo& evt)
+                               {return evt.jets()->size();});
       }
     };
 

@@ -10,6 +10,8 @@ eventBranches = cms.PSet(
         type1_pfMETEt = cms.string('type1_pfMETEt'),
         type1_pfMETPhi = cms.string('type1_pfMETPhi'),
         genWeight = cms.string('genWeight'),
+        jet1Pt = cms.string('jet1Pt'),
+        jet2Pt = cms.string('jet2Pt'),
         ),
     bools = cms.PSet(
         SS = cms.string('SS'),
@@ -20,6 +22,7 @@ eventBranches = cms.PSet(
         lumi = cms.string('lumi'),
         run = cms.string('run'),
         nvtx = cms.string('nvtx'),
+        nJets = cms.string('nJets'),
         ),
     ulls = cms.PSet(
         evt = cms.string('evt'),

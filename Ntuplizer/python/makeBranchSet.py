@@ -7,6 +7,7 @@ from UWVV.Ntuplizer.templates.objectBranches import objectBranches
 from UWVV.Ntuplizer.templates.leptonBranches import leptonBranches
 from UWVV.Ntuplizer.templates.electronBranches import electronBranches
 from UWVV.Ntuplizer.templates.muonBranches import muonBranches
+from UWVV.Ntuplizer.templates.zzDiscriminantBranches import zzDiscriminantBranches
 from UWVV.Ntuplizer.templates.crossDaughterBranches import makeCrossDaughterBranches
 
 from UWVV.Ntuplizer.helpers import pset2Dict, dict2PSet, \
@@ -85,6 +86,8 @@ def makeBranchSet(channel):
             'Invalid channel {}'.format(channel)
 
         branches.append(makeCrossDaughterBranches(channel))
+
+        branches.append(zzDiscriminantBranches)
 
         # include FSR when ordering Zs
         branches.append(cms.PSet(fsrLabel=cms.string("fsr")))
