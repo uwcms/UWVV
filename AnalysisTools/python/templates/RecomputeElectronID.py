@@ -1,4 +1,4 @@
-from UWVV.AnalysisTools.ElectronBaseFlow import ElectronBaseFlow
+from UWVV.AnalysisTools.AnalysisFlowBase import AnalysisFlowBase
 
 import FWCore.ParameterSet.Config as cms
 
@@ -6,17 +6,14 @@ from PhysicsTools.SelectorUtils.tools.vid_id_tools import setupAllVIDIdsInModule
     setupVIDElectronSelection, switchOnVIDElectronIdProducer, \
     DataFormat, setupVIDSelection
 
-class RecomputeElectronID(ElectronBaseFlow):
+class RecomputeElectronID(AnalysisFlowBase):
     def __init__(self, *args, **kwargs):
         super(RecomputeElectronID, self).__init__(*args, **kwargs)
 
     def makeAnalysisStep(self, stepName, **inputs):
         step = super(RecomputeElectronID, self).makeAnalysisStep(stepName, **inputs)
 
-        if stepName == 'preselection':
-            step.addBasicSelector('e', 'pt > 5 && abs(eta) < 2.6', 'preselection')
-
-        if stepName == 'embedding':
+        if stepName == 'preliminary':
             self.addElectronIDEmbedding(step)
 
         return step
@@ -27,7 +24,7 @@ class RecomputeElectronID(ElectronBaseFlow):
         switchOnVIDElectronIdProducer(self.process, DataFormat.MiniAOD)
 
         setupAllVIDIdsInModule(self.process, 
-                               'RecoEgamma.ElectronIdentification.Identification.mvaElectronID_Spring15_25ns_nonTrig_V1_cff',
+                               'RecoEgamma.ElectronIdentification.Identification.mvaElectronID_Spring16_V1_cff',
                                setupVIDElectronSelection)
 
         step.addModule('egmGsfElectronIDSequence', 
@@ -37,7 +34,7 @@ class RecomputeElectronID(ElectronBaseFlow):
             "PATElectronValueMapEmbedder",
             src = step.getObjTag('e'),
             label = cms.string("MVAIDNonTrig"),
-            valueSrc = cms.InputTag("electronMVAValueMapProducer:ElectronMVAEstimatorRun2Spring15NonTrig25nsV1Values"),
+            valueSrc = cms.InputTag("electronMVAValueMapProducer:ElectronMVAEstimatorRun2Spring16V1Values"),
             )
 
         step.addModule('electronMVAIDEmbedding', embedIDs, 'e')
