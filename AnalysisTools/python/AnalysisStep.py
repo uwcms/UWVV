@@ -72,7 +72,8 @@ class AnalysisStep(object):
         for name, mod in self.modules.iteritems():
             if not hasattr(process, name):
                 setattr(process, name, mod)
-            seq *= mod
+            if not isinstance(mod, cms.ESSource):
+                seq *= mod
 
         return seq
 
