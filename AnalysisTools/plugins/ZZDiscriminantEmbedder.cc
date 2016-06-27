@@ -74,7 +74,7 @@ private:
 
   std::unique_ptr<MEMs> mem;
   const std::string fsrLabel;
-  //const std::string qgDiscriminatorLabel;
+  const std::string qgDiscriminatorLabel;
 };
 
 
@@ -87,8 +87,8 @@ ZZDiscriminantEmbedder<T12,T34>::ZZDiscriminantEmbedder(const edm::ParameterSet&
   mem(new MEMs(13, 125, "CTEQ6L")),
   fsrLabel(pset.exists("fsrLabel") ? 
            pset.getParameter<std::string>("fsrLabel") : 
-           "")//,
-  //qgDiscriminatorLabel(pset.getParameter<std::string>("qgDiscriminator"))
+           ""),
+  qgDiscriminatorLabel(pset.getParameter<std::string>("qgDiscriminator"))
 {
   produces<std::vector<CCand> >();
 }
@@ -108,16 +108,16 @@ ZZDiscriminantEmbedder<T12,T34>::produce(edm::Event& iEvent,
   iEvent.getByToken(jetSrc, jets);
 
   TLorentzVector j1P4(0.,0.,0.,0.), j2P4(0.,0.,0.,0.);
-  // float j1PgOverPq = -1.;
-  // float j2PgOverPq = -1.;
+  float j1PgOverPq = -1.;
+  float j2PgOverPq = -1.;
 
   if(jets->size() >= 1)
     {
       const pat::Jet& j = jets->at(0);
       j1P4.SetPxPyPzE(j.px(), j.py(), j.pz(), j.energy());
 
-      // if(j.hasUserFloat(qgDiscriminatorLabel))
-      //   j1PgOverPq = (1./j.userFloat(qgDiscriminatorLabel) - 1.);
+      if(j.hasUserFloat(qgDiscriminatorLabel))
+        j1PgOverPq = (1./j.userFloat(qgDiscriminatorLabel) - 1.);
     }
 
   if(jets->size() >= 2)
@@ -125,8 +125,8 @@ ZZDiscriminantEmbedder<T12,T34>::produce(edm::Event& iEvent,
       const pat::Jet& j = jets->at(1);
       j2P4.SetPxPyPzE(j.px(), j.py(), j.pz(), j.energy());
 
-      // if(j.hasUserFloat(qgDiscriminatorLabel))
-      //   j2PgOverPq = (1./j.userFloat(qgDiscriminatorLabel) - 1.);
+      if(j.hasUserFloat(qgDiscriminatorLabel))
+        j2PgOverPq = (1./j.userFloat(qgDiscriminatorLabel) - 1.);
     }
 
   for(size_t i = 0; i < cands->size(); ++i)
@@ -205,10 +205,10 @@ ZZDiscriminantEmbedder<T12,T34>::produce(edm::Event& iEvent,
               D_WHh_VAJHU = pwh_hadronic_VAJHU / (pwh_hadronic_VAJHU + 100000.*phjj_VAJHU);
               D_ZHh_VAJHU = pzh_hadronic_VAJHU / (pzh_hadronic_VAJHU + 10000.*phjj_VAJHU);
 
-              // D_VBF2j = 1. / (1. + (1. / Djet_VAJHU - 1.) * 
-              //                 TMath::Power(j1PgOverPq * j2PgOverPq, 1./3.));
-              // D_WHh = 1. / (1. + (1. / D_WHh_VAJHU - 1.) * j1PgOverPq * j2PgOverPq);
-              // D_ZHh = 1. / (1. + (1. / D_ZHh_VAJHU - 1.) * j1PgOverPq * j2PgOverPq);
+              D_VBF2j = 1. / (1. + (1. / Djet_VAJHU - 1.) * 
+                              TMath::Power(j1PgOverPq * j2PgOverPq, 1./3.));
+              D_WHh = 1. / (1. + (1. / D_WHh_VAJHU - 1.) * j1PgOverPq * j2PgOverPq);
+              D_ZHh = 1. / (1. + (1. / D_ZHh_VAJHU - 1.) * j1PgOverPq * j2PgOverPq);
             }
           else
             {
@@ -221,7 +221,7 @@ ZZDiscriminantEmbedder<T12,T34>::produce(edm::Event& iEvent,
               D_VBF1j_VAJHU = pvbf_VAJHU * pAux_vbf_VAJHU / 
                 (pvbf_VAJHU * pAux_vbf_VAJHU + 5. * phj_VAJHU);
 
-              // D_VBF1j = 1. / (1. + (1. / D_VBF1j_VAJHU - 1.) * TMath::Power(j1PgOverPq, 1./3.));
+              D_VBF1j = 1. / (1. + (1. / D_VBF1j_VAJHU - 1.) * TMath::Power(j1PgOverPq, 1./3.));
             }
         }
 

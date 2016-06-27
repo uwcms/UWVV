@@ -2,8 +2,6 @@ from UWVV.AnalysisTools.AnalysisFlowBase import AnalysisFlowBase
 
 import FWCore.ParameterSet.Config as cms
 
-from CondCore.DBCommon.CondDBSetup_cfi import CondDBSetup
-
 class JetQuarkGluonTagging(AnalysisFlowBase):
     def __init__(self, *args, **kwargs):
         super(JetQuarkGluonTagging, self).__init__(*args, **kwargs)
@@ -11,22 +9,27 @@ class JetQuarkGluonTagging(AnalysisFlowBase):
     def makeAnalysisStep(self, stepName, **inputs):
         step = super(JetQuarkGluonTagging, self).makeAnalysisStep(stepName, **inputs)
 
-        if stepName == 'embedding':
+        if stepName == 'preliminary': 
+            self.process.load("CondCore.CondDB.CondDB_cfi")
+
             # Make Q/G tag ValueMap
             QGPoolDBESSource = cms.ESSource(
                 "PoolDBESSource",
-                CondDBSetup,
+                self.process.CondDB,
                 toGet = cms.VPSet(
                     cms.PSet(
                         record = cms.string('QGLikelihoodRcd'),
-                        tag = cms.string('QGLikelihoodObject_v2b_AK4PFchs'),
+                        tag = cms.string('QGLikelihoodObject_v1_AK4PFchs'),
                         label = cms.untracked.string('QGL_AK4PFchs'),
                         ),
                     ),
-                connect = cms.string('frontier://FrontierProd/CMS_COND_PAT_000'),
                 )
 
+            QGPoolDBESSource.connect = cms.string('frontier://FrontierProd/CMS_CONDITIONS')
+
             step.addModule('QGPoolDBESSource', QGPoolDBESSource)
+
+            self.process.es_prefer_qg = cms.ESPrefer('PoolDBESSource', 'QGPoolDBESSource')
 
             self.process.load('RecoJets.JetProducers.QGTagger_cfi')
             self.process.QGTagger.srcJets = step.getObjTag('j')

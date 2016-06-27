@@ -1,10 +1,9 @@
-#from UWVV.AnalysisTools.templates.JetQuarkGluonTagging import JetQuarkGluonTagging
-from UWVV.AnalysisTools.AnalysisFlowBase import AnalysisFlowBase
+from UWVV.AnalysisTools.templates.JetQuarkGluonTagging import JetQuarkGluonTagging
 
 import FWCore.ParameterSet.Config as cms
 
 
-class ZZClassification(AnalysisFlowBase): #JetQuarkGluonTagging):
+class ZZClassification(JetQuarkGluonTagging):
     def __init__(self, *args, **kwargs):
         super(ZZClassification, self).__init__(*args, **kwargs)
 
@@ -17,7 +16,7 @@ class ZZClassification(AnalysisFlowBase): #JetQuarkGluonTagging):
                 src = step.getObjTag('eeee'),
                 jetSrc = step.getObjTag('j'),
                 fsrLabel = cms.string(self.getFSRLabel()),
-                #qgDiscriminator = cms.string(self.qgLikelihoodLabel()),
+                qgDiscriminator = cms.string(self.qgLikelihoodLabel()),
                 )
             step.addModule('meEmbedding4e', meEmbedding4e, 'eeee')
                 
@@ -26,7 +25,7 @@ class ZZClassification(AnalysisFlowBase): #JetQuarkGluonTagging):
                 src = step.getObjTag('eemm'),
                 jetSrc = step.getObjTag('j'),
                 fsrLabel = cms.string(self.getFSRLabel()),
-                #qgDiscriminator = cms.string(self.qgLikelihoodLabel()),
+                qgDiscriminator = cms.string(self.qgLikelihoodLabel()),
                 )
             step.addModule('meEmbedding2e2m', meEmbedding2e2m, 'eemm')
                 
@@ -35,7 +34,7 @@ class ZZClassification(AnalysisFlowBase): #JetQuarkGluonTagging):
                 src = step.getObjTag('mmmm'),
                 jetSrc = step.getObjTag('j'),
                 fsrLabel = cms.string(self.getFSRLabel()),
-                #qgDiscriminator = cms.string(self.qgLikelihoodLabel()),
+                qgDiscriminator = cms.string(self.qgLikelihoodLabel()),
                 )
             step.addModule('meEmbedding4m', meEmbedding4m, 'mmmm')
                 

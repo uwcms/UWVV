@@ -123,6 +123,22 @@ namespace
                                          evt.jets()->at(1).pt() :
                                          -1.);
                                });
+
+        addTo["jet1QGLikelihood"] = 
+          std::function<FType>([](const edm::Ptr<T>& obj, uwvv::EventInfo& evt)
+                               {
+                                 return (evt.jets()->size() >= 1 && evt.jets()->at(0).hasUserFloat("qgLikelihood") ?
+                                         evt.jets()->at(0).userFloat("qgLikelihood") :
+                                         -1.);
+                               });
+
+        addTo["jet2QGLikelihood"] = 
+          std::function<FType>([](const edm::Ptr<T>& obj, uwvv::EventInfo& evt)
+                               {
+                                 return (evt.jets()->size() >= 2 && evt.jets()->at(1).hasUserFloat("qgLikelihood") ?
+                                         evt.jets()->at(1).userFloat("qgLikelihood") :
+                                         -1.);
+                               });
       }
     };
         

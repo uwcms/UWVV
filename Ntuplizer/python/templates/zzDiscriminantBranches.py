@@ -11,5 +11,12 @@ zzDiscriminantBranches = cms.PSet(
         D_HJ_VBF = cms.string('userFloat("D_VBF1j_VAJHU")'),
         D_HJJ_WHh = cms.string('userFloat("D_WHh_VAJHU")'),
         D_HJJ_ZHh = cms.string('userFloat("D_ZHh_VAJHU")'),
+        D_VBF2j = cms.string('userFloat("D_VBF2j")'),
+        D_VBF1j = cms.string('userFloat("D_VBF1j")'),
+        D_WHh = cms.string('userFloat("D_WHh")'),
+        D_ZHh = cms.string('userFloat("D_ZHh")'),
+        
+        jet1QGLikelihood = cms.string('jet1QGLikelihood'),
+        jet2QGLikelihood = cms.string('jet2QGLikelihood'),
         ),
     )
