@@ -38,7 +38,42 @@ class ZZClassification(JetQuarkGluonTagging):
                 )
             step.addModule('meEmbedding4m', meEmbedding4m, 'mmmm')
                 
+            categoryEmbedding4e = cms.EDProducer(
+                'ZZCategoryEmbedder',
+                src = step.getObjTag('eeee'),
+                electronSrc = step.getObjTag('e'),
+                muonSrc = step.getObjTag('m'),
+                jetSrc = step.getObjTag('j'),
+                leptonSelection = cms.string('userFloat("{}Tight") > 0.5 && userFloat("{}") > 0.5'.format(self.getZZIDLabel(), self.getZZIsoLabel())),
+                bDiscriminator = cms.string('pfCombinedInclusiveSecondaryVertexV2BJetTags'),
+                bDiscriminatorCut = cms.double(0.800),
+                )
+            step.addModule('categoryEmbedding4e', categoryEmbedding4e, 'eeee')
+
+            categoryEmbedding2e2m = cms.EDProducer(
+                'ZZCategoryEmbedder',
+                src = step.getObjTag('eemm'),
+                electronSrc = step.getObjTag('e'),
+                muonSrc = step.getObjTag('m'),
+                jetSrc = step.getObjTag('j'),
+                leptonSelection = cms.string('userFloat("{}Tight") > 0.5 && userFloat("{}") > 0.5'.format(self.getZZIDLabel(), self.getZZIsoLabel())),
+                bDiscriminator = cms.string('pfCombinedInclusiveSecondaryVertexV2BJetTags'),
+                bDiscriminatorCut = cms.double(0.800),
+                )
+            step.addModule('categoryEmbedding2e2m', categoryEmbedding2e2m, 'eemm')
+
+            categoryEmbedding4m = cms.EDProducer(
+                'ZZCategoryEmbedder',
+                src = step.getObjTag('mmmm'),
+                electronSrc = step.getObjTag('e'),
+                muonSrc = step.getObjTag('m'),
+                jetSrc = step.getObjTag('j'),
+                leptonSelection = cms.string('userFloat("{}Tight") > 0.5 && userFloat("{}") > 0.5'.format(self.getZZIDLabel(), self.getZZIsoLabel())),
+                bDiscriminator = cms.string('pfCombinedInclusiveSecondaryVertexV2BJetTags'),
+                bDiscriminatorCut = cms.double(0.800),
+                )
+            step.addModule('categoryEmbedding4m', categoryEmbedding4m, 'mmmm')
+
+
         return step
 
-    def getZZIsoLabel(self):
-        return 'ZZIsoPass'

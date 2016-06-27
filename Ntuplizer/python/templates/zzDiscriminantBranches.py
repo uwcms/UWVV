@@ -19,4 +19,7 @@ zzDiscriminantBranches = cms.PSet(
         jet1QGLikelihood = cms.string('jet1QGLikelihood'),
         jet2QGLikelihood = cms.string('jet2QGLikelihood'),
         ),
+    ints = cms.PSet(
+        ZZCategory = cms.string('userInt("ZZCategory")'),
+        ),
     )
