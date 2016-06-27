@@ -13,6 +13,7 @@
 // system includes
 #include <memory>
 #include <vector>
+#include <string>
 
 // CMS includes
 #include "FWCore/Framework/interface/Frameworkfwd.h"
@@ -20,9 +21,6 @@
 #include "FWCore/Framework/interface/Event.h"
 #include "FWCore/Framework/interface/MakerMacros.h"
 #include "FWCore/ParameterSet/interface/ParameterSet.h"
-#include "FWCore/ServiceRegistry/interface/Service.h"
-#include "CommonTools/UtilAlgos/interface/TFileService.h"
-#include "DataFormats/Math/interface/deltaR.h"
 #include "DataFormats/PatCandidates/interface/Electron.h"
 #include "DataFormats/PatCandidates/interface/Muon.h"
 #include "DataFormats/PatCandidates/interface/Jet.h"
