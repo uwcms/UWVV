@@ -4,8 +4,11 @@
 
 #include <string>
 
+#include "TLorentzVector.h"
+
 #include "DataFormats/PatCandidates/interface/CompositeCandidate.h"
 #include "DataFormats/Common/interface/Ptr.h"
+#include "DataFormats/Math/interface/LorentzVector.h"
 
 
 namespace uwvv
@@ -13,6 +16,54 @@ namespace uwvv
 
   namespace helpers
   {
+    // Get an object's four-momentum with FSR included (if any).
+    template<class T>
+      math::XYZTLorentzVector p4WithFSR(const T& cand,
+                                        const std::string& fsrLabel)
+      {
+        math::XYZTLorentzVector p4 = cand.p4();
+        if(cand.hasUserCand(fsrLabel))
+          p4 += cand.userCand(fsrLabel)->p4();
+
+        return p4;
+      }
+
+    template<>
+      math::XYZTLorentzVector p4WithFSR(const pat::CompositeCandidate& cand,
+                                        const std::string& fsrLabel)
+      {
+        math::XYZTLorentzVector p4 = cand.p4();
+        if(cand.hasUserInt("n"+fsrLabel+"Cands") && cand.userInt("n"+fsrLabel+"Cands") > 0)
+          {
+            for(size_t i = 0; i < size_t(cand.userInt("n"+fsrLabel+"Cands")); ++i)
+              p4 += cand.userCand(fsrLabel+std::to_string(i))->p4();
+          }
+
+        return p4;
+      }
+
+    template<class T>
+      math::XYZTLorentzVector p4WithFSR(const edm::Ptr<T>& cand,
+                                        const std::string& fsrLabel)
+      {
+        return p4WithFSR(*cand, fsrLabel);
+      }
+
+    float zMassDistance(const float m)
+    {
+      return std::abs(m - 91.1876);
+    }
+
+    float zMassDistance(const TLorentzVector& v)
+    {
+      return zMassDistance(v.M());
+    }
+
+    float zMassDistance(const math::XYZTLorentzVector& v)
+    {
+      return zMassDistance(v.mass());
+    }
+
     // Return true if the first daughter (made of leptons of type T12) is 
     // farther from the nominal Z mass than the second daughter (made of 
     // leptons of type T34). FSR is included if fsrLabel is non-empty.

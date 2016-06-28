@@ -8,6 +8,7 @@
 <use name="RecoEgamma/EgammaTools"/>
 <use name="ZZMatrixElement/MEMCalculators"/>
 <use name="ZZMatrixElement/MELA"/>
+<use name="KinZfitter/KinZfitter"/>
 
 <library file="*.cc" name="UWVVAnalysisToolsPlugins">
   <flags EDM_PLUGIN="1"/>

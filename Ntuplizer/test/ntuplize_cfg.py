@@ -63,6 +63,15 @@ z  = any(len(c) == 2 for c in channels)
 l  = any(len(c) == 1 for c in channels)
 
 
+from IgTools.IgProf.IgProfTrigger import igprof
+process.load("IgTools.IgProf.IgProfTrigger")
+process.igprofPath = cms.Path(process.igprof)
+process.igprof.reportEventInterval     = cms.untracked.int32(250)
+process.igprof.reportToFileAtBeginJob  = cms.untracked.string("|gzip -c>igprof.begin-job.gz")
+process.igprof.reportToFileAtEvent = cms.untracked.string("|gzip -c>igprof.%I.%E.%L.%R.event.gz")
+#process.schedule.append(process.igprofPath)
+
+
 # Basic stuff for all jobs
 
 process.load("Configuration.StandardSequences.GeometryRecoDB_cff")
@@ -140,6 +149,8 @@ if zz:
     from UWVV.AnalysisTools.templates.ZZClassification import ZZClassification
     FlowSteps.append(ZZClassification)
 
+    from UWVV.AnalysisTools.templates.ZKinematicFitting import ZKinematicFitting
+    FlowSteps.append(ZKinematicFitting)
     
 elif zl or z:
     from UWVV.AnalysisTools.templates.ZPlusXBaseFlow import ZPlusXBaseFlow

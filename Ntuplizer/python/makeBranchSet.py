@@ -1,7 +1,7 @@
 import FWCore.ParameterSet.Config as cms
 
 from UWVV.Ntuplizer.templates.eventBranches import eventBranches
-from UWVV.Ntuplizer.templates.fsBranches import fsBranches
+from UWVV.Ntuplizer.templates.fsBranches import fsBranches, kinFitBranches
 from UWVV.Ntuplizer.templates.zBranches import zBranches
 from UWVV.Ntuplizer.templates.objectBranches import objectBranches
 from UWVV.Ntuplizer.templates.leptonBranches import leptonBranches
@@ -88,6 +88,8 @@ def makeBranchSet(channel):
         branches.append(makeCrossDaughterBranches(channel))
 
         branches.append(zzDiscriminantBranches)
+
+        branches.append(kinFitBranches)
 
         # include FSR when ordering Zs
         branches.append(cms.PSet(fsrLabel=cms.string("fsr")))

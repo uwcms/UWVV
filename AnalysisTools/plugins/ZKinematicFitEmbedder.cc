@@ -1,0 +1,133 @@
+//////////////////////////////////////////////////////////////////////////////
+//                                                                          //
+//    ZKinematicFitEmbedder.cc                                              //
+//                                                                          //
+//    Embeds Z kintematic info in 4l CompositeCandidates as userFloats.     //
+//                                                                          //
+//    Nate Woods, U. Wisconsin                                              //
+//                                                                          //
+//////////////////////////////////////////////////////////////////////////////
+
+
+
+
+#include <memory>
+#include <vector>
+#include <map>
+#include <string>
+
+#include "FWCore/Framework/interface/Frameworkfwd.h"
+#include "FWCore/Framework/interface/stream/EDProducer.h"
+#include "FWCore/Framework/interface/Event.h"
+#include "FWCore/Framework/interface/MakerMacros.h"
+#include "FWCore/ParameterSet/interface/ParameterSet.h"
+#include "DataFormats/PatCandidates/interface/Electron.h"
+#include "DataFormats/PatCandidates/interface/Muon.h"
+#include "DataFormats/PatCandidates/interface/CompositeCandidate.h"
+#include "DataFormats/Candidate/interface/Candidate.h"
+#include "RecoParticleFlow/PFClusterTools/interface/PFEnergyResolution.h"
+
+#include "KinZfitter/KinZfitter/interface/KinZfitter.h"
+
+#include "UWVV/Utilities/interface/helpers.h"
+
+
+typedef pat::CompositeCandidate CCand;
+
+
+template<class T12, class T34>
+class ZKinematicFitEmbedder : public edm::stream::EDProducer<>
+{
+ public:
+  explicit ZKinematicFitEmbedder(const edm::ParameterSet& pset);
+  virtual ~ZKinematicFitEmbedder(){;}
+
+ private:
+  virtual void produce(edm::Event& iEvent, const edm::EventSetup& iSetup);
+  
+  edm::EDGetTokenT<edm::View<CCand> > srcToken;
+
+  KinZfitter fitter;
+
+  const std::string fsrLabel;
+};
+
+
+template<class T12, class T34>
+ZKinematicFitEmbedder<T12,T34>::ZKinematicFitEmbedder(const edm::ParameterSet& pset) :
+  srcToken(consumes<edm::View<CCand> >(pset.getParameter<edm::InputTag>("src"))),
+  fitter(pset.getParameter<bool>("isMC")),
+  fsrLabel(pset.exists("fsrLabel") ? 
+           pset.getParameter<std::string>("fsrLabel") : "")
+{
+  produces<std::vector<CCand> >();
+}
+
+
+template<class T12, class T34>
+void
+ZKinematicFitEmbedder<T12,T34>::produce(edm::Event& iEvent, 
+                                        const edm::EventSetup& iSetup)
+{
+  edm::Handle<edm::View<CCand> > in;
+  iEvent.getByToken(srcToken, in);
+
+  std::unique_ptr<std::vector<CCand> > out(new std::vector<CCand>);
+
+  for(size_t i = 0; i < in->size(); ++i)
+    {
+      out->push_back(in->at(i));
+      CCand& cand  = out->back();
+
+      const CCand* z1 = dynamic_cast<const CCand*>(cand.daughter(0)->masterClone().get());
+      const CCand* z2 = dynamic_cast<const CCand*>(cand.daughter(1)->masterClone().get());
+
+      math::XYZTLorentzVector p4Z1 = uwvv::helpers::p4WithFSR(*z1, fsrLabel);
+      math::XYZTLorentzVector p4Z2 = uwvv::helpers::p4WithFSR(*z2, fsrLabel);
+
+      bool flip = uwvv::helpers::zMassDistance(p4Z1) > uwvv::helpers::zMassDistance(p4Z2);
+
+      std::vector<const reco::Candidate*> leptons;
+
+      leptons.push_back((flip ? z2 : z1)->daughter(0)->masterClone().get());
+      leptons.push_back((flip ? z2 : z1)->daughter(1)->masterClone().get());
+      leptons.push_back((flip ? z1 : z2)->daughter(0)->masterClone().get());
+      leptons.push_back((flip ? z1 : z2)->daughter(1)->masterClone().get());
+
+      std::map<unsigned, TLorentzVector> fsrMap;
+
+      for(size_t k = 0; k < 2; ++k)
+        {
+          const T12* lz1 = dynamic_cast<const T12*>(z1->daughter(k)->masterClone().get());
+          if(lz1->hasUserCand(fsrLabel))
+            {
+              edm::Ptr<reco::Candidate> pho = lz1->userCand(fsrLabel);
+              fsrMap[(flip ? 2 : 0) + k] = TLorentzVector(pho->px(), pho->py(), pho->pz(), pho->energy());
+            }
+          const T34* lz2 = dynamic_cast<const T34*>(z2->daughter(k)->masterClone().get());
+          if(lz2->hasUserCand(fsrLabel))
+            {
+              edm::Ptr<reco::Candidate> pho = lz2->userCand(fsrLabel);
+              fsrMap[(flip ? 0 : 2) + k] = TLorentzVector(pho->px(), pho->py(), pho->pz(), pho->energy());
+            }
+        }
+
+      fitter.Setup(leptons, fsrMap);
+      fitter.KinRefitZ();
+
+      cand.addUserFloat("massRefit", fitter.GetRefitM4l());
+      cand.addUserFloat("massRefitError", fitter.GetRefitM4lErrFullCov());
+    }
+
+  iEvent.put(std::move(out));
+}
+
+
+
+typedef ZKinematicFitEmbedder<pat::Electron, pat::Electron> ZKinematicFitEmbedderEEEE;
+typedef ZKinematicFitEmbedder<pat::Electron, pat::Muon> ZKinematicFitEmbedderEEMM;
+typedef ZKinematicFitEmbedder<pat::Muon, pat::Muon> ZKinematicFitEmbedderMMMM;
+
+DEFINE_FWK_MODULE(ZKinematicFitEmbedderEEEE);
+DEFINE_FWK_MODULE(ZKinematicFitEmbedderEEMM);
+DEFINE_FWK_MODULE(ZKinematicFitEmbedderMMMM);
