@@ -58,7 +58,7 @@ namespace
 
     if(cand->hasUserInt("n"+label+"Cands"))
       {
-        size_t nCands = (size_t)cand->hasUserInt("n"+label+"Cands");
+        size_t nCands = (size_t)cand->userInt("n"+label+"Cands");
         for(size_t i = 0; i < nCands; ++i)
           {
             CandPtr c = cand->userCand(label+std::to_string(i));
