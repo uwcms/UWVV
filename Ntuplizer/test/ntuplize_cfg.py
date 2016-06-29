@@ -63,13 +63,21 @@ z  = any(len(c) == 2 for c in channels)
 l  = any(len(c) == 1 for c in channels)
 
 
-from IgTools.IgProf.IgProfTrigger import igprof
-process.load("IgTools.IgProf.IgProfTrigger")
-process.igprofPath = cms.Path(process.igprof)
-process.igprof.reportEventInterval     = cms.untracked.int32(250)
-process.igprof.reportToFileAtBeginJob  = cms.untracked.string("|gzip -c>igprof.begin-job.gz")
-process.igprof.reportToFileAtEvent = cms.untracked.string("|gzip -c>igprof.%I.%E.%L.%R.event.gz")
-#process.schedule.append(process.igprofPath)
+### To use IgProf's neat memory profiling tools, uncomment the following 
+### lines then run this cfg with igprof like so:
+###      $ igprof -d -mp -z -o igprof.mp.gz cmsRun ... 
+### this will create a memory profile every 250 events so you can track use
+### Turn the profile into text with
+###      $ igprof-analyse -d -v -g -r MEM_LIVE igprof.yourOutputFile.gz > igreport_live.res
+### To do a performance profile instead of a memory profile, change -mp to -pp
+### in the first command and remove  -r MEM_LIVE from the second
+### For interpretation of the output, see http://igprof.org/text-output-format.html
+# from IgTools.IgProf.IgProfTrigger import igprof
+# process.load("IgTools.IgProf.IgProfTrigger")
+# process.igprofPath = cms.Path(process.igprof)
+# process.igprof.reportEventInterval     = cms.untracked.int32(250)
+# process.igprof.reportToFileAtBeginJob  = cms.untracked.string("|gzip -c>igprof.begin-job.gz")
+# process.igprof.reportToFileAtEvent = cms.untracked.string("|gzip -c>igprof.%I.%E.%L.%R.event.gz")
 
 
 # Basic stuff for all jobs
