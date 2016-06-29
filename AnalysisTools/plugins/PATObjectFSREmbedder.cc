@@ -335,13 +335,38 @@ bool PATObjectFSREmbedder::passIso(const PCandRef& pho,
   for(auto& cand : nIsoCands)
     {
       double dR = reco::deltaR(pho->p4(), cand->p4());
-      if(dR < isoDR_ && dR > nIsoVetoDR_)
+      bool take = (dR < isoDR_ && dR > nIsoVetoDR_);
+      for(size_t iSelf = 0; 
+          iSelf < pho->numberOfSourceCandidatePtrs();
+          ++iSelf)
+        {
+          if(pho->sourceCandidatePtr(iSelf).refCore() == cand.refCore())
+            {
+              take = false;
+              break;
+            }
+        }
+      
+      if(take)
         iso += cand->pt();
     }
+
   for(auto& cand : chIsoCands)
     {
       double dR = reco::deltaR(pho->p4(), cand->p4());
-      if(dR < isoDR_ && dR > chIsoVetoDR_)
+      bool take = (dR < isoDR_ && dR > chIsoVetoDR_);
+      for(size_t iSelf = 0; 
+          iSelf < pho->numberOfSourceCandidatePtrs();
+          ++iSelf)
+        {
+          if(pho->sourceCandidatePtr(iSelf).refCore() == cand.refCore())
+            {
+              take = false;
+              break;
+            }
+        }
+      
+      if(take)
         iso += cand->pt();
     }
 
