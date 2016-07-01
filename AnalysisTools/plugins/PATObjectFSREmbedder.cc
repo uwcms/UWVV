@@ -319,7 +319,7 @@ bool PATObjectFSREmbedder::passIso(const PCandRef& pho,
                                    const edm::Handle<edm::View<PCand> >& allCands) const
 {
   // fill iso cand lists if needed
-  if(nIsoCands.size() == 0 || chIsoCands.size() == 0)
+  if(nIsoCands.size() == 0 && chIsoCands.size() == 0)
     {
       for(size_t i = 0; i < allCands->size(); ++i)
         {
@@ -335,38 +335,14 @@ bool PATObjectFSREmbedder::passIso(const PCandRef& pho,
   for(auto& cand : nIsoCands)
     {
       double dR = reco::deltaR(pho->p4(), cand->p4());
-      bool take = (dR < isoDR_ && dR > nIsoVetoDR_);
-      for(size_t iSelf = 0; 
-          iSelf < pho->numberOfSourceCandidatePtrs();
-          ++iSelf)
-        {
-          if(pho->sourceCandidatePtr(iSelf).refCore() == cand.refCore())
-            {
-              take = false;
-              break;
-            }
-        }
-      
-      if(take)
+      if(dR < isoDR_ && dR > nIsoVetoDR_)
         iso += cand->pt();
     }
 
   for(auto& cand : chIsoCands)
     {
       double dR = reco::deltaR(pho->p4(), cand->p4());
-      bool take = (dR < isoDR_ && dR > chIsoVetoDR_);
-      for(size_t iSelf = 0; 
-          iSelf < pho->numberOfSourceCandidatePtrs();
-          ++iSelf)
-        {
-          if(pho->sourceCandidatePtr(iSelf).refCore() == cand.refCore())
-            {
-              take = false;
-              break;
-            }
-        }
-      
-      if(take)
+      if(dR < isoDR_ && dR > chIsoVetoDR_)
         iso += cand->pt();
     }
 
