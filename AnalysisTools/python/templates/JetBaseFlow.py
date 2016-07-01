@@ -31,8 +31,14 @@ class JetBaseFlow(AnalysisFlowBase):
                            self.process.jecSequence,
                            'j')
 
+            jetIDEmbedding = cms.EDProducer(
+                "PATJetIDEmbedder",
+                src = step.getObjTag('j'),
+                )
+            step.addModule('jetIDEmbedding', jetIDEmbedding, 'j')
+
         if stepName == 'preselection':
-            step.addBasicSelector('j', 'pt>30. && abs(eta) < 4.7')
+            step.addBasicSelector('j', 'pt>30. && abs(eta) < 4.7 && userFloat("idLoose") > 0.5')
 
         return step
     
