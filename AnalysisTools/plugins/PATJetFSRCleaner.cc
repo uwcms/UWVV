@@ -1,6 +1,6 @@
 //////////////////////////////////////////////////////////////////////////////
 //                                                                          //
-//   PATJetFSRCleaner.cc                                                //
+//   PATJetFSRCleaner.cc                                                    //
 //                                                                          //
 //   Removes jets close to FSR photons.                                     //
 //                                                                          //
@@ -23,10 +23,7 @@
 #include "DataFormats/PatCandidates/interface/Electron.h"
 #include "DataFormats/PatCandidates/interface/Muon.h"
 #include "DataFormats/PatCandidates/interface/Jet.h"
-#include "DataFormats/Common/interface/ValueMap.h"
 #include "DataFormats/Common/interface/View.h"
-#include "FWCore/ServiceRegistry/interface/Service.h"
-#include "CommonTools/UtilAlgos/interface/TFileService.h"
 #include "CommonTools/Utils/interface/StringCutObjectSelector.h"
 
 
@@ -100,8 +97,8 @@ PATJetFSRCleaner::PATJetFSRCleaner(const edm::ParameterSet& iConfig):
            iConfig.getParameter<std::string>("fsrLabel") :
            std::string("dretFSRCand")),
   coneDR(iConfig.exists("deltaR") ?
-           iConfig.getParameter<double>("deltaR") :
-           0.4)
+         iConfig.getParameter<double>("deltaR") :
+         0.4)
 {
   produces<std::vector<Jet> >();
 }
@@ -142,7 +139,7 @@ void PATJetFSRCleaner::produce(edm::Event& iEvent, const edm::EventSetup& iSetup
 
 std::vector<CandPtr> 
 PATJetFSRCleaner::getFSR(const edm::Handle<ElecView>& elecs,
-                             const edm::Handle<MuonView>& muons) const
+                         const edm::Handle<MuonView>& muons) const
 {
   std::vector<CandPtr> out;
 
@@ -156,12 +153,13 @@ PATJetFSRCleaner::getFSR(const edm::Handle<ElecView>& elecs,
 template<typename Lep>
 void
 PATJetFSRCleaner::addFSR(const edm::Handle<edm::View<Lep> >& leps,
-                             std::vector<CandPtr>& fsr) const
+                         std::vector<CandPtr>& fsr) const
 {
   for(size_t iLep = 0; iLep < leps->size(); ++iLep)
     {
       edm::Ptr<Lep> lep = leps->ptrAt(iLep);
       if(!selectFSRLep(lep)) continue;
+
       if(lep->hasUserCand(fsrLabel))
         fsr.push_back(lep->userCand(fsrLabel));
     }
