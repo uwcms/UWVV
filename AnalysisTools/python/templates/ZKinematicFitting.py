@@ -18,6 +18,7 @@ class ZKinematicFitting(AnalysisFlowBase):
                 src = step.getObjTag('eeee'),
                 isMC = cms.bool(self.isMC),
                 fsrLabel = cms.string(self.getFSRLabel()),
+                leptonSelection = cms.string('userFloat("%sTight") > 0.5 && userFloat("%s") > 0.5'%(self.getZZIDLabel(), self.getZZIsoLabel())),
                 )
             step.addModule('kinFit4e', kinFit4e, 'eeee')
 
@@ -26,6 +27,7 @@ class ZKinematicFitting(AnalysisFlowBase):
                 src = step.getObjTag('eemm'),
                 isMC = cms.bool(self.isMC),
                 fsrLabel = cms.string(self.getFSRLabel()),
+                leptonSelection = cms.string('userFloat("%sTight") > 0.5 && userFloat("%s") > 0.5'%(self.getZZIDLabel(), self.getZZIsoLabel())),
                 )
             step.addModule('kinFit2e2m', kinFit2e2m, 'eemm')
 
@@ -34,6 +36,7 @@ class ZKinematicFitting(AnalysisFlowBase):
                 src = step.getObjTag('mmmm'),
                 isMC = cms.bool(self.isMC),
                 fsrLabel = cms.string(self.getFSRLabel()),
+                leptonSelection = cms.string('userFloat("%sTight") > 0.5 && userFloat("%s") > 0.5'%(self.getZZIDLabel(), self.getZZIsoLabel())),
                 )
             step.addModule('kinFit4m', kinFit4m, 'mmmm')
 

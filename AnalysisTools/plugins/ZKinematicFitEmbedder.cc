@@ -26,6 +26,7 @@
 #include "DataFormats/PatCandidates/interface/CompositeCandidate.h"
 #include "DataFormats/Candidate/interface/Candidate.h"
 #include "RecoParticleFlow/PFClusterTools/interface/PFEnergyResolution.h"
+#include "CommonTools/Utils/interface/StringCutObjectSelector.h"
 
 #include "KinZfitter/KinZfitter/interface/KinZfitter.h"
 
@@ -50,6 +51,8 @@ class ZKinematicFitEmbedder : public edm::stream::EDProducer<>
   KinZfitter fitter;
 
   const std::string fsrLabel;
+
+  const StringCutObjectSelector<reco::Candidate, true> lepSelector;
 };
 
 
@@ -58,7 +61,10 @@ ZKinematicFitEmbedder<T12,T34>::ZKinematicFitEmbedder(const edm::ParameterSet& p
   srcToken(consumes<edm::View<CCand> >(pset.getParameter<edm::InputTag>("src"))),
   fitter(pset.getParameter<bool>("isMC")),
   fsrLabel(pset.exists("fsrLabel") ? 
-           pset.getParameter<std::string>("fsrLabel") : "")
+           pset.getParameter<std::string>("fsrLabel") : ""),
+  lepSelector(pset.exists("leptonSelection") ?
+              pset.getParameter<std::string>("leptonSelection") :
+              "")
 {
   produces<std::vector<CCand> >();
 }
@@ -93,6 +99,23 @@ ZKinematicFitEmbedder<T12,T34>::produce(edm::Event& iEvent,
       leptons.push_back((flip ? z2 : z1)->daughter(1)->masterClone().get());
       leptons.push_back((flip ? z1 : z2)->daughter(0)->masterClone().get());
       leptons.push_back((flip ? z1 : z2)->daughter(1)->masterClone().get());
+
+      bool lepsGood = true;
+      for(auto& lep : leptons)
+        {
+          if(!lepSelector(*lep))
+            {
+              lepsGood = false;
+              break;
+            }
+        }
+
+      if(!lepsGood)
+        {
+          cand.addUserFloat("massRefit", -1.);
+          cand.addUserFloat("massRefitError", -1.);
+          continue;
+        }
 
       std::map<unsigned, TLorentzVector> fsrMap;
 
