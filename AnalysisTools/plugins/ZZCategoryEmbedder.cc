@@ -167,10 +167,12 @@ int ZZCategoryEmbedder::getCategory(const CCand& cand, // cand do consider
     return 2;
 
   // VH hadronic
-  if((cand.userFloat("D_WHh") > 0.999 || cand.userFloat("D_ZHh") > 0.999) && 
-     nLep == 4 && 
-     ((nJets >= 2 && nJets < 4 && nBJets < 2) ||
-      (nJets >= 4 && nBJets == 0)))
+  if(nLep == 4 && 
+     (((cand.userFloat("D_WHh") > 0.999 || cand.userFloat("D_ZHh") > 0.999) && 
+       ((nJets >= 2 && nJets < 4 && nBJets < 2) ||
+        (nJets >= 4 && nBJets == 0))
+       ) ||
+      (nJets >= 2 && nJets < 4 && nBJets >= 2)))
     return 4;
   
   // VH leptonic
