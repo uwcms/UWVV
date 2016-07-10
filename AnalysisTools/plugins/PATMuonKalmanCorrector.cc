@@ -9,7 +9,6 @@
 //////////////////////////////////////////////////////////////////////////////
 
 
-#ifdef KALMAN
 
 #include <vector>
 #include <string>
@@ -69,7 +68,6 @@ PATMuonKalmanCorrector::produce(edm::Event& event, const edm::EventSetup& setup)
     {
       edm::Ptr<pat::Muon> muIn = in->ptrAt(i);
 
-      // kinematics are slow in CMSSW :(
       float pt = muIn->pt();
       float eta = muIn->eta();
       float phi = muIn->phi();
@@ -88,12 +86,13 @@ PATMuonKalmanCorrector::produce(edm::Event& event, const edm::EventSetup& setup)
           else
             pt = calib->smear(pt, eta);
 
-          ptErr = pt * calib->getCorrectedErrorAfterSmearing(pt, eta, ptErr/pt);
+          ptErr = pt * calib->getCorrectedError(pt, eta, ptErr/pt);//calib->getCorrectedErrorAfterSmearing(pt, eta, ptErr/pt);
         }
         
       out->push_back(*muIn);
       out->back().setP4(reco::Particle::PolarLorentzVector(pt, eta, phi, muIn->mass()));
       out->back().addUserFloat("kalmanPtError", ptErr);
+      out->back().addUserCand("uncorrected", muIn);
     }
 
   event.put(std::move(out));
@@ -102,4 +101,3 @@ PATMuonKalmanCorrector::produce(edm::Event& event, const edm::EventSetup& setup)
 #include "FWCore/Framework/interface/MakerMacros.h"
 DEFINE_FWK_MODULE(PATMuonKalmanCorrector);
 
-#endif // KALMAN

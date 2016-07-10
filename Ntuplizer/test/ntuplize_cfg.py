@@ -176,8 +176,6 @@ if options.eCalib:
     FlowSteps.append(ElectronCalibration)
 
 if options.muCalib:
-    raise ValueError("Muon calibrations are not yet available in 80X")
-
     from UWVV.AnalysisTools.templates.MuonCalibration import MuonCalibration
     FlowSteps.append(MuonCalibration)
 

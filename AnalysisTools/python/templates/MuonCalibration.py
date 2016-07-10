@@ -15,9 +15,9 @@ class MuonCalibration(AnalysisFlowBase):
 
         if stepName == 'preliminary':
             if self.isMC:
-                calibType = 'MC_76X_13TeV'
+                calibType = 'MC_80X_13TeV'
             else:
-                calibType = 'DATA_76X_13TeV'
+                calibType = 'DATA_80X_13TeV'
 
             muCalibrator = cms.EDProducer(
                 "PATMuonKalmanCorrector",
