@@ -12,15 +12,15 @@ if [ ! -d ZZMatrixElement ]; then
     echo "Setting up ZZ matrix element stuff"
     git clone https://github.com/cms-analysis/HiggsAnalysis-ZZMatrixElement.git ZZMatrixElement
 
-    # Get a version we know works during the awkward MELA v1->v2 transition
     pushd ZZMatrixElement
-    git checkout c6d45de674ee145a8a4d74ba99f3e446dd1d9987
+    git checkout -b from-v200p3 v2.0.0_patch3
+    source setup.sh -j 12
     popd
 fi
 
 if [ ! -d ./KinZfitter ]; then
     echo "Setting up Z kinematic fit stuff"
-    git clone -b segfaultFix git@github.com:nwoods/KinZfitter.git
+    git clone -b segfaultFix https://github.com/nwoods/KinZfitter.git
 fi
 
 if [ ! -d ./KaMuCa ]; then
