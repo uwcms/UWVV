@@ -144,6 +144,9 @@ FlowSteps.append(RecomputeElectronID)
 from UWVV.AnalysisTools.templates.MuonBaseFlow import MuonBaseFlow
 FlowSteps.append(MuonBaseFlow)
 
+from UWVV.AnalysisTools.templates.MuonScaleFactors import MuonScaleFactors
+FlowSteps.append(MuonScaleFactors)
+
 # jet energy corrections and basic preselection
 from UWVV.AnalysisTools.templates.JetBaseFlow import JetBaseFlow
 FlowSteps.append(JetBaseFlow)

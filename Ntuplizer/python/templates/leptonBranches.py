@@ -17,6 +17,11 @@ leptonBranches = cms.PSet(
         GenPt = cms.string('? genParticleRef.isNull ? -999. : genParticleRef.pt'),
         GenEta = cms.string('? genParticleRef.isNull ? -999. : genParticleRef.eta'),
         GenPhi = cms.string('? genParticleRef.isNull ? -999. : genParticleRef.phi'),
+
+        EffScaleFactor = cms.string('? hasUserFloat("effScaleFactor") ? '
+                                    'userFloat("effScaleFactor") : 1.'),
+        EffScaleFactorError = cms.string('? hasUserFloat("effScaleFactorError") ? '
+                                         'userFloat("effScaleFactorError") : 0.'),
         ),
     ints = cms.PSet(
         PdgId = cms.string('pdgId'),
