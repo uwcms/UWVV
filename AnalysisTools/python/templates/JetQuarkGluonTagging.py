@@ -1,6 +1,8 @@
 from UWVV.AnalysisTools.AnalysisFlowBase import AnalysisFlowBase
+from UWVV.Utilities.helpers import UWVV_BASE_PATH
 
 import FWCore.ParameterSet.Config as cms
+from os import path
 
 class JetQuarkGluonTagging(AnalysisFlowBase):
     def __init__(self, *args, **kwargs):
@@ -19,13 +21,21 @@ class JetQuarkGluonTagging(AnalysisFlowBase):
                 toGet = cms.VPSet(
                     cms.PSet(
                         record = cms.string('QGLikelihoodRcd'),
-                        tag = cms.string('QGLikelihoodObject_v1_AK4PFchs'),
+                        tag = cms.string('QGLikelihoodObject_80X_AK4PFchs'),
                         label = cms.untracked.string('QGL_AK4PFchs'),
                         ),
                     ),
                 )
 
-            QGPoolDBESSource.connect = cms.string('frontier://FrontierProd/CMS_CONDITIONS')
+            # Use this version to get it from the Frontier database
+            # frontierConnection = 'frontier://FrontierProd/CMS_CONDITIONS'
+            # QGPoolDBESSource.connect = cms.string(frontierConnection)
+            
+            # Use this version to get it from a local db file
+            dbPath = 'sqlite_file:' + path.join(UWVV_BASE_PATH, 'data', 
+                                                'QuarkGluonTagging', 
+                                                'QGL_80X.db')
+            QGPoolDBESSource.connect = cms.string(dbPath)
 
             step.addModule('QGPoolDBESSource', QGPoolDBESSource)
 
