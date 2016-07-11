@@ -76,7 +76,9 @@ PATMuonKalmanCorrector::produce(edm::Event& event, const edm::EventSetup& setup)
       if(isMC || (pt > 2. && fabs(eta) < 2.4))
         {
           pt = calib->getCorrectedPt(pt, eta, phi, muIn->charge());
-          ptErr = pt * calib->getCorrectedError(pt, eta, ptErr/pt);
+          
+          // Leave error as-is until something better is ready
+          // ptErr = pt * calib->getCorrectedError(pt, eta, ptErr/pt);
         }
       
       if(isMC)
@@ -86,7 +88,9 @@ PATMuonKalmanCorrector::produce(edm::Event& event, const edm::EventSetup& setup)
           else
             pt = calib->smear(pt, eta);
 
-          ptErr = pt * calib->getCorrectedError(pt, eta, ptErr/pt);//calib->getCorrectedErrorAfterSmearing(pt, eta, ptErr/pt);
+          // several options we're not using for now...
+          // leave as-is until more options are ready
+          // ptErr = pt * calib->getCorrectedError(pt, eta, ptErr/pt);//calib->getCorrectedErrorAfterSmearing(pt, eta, ptErr/pt);
         }
         
       out->push_back(*muIn);
