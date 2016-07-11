@@ -14,6 +14,7 @@
 #include <memory>
 #include <vector>
 #include <string>
+#include <cmath>
 
 // CMS includes
 #include "FWCore/Framework/interface/Frameworkfwd.h"
@@ -27,7 +28,6 @@
 #include "DataFormats/PatCandidates/interface/CompositeCandidate.h"
 
 // ZZMatrixElement includes
-#include "ZZMatrixElement/MEMCalculators/interface/MEMCalculators.h"
 #include "ZZMatrixElement/MELA/interface/Mela.h"
 
 
@@ -47,19 +47,21 @@ public:
 private:
   virtual void produce(edm::Event& iEvent, const edm::EventSetup& iSetup);
 
-  // Calculate the matrix element for fs under process hypothesis proc using 
-  // calculator calc
-  const float getZZME(MEMNames::Processes proc, MEMNames::MEMCalcs calc, 
-                      const std::vector<TLorentzVector>& p4s,
-                      const std::vector<int>& ids);
+  // Calculate the matrix element of type me for the final state currently set 
+  // in mela, under model proc, for production mode prod
+  float getP(TVar::Process proc, TVar::MatrixElement me,
+                TVar::Production prod);
 
-  // Calculate the 4l SM Higgs and background probability under 
-  // systematics assumption syst. Outputs by setting sigProb and bkgProb rather
-  // than returning
-  void getPm4l(MEMNames::SuperKDsyst syst, 
-               const std::vector<TLorentzVector>& p4s,
-               const std::vector<int>& ids,
-               float& sigProb, float& bkgProb);
+  // Calculate the matrix element of type me for the final state and jets 
+  // currently set in mela, under model proc, for production mode prod
+  float getProdP(TVar::Process proc, TVar::MatrixElement me,
+                 TVar::Production prod);
+
+  // Calculate the probability for matrix element of type me for the final 
+  // state currently set in mela, under model proc, for production mode prod,
+  // with systematic syst
+  float getPM4l(TVar::Process proc, TVar::MatrixElement me,
+                TVar::Production prod, TVar::SuperMelaSyst syst);
 
   // Get the 4-momenta of the leptons in the candidate
   std::vector<TLorentzVector> getLeptonP4s(const CCand& cand);
@@ -70,7 +72,7 @@ private:
   edm::EDGetTokenT<edm::View<CCand> > src;
   edm::EDGetTokenT<edm::View<pat::Jet> > jetSrc;
 
-  std::unique_ptr<MEMs> mem;
+  std::unique_ptr<Mela> mela;
   const std::string fsrLabel;
   const std::string qgDiscriminatorLabel;
 };
@@ -82,12 +84,14 @@ ZZDiscriminantEmbedder<T12,T34>::ZZDiscriminantEmbedder(const edm::ParameterSet&
   jetSrc(consumes<edm::View<pat::Jet> >(pset.exists("jetSrc") ? 
                                         pset.getParameter<edm::InputTag>("jetSrc") :
                                         edm::InputTag("slimmedJets"))),
-  mem(new MEMs(13, 125, "CTEQ6L")),
+  mela(new Mela(13, 125, TVar::SILENT)),
   fsrLabel(pset.exists("fsrLabel") ? 
            pset.getParameter<std::string>("fsrLabel") : 
            ""),
   qgDiscriminatorLabel(pset.getParameter<std::string>("qgDiscriminator"))
 {
+  mela->setCandidateDecayMode(TVar::CandidateDecay_ZZ);
+
   produces<std::vector<CCand> >();
 }
 
@@ -105,26 +109,19 @@ ZZDiscriminantEmbedder<T12,T34>::produce(edm::Event& iEvent,
   edm::Handle<edm::View<pat::Jet> > jets;
   iEvent.getByToken(jetSrc, jets);
 
-  TLorentzVector j1P4(0.,0.,0.,0.), j2P4(0.,0.,0.,0.);
-  float j1PgOverPq = -1.;
-  float j2PgOverPq = -1.;
-
-  if(jets->size() >= 1)
+  SimpleParticleCollection_t simpleJets;
+  std::vector<float> pgOverPq;
+  for(size_t iJet = 0; iJet < 2 && iJet < jets->size(); ++iJet)
     {
-      const pat::Jet& j = jets->at(0);
-      j1P4.SetPxPyPzE(j.px(), j.py(), j.pz(), j.energy());
+      const pat::Jet& jet = jets->at(iJet);
 
-      if(j.hasUserFloat(qgDiscriminatorLabel))
-        j1PgOverPq = (1./j.userFloat(qgDiscriminatorLabel) - 1.);
-    }
+      TLorentzVector v(jet.px(), jet.py(), jet.pz(), jet.energy());
+      simpleJets.push_back(SimpleParticle_t(0, v));
 
-  if(jets->size() >= 2)
-    {
-      const pat::Jet& j = jets->at(1);
-      j2P4.SetPxPyPzE(j.px(), j.py(), j.pz(), j.energy());
-
-      if(j.hasUserFloat(qgDiscriminatorLabel))
-        j2PgOverPq = (1./j.userFloat(qgDiscriminatorLabel) - 1.);
+      if(jet.hasUserFloat(qgDiscriminatorLabel))
+        pgOverPq.push_back(1./jet.userFloat(qgDiscriminatorLabel) - 1.);
+      else
+        pgOverPq.push_back(-1.);
     }
 
   for(size_t i = 0; i < cands->size(); ++i)
@@ -134,32 +131,56 @@ ZZDiscriminantEmbedder<T12,T34>::produce(edm::Event& iEvent,
 
       std::vector<TLorentzVector> p4s = getLeptonP4s(cand);
       std::vector<int> ids = getLeptonIDs(cand);
-      
-      float p0plus_VAJHU = getZZME(MEMNames::kSMHiggs,
-                                   MEMNames::kJHUGen, p4s, ids);
-      float p0minus_VAJHU = getZZME(MEMNames::k0minus,
-                                    MEMNames::kJHUGen, p4s, ids);
-      float Dgg10_VAMCFM = getZZME(MEMNames::kggHZZ_10,
-                                   MEMNames::kMCFM, p4s, ids);
-      float bkg_VAMCFM = getZZME(MEMNames::kqqZZ,
-                                 MEMNames::kMCFM, p4s, ids);
+      SimpleParticleCollection_t daughters;
+      for(size_t dau = 0; dau < 4; ++dau)
+        daughters.push_back(SimpleParticle_t(ids.at(dau), p4s.at(dau)));
 
-      float p0plus_m4l, bkg_m4l;
-      getPm4l(MEMNames::kNone, p4s, ids, p0plus_m4l, bkg_m4l);
+      mela->setInputEvent(&daughters, &simpleJets, 0, 0);
+      mela->setCurrentCandidateFromIndex(0);
+
+      float p0plus_VAJHU = getP(TVar::HSMHiggs, TVar::JHUGen, 
+                                   TVar::ZZGG);
+      float p0minus_VAJHU = getP(TVar::H0minus, TVar::JHUGen, 
+                                    TVar::ZZGG);
+
+      float pg1g4_VAJHU = -1.;
+      mela->setProcess(TVar::SelfDefine_spin0, TVar::JHUGen, TVar::ZZGG);
+      (mela->selfDHggcoupl)[0][0] = 1.;
+      (mela->selfDHzzcoupl)[0][0][0] = 1.;
+      (mela->selfDHzzcoupl)[0][3][0] = 1.;
+      mela->computeP(pg1g4_VAJHU, true);
+      pg1g4_VAJHU -= p0plus_VAJHU + p0minus_VAJHU;
+
+      float bkg_VAMCFM = getP(TVar::bkgZZ, TVar::MCFM, TVar::ZZQQB);
+
+      float Dgg10_VAMCFM = -1.;
+      mela->computeD_gg(TVar::MCFM, TVar::D_gg10, Dgg10_VAMCFM);
+
+      float p0plus_m4l = getPM4l(TVar::HSMHiggs, TVar::JHUGen, TVar::ZZGG, 
+                                 TVar::SMSyst_None);
+      float bkg_m4l = getPM4l(TVar::bkgZZ, TVar::JHUGen, TVar::ZZGG, 
+                              TVar::SMSyst_None);
 
       cand.addUserFloat("p0plus_m4l", p0plus_m4l);
       cand.addUserFloat("bkg_m4l", bkg_m4l);
       cand.addUserFloat("p0plus_VAJHU", p0plus_VAJHU);
       cand.addUserFloat("p0minus_VAJHU", p0minus_VAJHU);
-      cand.addUserFloat("Dgg10_VAMCFM", Dgg10_VAMCFM);
+      cand.addUserFloat("pg1g4_VAJHU", pg1g4_VAJHU);
       cand.addUserFloat("bkg_VAMCFM", bkg_VAMCFM);
+      cand.addUserFloat("Dgg10_VAMCFM", Dgg10_VAMCFM);
       cand.addUserFloat("D_bkg_kin", 
                         p0plus_VAJHU / (p0plus_VAJHU + bkg_VAMCFM));
       cand.addUserFloat("D_bkg", 
                         p0plus_VAJHU * p0plus_m4l / 
                         (p0plus_VAJHU * p0plus_m4l + bkg_VAMCFM * bkg_m4l));
-      cand.addUserFloat("D_g4", p0plus_VAJHU / (p0plus_VAJHU + p0minus_VAJHU));
-      
+      cand.addUserFloat("D_g4", p0plus_VAJHU / (p0plus_VAJHU + 
+                                                (2.521 * 2.521 * // since g4=1
+                                                 p0minus_VAJHU)));
+      cand.addUserFloat("D_g1g4", (pg1g4_VAJHU * 2.521 / // 2.521 since g1=g4=1
+                                   (p0plus_VAJHU + 
+                                    2.521 * 2.521 *
+                                    p0minus_VAJHU)));
+
       float phjj_VAJHU = -1.;
       float pvbf_VAJHU = -1.;
       float pwh_hadronic_VAJHU = -1.;
@@ -177,49 +198,38 @@ ZZDiscriminantEmbedder<T12,T34>::produce(edm::Event& iEvent,
 
       if(jets->size())
         {
-          Mela* mela = mem->m_MELA;
-
-          TLorentzVector p4(0.,0.,0.,0.);
-          for(auto& v : p4s)
-            p4 += v;
-
           if(jets->size() > 1)
             {
-              p4s.push_back(j1P4);
-              p4s.push_back(j2P4);
-              ids.push_back(0);
-              ids.push_back(0);
-
-              phjj_VAJHU = getZZME(MEMNames::kJJ_SMHiggs_GG, MEMNames::kJHUGen,
-                                   p4s, ids);
-              pvbf_VAJHU = getZZME(MEMNames::kJJ_SMHiggs_VBF, 
-                                   MEMNames::kJHUGen, p4s, ids);
-              mela->setProcess(TVar::HSMHiggs, TVar::JHUGen, TVar::WH);
-              mela->computeProdP(j1P4, 0, j2P4, 0, p4, pwh_hadronic_VAJHU);
-              mela->setProcess(TVar::HSMHiggs, TVar::JHUGen, TVar::ZH);
-              mela->computeProdP(j1P4, 0, j2P4, 0, p4, pzh_hadronic_VAJHU);
+              phjj_VAJHU = getProdP(TVar::HSMHiggs, TVar::JHUGen, TVar::JJQCD);
+              pvbf_VAJHU = getProdP(TVar::HSMHiggs, TVar::JHUGen, TVar::JJVBF);
+              pwh_hadronic_VAJHU = getProdP(TVar::HSMHiggs, TVar::JHUGen,
+                                            TVar::Had_WH);
+              pzh_hadronic_VAJHU = getProdP(TVar::HSMHiggs, TVar::JHUGen,
+                                            TVar::Had_ZH);
 
               Djet_VAJHU = pvbf_VAJHU / (pvbf_VAJHU + phjj_VAJHU);
               D_WHh_VAJHU = pwh_hadronic_VAJHU / (pwh_hadronic_VAJHU + 100000.*phjj_VAJHU);
               D_ZHh_VAJHU = pzh_hadronic_VAJHU / (pzh_hadronic_VAJHU + 10000.*phjj_VAJHU);
 
               D_VBF2j = 1. / (1. + (1. / Djet_VAJHU - 1.) * 
-                              TMath::Power(j1PgOverPq * j2PgOverPq, 1./3.));
-              D_WHh = 1. / (1. + (1. / D_WHh_VAJHU - 1.) * j1PgOverPq * j2PgOverPq);
-              D_ZHh = 1. / (1. + (1. / D_ZHh_VAJHU - 1.) * j1PgOverPq * j2PgOverPq);
+                              std::pow(pgOverPq.at(0) * 
+                                       pgOverPq.at(1), 1./3.));
+              D_WHh = 1. / (1. + (1. / D_WHh_VAJHU - 1.) * pgOverPq.at(0) * 
+                            pgOverPq.at(1));
+              D_ZHh = 1. / (1. + (1. / D_ZHh_VAJHU - 1.) * pgOverPq.at(0) * 
+                            pgOverPq.at(1));
             }
           else
             {
-              mela->setProcess(TVar::HSMHiggs, TVar::JHUGen, TVar::JH);
-              mela->computeProdP(j1P4, 0, j2P4, 0, p4, phj_VAJHU);
-              mela->setProcess(TVar::HSMHiggs, TVar::JHUGen, TVar::JJVBF);
-              mela->computeProdP(j1P4, 0, j2P4, 0, p4, pvbf_VAJHU);
-              mela->get_PAux(pAux_vbf_VAJHU);
+              phj_VAJHU = getProdP(TVar::HSMHiggs, TVar::JHUGen, TVar::JQCD);
+              pvbf_VAJHU = getProdP(TVar::HSMHiggs, TVar::JHUGen, TVar::JJVBF);
+              mela->getPAux(pAux_vbf_VAJHU);
 
               D_VBF1j_VAJHU = pvbf_VAJHU * pAux_vbf_VAJHU / 
                 (pvbf_VAJHU * pAux_vbf_VAJHU + 5. * phj_VAJHU);
 
-              D_VBF1j = 1. / (1. + (1. / D_VBF1j_VAJHU - 1.) * TMath::Power(j1PgOverPq, 1./3.));
+              D_VBF1j = 1. / (1. + (1. / D_VBF1j_VAJHU - 1.) * 
+                              std::pow(pgOverPq.at(0), 1./3.));
             }
         }
 
@@ -237,6 +247,8 @@ ZZDiscriminantEmbedder<T12,T34>::produce(edm::Event& iEvent,
       cand.addUserFloat("D_VBF2j", D_VBF2j);
       cand.addUserFloat("D_WHh", D_WHh);
       cand.addUserFloat("D_ZHh", D_ZHh);
+
+      mela->resetInputEvent();
     }
 
   iEvent.put(std::move(out));
@@ -244,31 +256,45 @@ ZZDiscriminantEmbedder<T12,T34>::produce(edm::Event& iEvent,
 
 
 template<class T12, class T34>
-const float 
-ZZDiscriminantEmbedder<T12,T34>::getZZME(MEMNames::Processes proc, 
-                                         MEMNames::MEMCalcs calc, 
-                                         const std::vector<TLorentzVector>& p4s,
-                                         const std::vector<int>& ids)
+float 
+ZZDiscriminantEmbedder<T12,T34>::getP(TVar::Process proc, 
+                                      TVar::MatrixElement me, 
+                                      TVar::Production prod)
 {
-  double ME;
-  mem->computeME(proc, calc, p4s, ids, ME);
+  float out;
+  mela->setProcess(proc, me, prod);
+  mela->computeP(out, true);
 
-  return ME;
+  return out;
 }
 
-// Assigns the answers to sigProb and bkgProb rather than returning them
-template<class T12, class T34>
-void 
-ZZDiscriminantEmbedder<T12,T34>::getPm4l(MEMNames::SuperKDsyst syst, 
-                                         const std::vector<TLorentzVector>& p4s,
-                                         const std::vector<int>& ids,
-                                         float& sigProb, float& bkgProb)
-{
-  double pSig, pBkg;
-  mem->computePm4l(p4s, ids, syst, pSig, pBkg);
 
-  sigProb = float(pSig);
-  bkgProb = float(pBkg);
+template<class T12, class T34>
+float 
+ZZDiscriminantEmbedder<T12,T34>::getProdP(TVar::Process proc, 
+                                          TVar::MatrixElement me, 
+                                          TVar::Production prod)
+{
+  float out;
+  mela->setProcess(proc, me, prod);
+  mela->computeProdP(out, true);
+
+  return out;
+}
+
+
+template<class T12, class T34>
+float
+ZZDiscriminantEmbedder<T12,T34>::getPM4l(TVar::Process proc, 
+                                         TVar::MatrixElement me, 
+                                         TVar::Production prod,
+                                         TVar::SuperMelaSyst syst)
+{
+  float out;
+  mela->setProcess(proc, me, prod);
+  mela->computePM4l(syst, out);
+
+  return out;
 }
 
 
