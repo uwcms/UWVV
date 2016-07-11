@@ -4,7 +4,7 @@
 import FWCore.ParameterSet.Config as cms
 from FWCore.ParameterSet.SequenceTypes import _ModuleSequenceType
 
-from UWVV.AnalysisTools.helpers import getObjTypes, getObjName
+from UWVV.Utilities.helpers import getObjTypes, getObjName
 
 from collections import OrderedDict
 

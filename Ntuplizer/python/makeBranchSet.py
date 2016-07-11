@@ -10,9 +10,8 @@ from UWVV.Ntuplizer.templates.muonBranches import muonBranches
 from UWVV.Ntuplizer.templates.zzDiscriminantBranches import zzDiscriminantBranches
 from UWVV.Ntuplizer.templates.crossDaughterBranches import makeCrossDaughterBranches
 
-from UWVV.Ntuplizer.helpers import pset2Dict, dict2PSet, \
-    recursiveMerge, combinePSets 
-from UWVV.AnalysisTools.helpers import mapObjects
+from UWVV.Utilities.helpers import pset2Dict, dict2PSet, \
+    recursiveMerge, combinePSets, mapObjects
 
 
 

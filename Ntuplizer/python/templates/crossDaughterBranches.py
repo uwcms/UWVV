@@ -2,8 +2,7 @@ import FWCore.ParameterSet.Config as cms
 
 from itertools import combinations
 
-from UWVV.Ntuplizer.helpers import dict2PSet
-from UWVV.AnalysisTools.helpers import mapObjects
+from UWVV.Utilities.helpers import dict2PSet, mapObjects
 
 
 def makeCrossDaughterBranches(channel):

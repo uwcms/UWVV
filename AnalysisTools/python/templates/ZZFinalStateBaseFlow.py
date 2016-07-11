@@ -1,6 +1,5 @@
 from UWVV.AnalysisTools.templates.ZPlusXBaseFlow import ZPlusXBaseFlow
-from UWVV.AnalysisTools.helpers import mapObjects
-from UWVV.Ntuplizer.helpers import parseChannels
+from UWVV.Utilities.helpers import mapObjects, parseChannels
 
 import FWCore.ParameterSet.Config as cms
 

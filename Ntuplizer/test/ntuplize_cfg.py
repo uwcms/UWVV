@@ -5,7 +5,7 @@ import FWCore.ParameterSet.Types as CfgTypes
 
 from UWVV.AnalysisTools.analysisFlowMaker import createFlow
 
-from UWVV.Ntuplizer.helpers import parseChannels, expandChannelName
+from UWVV.Utilities.helpers import parseChannels, expandChannelName
 from UWVV.Ntuplizer.makeBranchSet import makeBranchSet
 from UWVV.Ntuplizer.eventParams import makeEventParams
 from UWVV.Ntuplizer.templates.triggerBranches import triggerBranches    
