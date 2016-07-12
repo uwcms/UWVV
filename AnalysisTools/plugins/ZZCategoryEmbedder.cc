@@ -161,14 +161,15 @@ int ZZCategoryEmbedder::getCategory(const CCand& cand, // cand do consider
   unsigned nLep = nep + nem + nmp + nmm;
 
   // VBF 2-jet
-  if(cand.userFloat("D_VBF2j") > 0.38 && nLep == 4 && 
+  if(cand.hasUserFloat("D_VBF2j") && cand.userFloat("D_VBF2j") > 0.38 && nLep == 4 && 
      ((nJets >= 2 && nJets < 4 && nBJets < 2) ||
       (nJets >= 4 && nBJets == 0)))
     return 2;
 
   // VH hadronic
   if(nLep == 4 && 
-     (((cand.userFloat("D_WHh") > 0.999 || cand.userFloat("D_ZHh") > 0.999) && 
+     ((((cand.hasUserFloat("D_WHh") && cand.userFloat("D_WHh") > 0.999) || 
+        (cand.hasUserFloat("D_ZHh") && cand.userFloat("D_ZHh") > 0.999)) && 
        ((nJets >= 2 && nJets < 4 && nBJets < 2) ||
         (nJets >= 4 && nBJets == 0))
        ) ||
@@ -186,7 +187,7 @@ int ZZCategoryEmbedder::getCategory(const CCand& cand, // cand do consider
     return 5;
 
   // VBF 1-jet
-  if(nLep == 4 && nJets == 1 && cand.userFloat("D_VBF1j") > 0.56)
+  if(nLep == 4 && nJets == 1 && cand.hasUserFloat("D_VBF1j") && cand.userFloat("D_VBF1j") > 0.56)
     return 1;
   
   // untagged
