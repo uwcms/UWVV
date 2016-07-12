@@ -62,8 +62,6 @@ plots
 plots/*
 *ipynb_checkpoints*
 recipe/vpython
-data
-data/*
 ipynb
 
 # EMACS temporary files
