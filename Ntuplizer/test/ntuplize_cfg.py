@@ -150,6 +150,10 @@ FlowSteps.append(MuonScaleFactors)
 # jet energy corrections and basic preselection
 from UWVV.AnalysisTools.templates.JetBaseFlow import JetBaseFlow
 FlowSteps.append(JetBaseFlow)
+if options.isMC:
+    from UWVV.AnalysisTools.templates.JetEnergySmearing import JetEnergySmearing
+    FlowSteps.append(JetEnergySmearing)
+
 
 # make final states
 if zz:
