@@ -22,15 +22,16 @@ class ElectronCalibration(AnalysisFlowBase):
                 initialSeed = cms.untracked.uint32(987),
                 )
             
-            self.process.load('EgammaAnalysis.ElectronTools.calibratedElectronsRun2_cfi')
+            calibratedPatElectrons = cms.EDProducer(
+                "CalibratedPatElectronProducerRun2",
+                electrons = step.getObjTag('e'),
+                gbrForestName = cms.string("gedelectron_p4combination_25ns"),
+                isMC = cms.bool(self.isMC),
+                isSynchronization = cms.bool(self.isSync),
+                correctionFile = cms.string('EgammaAnalysis/ElectronTools/data/ScalesSmearings/80X_Golden22June_approval'),
+                )
 
-            self.process.calibratedPatElectrons.electrons = step.getObjTag('e')
-            self.process.calibratedPatElectrons.isMC = cms.bool(self.isMC)
-            self.process.calibratedPatElectrons.isSynchronization = cms.bool(self.isSync)
-
-            step.addModule('calibratedPatElectrons', 
-                           self.process.calibratedPatElectrons,
-                           'e')
+            step.addModule('calibratedPatElectrons', calibratedPatElectrons, 'e')
 
         return step
 

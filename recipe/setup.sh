@@ -8,7 +8,20 @@ if [ ! -d ./RecoEgamma ]; then
     git clone https://github.com/Werbellin/RecoEgamma_8X RecoEgamma
 fi
 
-if [ ! -d ZZMatrixElement ]; then
+if [ ! -d ./EgammaAnalysis ]; then
+    echo "Setting up electron energy scale corrections"
+    git remote add -f -t smearings80X shervin86 https://github.com/shervin86/cmssw.git
+    git cherry-pick f3b0b0140483c336212baa035cf9a820a016a799
+    git cherry-pick a5aaeb7a598800ae98e88ea1a952ecd1d66aa059
+    git cherry-pick c7ac16dd88969510d2d6d6ea2c4702e0108bf151
+    git cherry-pick 054a90830c77423ee673204611522018ace69c5d
+    git cms-addpkg EgammaAnalysis/ElectronTools
+    pushd EgammaAnalysis/ElectronTools/data
+    git clone -b ICHEP2016_approval_4fb https://github.com/ECALELFS/ScalesSmearings.git
+    popd
+fi
+
+if [ ! -d ./ZZMatrixElement ]; then
     echo "Setting up ZZ matrix element stuff"
     git clone https://github.com/cms-analysis/HiggsAnalysis-ZZMatrixElement.git ZZMatrixElement
 

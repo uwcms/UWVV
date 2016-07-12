@@ -177,8 +177,6 @@ FlowSteps.append(ZZFlow)
 
 # Lepton calibrations
 if options.eCalib:
-    raise ValueError("Electron calibrations are not yet available in 80X")
-
     from UWVV.AnalysisTools.templates.ElectronCalibration import ElectronCalibration
     FlowSteps.append(ElectronCalibration)
 
