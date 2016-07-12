@@ -3,7 +3,12 @@
 //    ZZDiscriminantEmbedder.cc                                             //
 //                                                                          //
 //    Takes composite cands for 4l final states and computes a bunch of     //
-//    MELA/MEKD discriminants for them.                                     //
+//    MELA/MEKD discriminants for them, embedded as userFloats.             //
+//                                                                          //
+//    To speed things up, labels for userFloats indicating decisions on ID, //
+//    isolation, etc., may be passed in, and only candidates with all       //
+//    daughters passing these will be considered (the rest have nothing     //
+//    embedded, so be sure to check downstream).                            //
 //                                                                          //
 //    Author: Nate Woods, U. Wisconsin                                      //
 //                                                                          //
@@ -47,10 +52,17 @@ public:
 private:
   virtual void produce(edm::Event& iEvent, const edm::EventSetup& iSetup);
 
+  // Check if all daughters of a candidate pass the decision userFloats
+  bool candPasses(const CCand& cand) const;
+
+  // Helper to check one of the daughters
+  template<class T>
+  bool daughterPasses(const T& dau) const;
+
   // Calculate the matrix element of type me for the final state currently set 
   // in mela, under model proc, for production mode prod
   float getP(TVar::Process proc, TVar::MatrixElement me,
-                TVar::Production prod);
+             TVar::Production prod);
 
   // Calculate the matrix element of type me for the final state and jets 
   // currently set in mela, under model proc, for production mode prod
@@ -64,10 +76,10 @@ private:
                 TVar::Production prod, TVar::SuperMelaSyst syst);
 
   // Get the 4-momenta of the leptons in the candidate
-  std::vector<TLorentzVector> getLeptonP4s(const CCand& cand);
+  std::vector<TLorentzVector> getLeptonP4s(const CCand& cand) const;
 
   // Get the PDG IDs of the leptons in the candidate
-  std::vector<int> getLeptonIDs(const CCand& cand);
+  std::vector<int> getLeptonIDs(const CCand& cand) const;
 
   edm::EDGetTokenT<edm::View<CCand> > src;
   edm::EDGetTokenT<edm::View<pat::Jet> > jetSrc;
@@ -75,6 +87,7 @@ private:
   std::unique_ptr<Mela> mela;
   const std::string fsrLabel;
   const std::string qgDiscriminatorLabel;
+  const std::vector<std::string> skimDecisionLabels;
 };
 
 
@@ -88,7 +101,10 @@ ZZDiscriminantEmbedder<T12,T34>::ZZDiscriminantEmbedder(const edm::ParameterSet&
   fsrLabel(pset.exists("fsrLabel") ? 
            pset.getParameter<std::string>("fsrLabel") : 
            ""),
-  qgDiscriminatorLabel(pset.getParameter<std::string>("qgDiscriminator"))
+  qgDiscriminatorLabel(pset.getParameter<std::string>("qgDiscriminator")),
+  skimDecisionLabels(pset.exists("skimDecisionLabels") ? 
+                     pset.getParameter<std::vector<std::string> >("skimDecisionLabels") : 
+                     std::vector<std::string>())
 {
   mela->setCandidateDecayMode(TVar::CandidateDecay_ZZ);
 
@@ -128,6 +144,10 @@ ZZDiscriminantEmbedder<T12,T34>::produce(edm::Event& iEvent,
     {
       out->push_back(cands->at(i));
       CCand& cand = out->back(); // just for convenience
+
+      // Only do all this slow stuff on a good candidate
+      if(!(skimDecisionLabels.size() == 0 || candPasses(cand)))
+        continue;
 
       std::vector<TLorentzVector> p4s = getLeptonP4s(cand);
       std::vector<int> ids = getLeptonIDs(cand);
@@ -256,6 +276,49 @@ ZZDiscriminantEmbedder<T12,T34>::produce(edm::Event& iEvent,
 
 
 template<class T12, class T34>
+bool
+ZZDiscriminantEmbedder<T12,T34>::candPasses(const CCand& cand) const
+{
+  const reco::Candidate* z1 = cand.daughter(0);
+  
+  const T12* l1 = static_cast<const T12*>(z1->daughter(0)->masterClone().get());
+  if(!daughterPasses(*l1))
+    return false;
+
+  const T12* l2 = static_cast<const T12*>(z1->daughter(1)->masterClone().get());
+  if(!daughterPasses(*l2))
+    return false;
+
+  const reco::Candidate* z2 = cand.daughter(1);
+
+  const T34* l3 = static_cast<const T34*>(z2->daughter(0)->masterClone().get());
+  if(!daughterPasses(*l3))
+    return false;
+
+  const T34* l4 = static_cast<const T34*>(z2->daughter(1)->masterClone().get());
+  if(!daughterPasses(*l4))
+    return false;
+
+  return true;
+}
+
+
+template<class T12, class T34>
+template<class T>
+bool
+ZZDiscriminantEmbedder<T12,T34>::daughterPasses(const T& dau) const
+{
+  for(auto& label : skimDecisionLabels)
+    {
+      if(!(dau.hasUserFloat(label) && bool(dau.userFloat(label))))
+        return false;
+    }
+
+  return true;
+}
+
+
+template<class T12, class T34>
 float 
 ZZDiscriminantEmbedder<T12,T34>::getP(TVar::Process proc, 
                                       TVar::MatrixElement me, 
@@ -300,7 +363,7 @@ ZZDiscriminantEmbedder<T12,T34>::getPM4l(TVar::Process proc,
 
 template<class T12, class T34>
 std::vector<TLorentzVector>
-ZZDiscriminantEmbedder<T12,T34>::getLeptonP4s(const CCand& cand)
+ZZDiscriminantEmbedder<T12,T34>::getLeptonP4s(const CCand& cand) const
 {
   std::vector<TLorentzVector> out;
   
@@ -345,7 +408,7 @@ ZZDiscriminantEmbedder<T12,T34>::getLeptonP4s(const CCand& cand)
 
 template<class T12, class T34>
 std::vector<int>
-ZZDiscriminantEmbedder<T12,T34>::getLeptonIDs(const CCand& cand)
+ZZDiscriminantEmbedder<T12,T34>::getLeptonIDs(const CCand& cand) const
 {
   std::vector<int> out;
   
