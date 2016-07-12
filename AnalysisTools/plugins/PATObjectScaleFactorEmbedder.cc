@@ -82,7 +82,7 @@ void PATObjectScaleFactorEmbedder<T>::produce(edm::Event& iEvent,
     {
       const T& t = in->at(i);
 
-      float value = h->GetBinContent(h->FindBin(t.pt(), t.eta()));
+      float value = h->GetBinContent(h->FindBin(t.eta(), t.pt()));
 
       out->push_back(t);
       out->back().addUserFloat(label, value);
