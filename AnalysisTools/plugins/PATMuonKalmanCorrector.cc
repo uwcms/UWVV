@@ -48,7 +48,7 @@ private:
 PATMuonKalmanCorrector::PATMuonKalmanCorrector(const edm::ParameterSet& params) :
   srcToken(consumes<edm::View<pat::Muon> >(params.getParameter<edm::InputTag>("src"))),
   corType(params.getParameter<std::string>("calibType")),
-  isMC(corType.find("isMC") != std::string::npos),
+  isMC(corType.find("MC") != std::string::npos),
   calib(new KalmanMuonCalibrator(corType)),
   isSync(params.exists("isSync") && isMC && params.getParameter<bool>("isSync"))
 {
