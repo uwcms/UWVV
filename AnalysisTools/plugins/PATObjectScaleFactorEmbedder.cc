@@ -82,7 +82,32 @@ void PATObjectScaleFactorEmbedder<T>::produce(edm::Event& iEvent,
     {
       const T& t = in->at(i);
 
-      float value = h->GetBinContent(h->FindBin(t.eta(), t.pt()));
+      // don't just give 0 for under/overflow
+      int bin = h->FindBin(t.eta(), t.pt());
+      if(h->IsBinOverflow(bin))
+        {
+          int binx, biny, binz;
+          h->GetBinXYZ(bin, binx, biny, binz);
+          if(binx > h->GetNbinsX())
+            binx -= 1;
+          if(biny > h->GetNbinsY())
+            biny -= 1;
+          
+          bin = h->GetBin(binx, biny, binz);
+        }
+      if(h->IsBinUnderflow(bin))
+        {
+          int binx, biny, binz;
+          h->GetBinXYZ(bin, binx, biny, binz);
+          if(!binx)
+            binx += 1;
+          if(!biny)
+            biny += 1;
+          
+          bin = h->GetBin(binx, biny, binz);
+        }
+
+      float value = h->GetBinContent(bin);
 
       out->push_back(t);
       out->back().addUserFloat(label, value);
