@@ -8,7 +8,7 @@ import FWCore.ParameterSet.Config as cms
 class MuonScaleFactors(AnalysisFlowBase):
     def __init__(self, *args, **kwargs):
         if not hasattr(self, 'isMC'):
-            self.isMC = kwargs.get('isMC', True)
+            self.isMC = kwargs.pop('isMC', True)
         super(MuonScaleFactors, self).__init__(*args, **kwargs)
 
     def makeAnalysisStep(self, stepName, **inputs):
