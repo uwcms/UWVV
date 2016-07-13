@@ -26,5 +26,9 @@ muonBranches = cms.PSet(
                               'userFloat("ZZIDPassHighPt") : 0.'),
         PFID = cms.string('? hasUserFloat("ZZIDPassPF") ? '
                           'userFloat("ZZIDPassPF") : 0.'),
+        HighPtIDNoVtx = cms.string('? hasUserFloat("ZZIDPassHighPtNoVtx") ? '
+                                   'userFloat("ZZIDPassHighPtNoVtx") : 0.'),
+        PFIDNoVtx = cms.string('? hasUserFloat("ZZIDPassPFNoVtx") ? '
+                               'userFloat("ZZIDPassPFNoVtx") : 0.'),
         ),
     )
