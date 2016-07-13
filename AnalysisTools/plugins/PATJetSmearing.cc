@@ -94,10 +94,6 @@ void PATJetSmearing::produce(edm::Event& iEvent,
 
       float relPtErr = resPt.getResolution(params);
 
-      double jerCorr = 1.;
-      double jerCorrUp = 1.;
-      double jerCorrDn = 1.;
-
       JME::JetParameters paramsSF;
       paramsSF.setJetEta(eta).setRho(*rho);
       
@@ -129,9 +125,9 @@ void PATJetSmearing::produce(edm::Event& iEvent,
           ptJERDn = std::max(float(0.), smear * sigDn + pt);
         }
 
-      jerCorr = ptJER / pt;
-      jerCorrUp = ptJERUp / pt;
-      jerCorrDn = ptJERDn / pt;
+      float jerCorr = ptJER / pt;
+      float jerCorrUp = ptJERUp / pt;
+      float jerCorrDn = ptJERDn / pt;
 
       math::XYZTLorentzVector p4JER = jerCorr * jet.p4();
       jet.setP4(p4JER);
