@@ -73,24 +73,27 @@ PATMuonKalmanCorrector::produce(edm::Event& event, const edm::EventSetup& setup)
       float phi = muIn->phi();
       float ptErr = muIn->bestTrack()->ptError();
       
-      if(isMC || (pt > 2. && fabs(eta) < 2.4))
+      if(muIn->muonBestTrackType() == 1)
         {
-          pt = calib->getCorrectedPt(pt, eta, phi, muIn->charge());
+          if(isMC || (pt > 2. && fabs(eta) < 2.4))
+            {
+              pt = calib->getCorrectedPt(pt, eta, phi, muIn->charge());
           
-          // Leave error as-is until something better is ready
-          // ptErr = pt * calib->getCorrectedError(pt, eta, ptErr/pt);
-        }
+              // Leave error as-is until something better is ready
+              // ptErr = pt * calib->getCorrectedError(pt, eta, ptErr/pt);
+            }
       
-      if(isMC)
-        {
-          if(isSync)
-            pt = calib->smearForSync(pt, eta);
-          else
-            pt = calib->smear(pt, eta);
+          if(isMC)
+            {
+              if(isSync)
+                pt = calib->smearForSync(pt, eta);
+              else
+                pt = calib->smear(pt, eta);
 
-          // several options we're not using for now...
-          // leave as-is until more options are ready
-          // ptErr = pt * calib->getCorrectedError(pt, eta, ptErr/pt);//calib->getCorrectedErrorAfterSmearing(pt, eta, ptErr/pt);
+              // several options we're not using for now...
+              // leave as-is until more options are ready
+              // ptErr = pt * calib->getCorrectedError(pt, eta, ptErr/pt);//calib->getCorrectedErrorAfterSmearing(pt, eta, ptErr/pt);
+            }
         }
         
       out->push_back(*muIn);
