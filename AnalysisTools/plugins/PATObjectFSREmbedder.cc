@@ -103,16 +103,16 @@ PATObjectFSREmbedder::PATObjectFSREmbedder(const edm::ParameterSet& iConfig):
                   !iConfig.getParameter<std::string>("phoSelection").empty()) ? 
                  " && " + iConfig.getParameter<std::string>("phoSelection") :
                  "")),
-  nIsoSelection_("pdgId == 22 || pdgId == 130" +
+  nIsoSelection_("(pdgId == 22 || pdgId == 130)" +
                  ((iConfig.exists("nIsoSelection") && 
-                  !iConfig.getParameter<std::string>("nIsoSelection").empty()) ? 
-                 " && " + iConfig.getParameter<std::string>("nIsoSelection") :
+                   !iConfig.getParameter<std::string>("nIsoSelection").empty()) ? 
+                  " && " + iConfig.getParameter<std::string>("nIsoSelection") :
                   "")),
   chIsoSelection_("abs(pdgId) == 211" +
-                 ((iConfig.exists("chIsoSelection") && 
-                  !iConfig.getParameter<std::string>("chIsoSelection").empty()) ? 
-                 " && " + iConfig.getParameter<std::string>("chIsoSelection") :
-                  "")),
+                  ((iConfig.exists("chIsoSelection") && 
+                    !iConfig.getParameter<std::string>("chIsoSelection").empty()) ? 
+                   " && " + iConfig.getParameter<std::string>("chIsoSelection") :
+                   "")),
   eSelection_(iConfig.exists("eSelection") ?
 	      iConfig.getParameter<std::string>("eSelection") :
 	      ""),
