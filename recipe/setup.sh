@@ -26,7 +26,7 @@ if [ ! -d ./ZZMatrixElement ]; then
     git clone https://github.com/cms-analysis/HiggsAnalysis-ZZMatrixElement.git ZZMatrixElement
 
     pushd ZZMatrixElement
-    git checkout -b from-v200p4 v2.0.0_patch4
+    git checkout -b from-v200p5 v2.0.0_patch5
     source setup.sh -j 12
     popd
 fi

@@ -205,16 +205,16 @@ ZZDiscriminantEmbedder<T12,T34>::produce(edm::Event& iEvent,
       float pvbf_VAJHU = -1.;
       float pwh_hadronic_VAJHU = -1.;
       float pzh_hadronic_VAJHU = -1.;
-      float Djet_VAJHU = -1.;
-      float D_WHh_VAJHU = -1.;
-      float D_ZHh_VAJHU = -1.;
       float pAux_vbf_VAJHU = -1.;
       float phj_VAJHU = -1.;
-      float D_VBF1j_VAJHU = -1.;
       float D_VBF1j = -1.;
       float D_VBF2j = -1.;
       float D_WHh = -1.;
       float D_ZHh = -1.;
+      float D_VBF1j_QG = -1.;
+      float D_VBF2j_QG = -1.;
+      float D_WHh_QG = -1.;
+      float D_ZHh_QG = -1.;
 
       if(jets->size())
         {
@@ -227,17 +227,17 @@ ZZDiscriminantEmbedder<T12,T34>::produce(edm::Event& iEvent,
               pzh_hadronic_VAJHU = getProdP(TVar::HSMHiggs, TVar::JHUGen,
                                             TVar::Had_ZH);
 
-              Djet_VAJHU = pvbf_VAJHU / (pvbf_VAJHU + phjj_VAJHU);
-              D_WHh_VAJHU = pwh_hadronic_VAJHU / (pwh_hadronic_VAJHU + 100000.*phjj_VAJHU);
-              D_ZHh_VAJHU = pzh_hadronic_VAJHU / (pzh_hadronic_VAJHU + 10000.*phjj_VAJHU);
+              D_VBF2j = pvbf_VAJHU / (pvbf_VAJHU + 0.06 * phjj_VAJHU);
+              D_WHh = pwh_hadronic_VAJHU / (pwh_hadronic_VAJHU + 100000.*phjj_VAJHU);
+              D_ZHh = pzh_hadronic_VAJHU / (pzh_hadronic_VAJHU + 10000.*phjj_VAJHU);
 
-              D_VBF2j = 1. / (1. + (1. / Djet_VAJHU - 1.) * 
-                              std::pow(pgOverPq.at(0) * 
-                                       pgOverPq.at(1), 1./3.));
-              D_WHh = 1. / (1. + (1. / D_WHh_VAJHU - 1.) * pgOverPq.at(0) * 
-                            pgOverPq.at(1));
-              D_ZHh = 1. / (1. + (1. / D_ZHh_VAJHU - 1.) * pgOverPq.at(0) * 
-                            pgOverPq.at(1));
+              D_VBF2j_QG = 1. / (1. + (1. / D_VBF2j - 1.) * 
+                                 std::pow(pgOverPq.at(0) * 
+                                          pgOverPq.at(1), 1./3.));
+              D_WHh_QG = 1. / (1. + (1. / D_WHh - 1.) * pgOverPq.at(0) * 
+                               pgOverPq.at(1));
+              D_ZHh_QG = 1. / (1. + (1. / D_ZHh - 1.) * pgOverPq.at(0) * 
+                               pgOverPq.at(1));
             }
           else
             {
@@ -245,11 +245,11 @@ ZZDiscriminantEmbedder<T12,T34>::produce(edm::Event& iEvent,
               pvbf_VAJHU = getProdP(TVar::HSMHiggs, TVar::JHUGen, TVar::JJVBF);
               mela->getPAux(pAux_vbf_VAJHU);
 
-              D_VBF1j_VAJHU = pvbf_VAJHU * pAux_vbf_VAJHU / 
-                (pvbf_VAJHU * pAux_vbf_VAJHU + 5. * phj_VAJHU);
+              D_VBF1j = pvbf_VAJHU * pAux_vbf_VAJHU / 
+                (pvbf_VAJHU * pAux_vbf_VAJHU + 2.34 * phj_VAJHU);
 
-              D_VBF1j = 1. / (1. + (1. / D_VBF1j_VAJHU - 1.) * 
-                              std::pow(pgOverPq.at(0), 1./3.));
+              D_VBF1j_QG = 1. / (1. + (1. / D_VBF1j - 1.) * 
+                                 std::pow(pgOverPq.at(0), 1./3.));
             }
         }
 
@@ -257,16 +257,16 @@ ZZDiscriminantEmbedder<T12,T34>::produce(edm::Event& iEvent,
       cand.addUserFloat("pvbf_VAJHU", pvbf_VAJHU);
       cand.addUserFloat("pwh_hadronic_VAJHU", pwh_hadronic_VAJHU);
       cand.addUserFloat("pzh_hadronic_VAJHU", pzh_hadronic_VAJHU);
-      cand.addUserFloat("Djet_VAJHU", Djet_VAJHU);
-      cand.addUserFloat("D_WHh_VAJHU", D_WHh_VAJHU);
-      cand.addUserFloat("D_ZHh_VAJHU", D_ZHh_VAJHU);
       cand.addUserFloat("pAux_vbf_VAJHU", pAux_vbf_VAJHU);
       cand.addUserFloat("phj_VAJHU", phj_VAJHU);
-      cand.addUserFloat("D_VBF1j_VAJHU", D_VBF1j_VAJHU);
       cand.addUserFloat("D_VBF1j", D_VBF1j);
       cand.addUserFloat("D_VBF2j", D_VBF2j);
       cand.addUserFloat("D_WHh", D_WHh);
       cand.addUserFloat("D_ZHh", D_ZHh);
+      cand.addUserFloat("D_VBF1j_QG", D_VBF1j_QG);
+      cand.addUserFloat("D_VBF2j_QG", D_VBF2j_QG);
+      cand.addUserFloat("D_WHh_QG", D_WHh_QG);
+      cand.addUserFloat("D_ZHh_QG", D_ZHh_QG);
 
       mela->resetInputEvent();
     }
