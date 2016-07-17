@@ -26,8 +26,10 @@ class MuonScaleFactors(AnalysisFlowBase):
                 fileName = cms.string(sfFile),
                 histName = cms.string(sfName),
                 label = cms.string("effScaleFactor"),
+                xValue = cms.string('eta'),
+                yValue = cms.string('pt'),
                 )
-            step.addModule('scaleFactorEmbedder', scaleFactorEmbedder, 'm')
+            step.addModule('scaleFactorEmbedderM', scaleFactorEmbedder, 'm')
 
             sfErrName = 'ERROR'
 
@@ -37,8 +39,10 @@ class MuonScaleFactors(AnalysisFlowBase):
                 fileName = cms.string(sfFile),
                 histName = cms.string(sfErrName),
                 label = cms.string("effScaleFactorError"),
+                xValue = cms.string('eta'),
+                yValue = cms.string('pt'),
                 )
-            step.addModule('scaleFactorErrorEmbedder', 
+            step.addModule('scaleFactorErrorEmbedderM', 
                            scaleFactorErrorEmbedder, 'm')
 
         return step
