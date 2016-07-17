@@ -12,6 +12,17 @@ muonBranches = cms.PSet(
         PFPhotonIso = cms.string('pfIsolationR03.sumPhotonEt'),
         PFNeutralIso = cms.string('pfIsolationR03.sumNeutralHadronEt'),
         PFPUIso = cms.string('pfIsolationR03.sumPUPt'),
+
+        PtErr = cms.string('? hasUserFloat("kalmanPtError") ? '
+                           'userFloat("kalmanPtError") : '
+                           'bestTrack.ptError'),
+
+        PtUncorrected = cms.string('? hasUserCand("uncorrected") ? '
+                                   'userCand("uncorrected").pt : '
+                                   'pt'),
+        PtErrUncorrected = cms.string('? hasUserCand("uncorrected") ? '
+                                      'userCand("uncorrected").bestTrack.ptError : '
+                                      'bestTrack.ptError'),
         ),
     uints = cms.PSet(
         MatchedStations = cms.string('MatchedStations'),

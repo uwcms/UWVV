@@ -38,7 +38,7 @@ fi
 
 if [ ! -d ./KaMuCa ]; then
     echo "Setting up muon calibration"
-    git clone https://github.com/bachtis/analysis.git -b KaMuCa_V3 KaMuCa
+    git clone https://github.com/bachtis/analysis.git -b KaMuCa_V4 KaMuCa
 fi
 
 popd
