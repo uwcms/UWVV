@@ -19,7 +19,10 @@
 // system include files
 #include <memory>
 #include <iostream>
-#include <math.h> // pow
+#include <cmath> // pow, abs
+#include <list>
+#include <functional>
+#include <utility> // pair
 
 // user include files
 #include "FWCore/Framework/interface/Frameworkfwd.h"
@@ -91,6 +94,8 @@ private:
   const float nIsoVetoDR_;
   const float chIsoVetoDR_;
   const float relIsoCut_;
+
+  const float eMuCrossCleaningDR_;
 };
 
 
@@ -142,7 +147,10 @@ PATObjectFSREmbedder::PATObjectFSREmbedder(const edm::ParameterSet& iConfig):
                0.0001),
   relIsoCut_(iConfig.exists("relIsoCut") ? 
              float(iConfig.getParameter<double>("relIsoCut")) :
-             1.8)
+             1.8),
+  eMuCrossCleaningDR_(iConfig.exists("eMuCrossCleaningDR") ?
+                      float(iConfig.getParameter<double>("eMuCrossCleaningDR")) :
+                      0.)
 {
   produces<std::vector<Muon> >();
   produces<std::vector<Elec> >();
@@ -180,22 +188,25 @@ void PATObjectFSREmbedder::produce(edm::Event& iEvent, const edm::EventSetup& iS
       if (!phoSelection_(*pho))
         continue;
 
-      size_t iBestEle = 9999;
-      size_t iBestMu = 9999;
-      float dRBestEle = 9999.;
-      float dRBestMu = 9999.;
+      std::list<std::pair<size_t, float> > closeEles;
+      std::list<std::pair<size_t, float> > closeMus;
 
       for(size_t iE = 0; iE < elecs->size(); ++iE)
         {
           float deltaR = reco::deltaR(pho->p4(), elecs->at(iE).p4());
 
-          if(!eSelection_(elecs->at(iE)))
+          if(deltaR > maxDR_ || !eSelection_(elecs->at(iE)))
             continue;
 
-          if(deltaR < dRBestEle)
+          if(closeEles.empty() || deltaR < closeEles.front().second)
             {
-              iBestEle = iE;
-              dRBestEle = deltaR;
+              closeEles.emplace_front(std::pair<size_t, float>(iE, deltaR));
+            }
+          else
+            {
+              // we almost never need the second one, so don't waste time 
+              // sorting the rest
+              closeEles.emplace_back(std::pair<size_t, float>(iE, deltaR));
             }
         }
 
@@ -203,20 +214,102 @@ void PATObjectFSREmbedder::produce(edm::Event& iEvent, const edm::EventSetup& iS
         {
           float deltaR = reco::deltaR(pho->p4(), mus->at(iM).p4());
 
-          if(!mSelection_(mus->at(iM)))
+          if(deltaR > maxDR_ || !mSelection_(mus->at(iM)))
             continue;
 
-          if(deltaR < dRBestMu)
+          if(closeMus.empty() || deltaR < closeMus.front().second)
             {
-              iBestMu = iM;
-              dRBestMu = deltaR;
+              closeMus.emplace_front(std::pair<size_t, float>(iM, deltaR));
+            }
+          else
+            {
+              // we almost never need the second one, so don't waste time 
+              // sorting the rest
+              closeMus.emplace_back(std::pair<size_t, float>(iM, deltaR));
             }
         }
 
-      if(elecs->size() && dRBestEle < dRBestMu && dRBestEle < maxDR_)
-        phosByEle.at(iBestEle).push_back(pho);
-      else if(mus->size() && dRBestMu < maxDR_)
-        phosByMu.at(iBestMu).push_back(pho);
+
+      if(closeEles.size() && 
+         (closeMus.empty() || 
+          closeEles.front().second < closeMus.front().second)
+         )
+        {
+          // Make sure electron isn't removed by cross cleaning
+          bool crossCleaned = false;
+          for(auto& m : closeMus)
+            {
+              if(std::abs(closeEles.front().second - m.second) < eMuCrossCleaningDR_)
+                {
+                  if(reco::deltaR(elecs->at(closeEles.front().first).p4(),
+                                  mus->at(m.first)) < eMuCrossCleaningDR_)
+                    {
+                      crossCleaned = true;
+                      break;
+                    }
+                }
+            }
+
+          if(!crossCleaned)
+            phosByEle.at(closeEles.front().first).push_back(pho);
+          else
+            {
+              // remove the bad electron
+              closeEles.pop_front();
+
+              //// find the new closest electron
+              // function for sorting these things
+              std::function<bool(const std::pair<size_t,float>&,
+                                 const std::pair<size_t,float>&)>
+                f([](const std::pair<size_t,float>& a, 
+                     const std::pair<size_t,float>& b)
+                  {return a.second < b.second;});
+
+              closeEles.sort(f);
+
+              // if there are only muons left, use them
+              if(closeEles.empty())
+                {
+                  if(closeMus.size() && closeMus.front().second < maxDR_)
+                    phosByMu.at(closeMus.front().first).push_back(pho);
+                }
+              else
+                {
+                  for(auto& e : closeEles)
+                    {
+                      // if the best muon is better, use that
+                      if(closeMus.size() && e.second > closeMus.front().second)
+                        {
+                          phosByMu.at(closeMus.front().first).push_back(pho);
+                          break;
+                        }
+
+                      // is this electron also cross cleaned?
+                      bool crossCleaned = false;
+                      for(auto& m : closeMus)
+                        {
+                          if(std::abs(e.second - m.second) < eMuCrossCleaningDR_)
+                            {
+                              if(reco::deltaR(elecs->at(e.first).p4(),
+                                              mus->at(m.first)) < eMuCrossCleaningDR_)
+                                {
+                                  crossCleaned = true;
+                                  break;
+                                }
+                            }
+                        }
+
+                      if(!crossCleaned)
+                        {
+                          phosByEle.at(e.first).push_back(pho);
+                          break;
+                        }
+                    }
+                }
+            }
+        }
+      else if(closeMus.size() && closeMus.front().second < maxDR_)
+        phosByMu.at(closeMus.front().first).push_back(pho);
     }
 
   
