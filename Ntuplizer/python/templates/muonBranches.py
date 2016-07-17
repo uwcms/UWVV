@@ -23,6 +23,11 @@ muonBranches = cms.PSet(
         PtErrUncorrected = cms.string('? hasUserCand("uncorrected") ? '
                                       'userCand("uncorrected").bestTrack.ptError : '
                                       'bestTrack.ptError'),
+
+        EffScaleFactor = cms.string('? hasUserFloat("effScaleFactor") ? '
+                                    'userFloat("effScaleFactor") : 1.'),
+        EffScaleFactorError = cms.string('? hasUserFloat("effScaleFactorError") ? '
+                                         'userFloat("effScaleFactorError") : 0.'),
         ),
     uints = cms.PSet(
         MatchedStations = cms.string('MatchedStations'),
