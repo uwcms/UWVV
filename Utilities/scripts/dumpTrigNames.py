@@ -19,7 +19,7 @@ triggerObjects, triggerObjectLabel  = Handle("std::vector<pat::TriggerObjectStan
 triggerPrescales, triggerPrescaleLabel  = Handle("pat::PackedTriggerPrescales"), "patTrigger"
 
 # open file (you can use 'edmFileUtil -d /store/whatever.root' to get the physical file name)
-events = Events("root://eoscms.cern.ch//store/mc/RunIISpring16MiniAODv1/WminusH_HToZZTo4L_M150_13TeV_powheg2-minlo-HWJ_JHUgenV6_pythia8/MINIAODSIM/PUSpring16RAWAODSIM_80X_mcRun2_asymptotic_2016_v3-v1/00000/C6DF34D4-CF20-E611-A8EE-782BCB27B958.root")
+events = Events("root://eoscms.cern.ch//store/data/Run2016B/MuonEG/MINIAOD/PromptReco-v2/000/273/158/00000/CC82FDA4-201A-E611-BC48-02163E013552.root")
 
 for iev,event in enumerate(events):
     event.getByLabel(triggerBitLabel, triggerBits)
