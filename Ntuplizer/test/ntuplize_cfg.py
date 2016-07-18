@@ -200,8 +200,8 @@ process.metaInfo = cms.EDAnalyzer(
     )
 process.treeSequence = cms.Sequence(process.metaInfo)
 
-# no triggers in MC for now
-if options.isMC:
+# Trigger info is only in MC from reHLT campaign
+if options.isMC and 'reHLT' not in options.inputFiles[0]:
     trgBranches = cms.PSet(
         trigNames=cms.vstring(),
         trigResultsSrc = cms.InputTag("TriggerResults", "", "HLT"),
@@ -209,6 +209,9 @@ if options.isMC:
         )
 else:
     trgBranches = triggerBranches
+
+    if 'reHLT' in options.inputFiles[0]:
+        trgBranches = trgBranches.clone(trigResultsSrc=cms.InputTag("TriggerResults", "", "HLT2"))
 
 
 # then the ntuples
