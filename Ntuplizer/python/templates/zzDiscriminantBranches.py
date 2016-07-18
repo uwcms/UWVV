@@ -21,5 +21,6 @@ zzDiscriminantBranches = cms.PSet(
         ),
     uints = cms.PSet(
         ZZCategory = cms.string('userInt("ZZCategory")'),
+        ZZCategoryQG = cms.string('userInt("ZZCategoryQG")'),
         ),
     )
