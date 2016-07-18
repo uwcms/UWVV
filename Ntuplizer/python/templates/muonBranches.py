@@ -28,6 +28,8 @@ muonBranches = cms.PSet(
                                     'userFloat("effScaleFactor") : 1.'),
         EffScaleFactorError = cms.string('? hasUserFloat("effScaleFactorError") ? '
                                          'userFloat("effScaleFactorError") : 0.'),
+        TrkRecoEffScaleFactor = cms.string('? hasUserFloat("trkRecoEffScaleFactor") ? '
+                                           'userFloat("trkRecoEffScaleFactor") : 1.'),
         ),
     uints = cms.PSet(
         MatchedStations = cms.string('MatchedStations'),
