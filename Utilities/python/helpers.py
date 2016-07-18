@@ -2,7 +2,7 @@ import FWCore.ParameterSet.Config as cms
 from FWCore.ParameterSet.Mixins import _Parameterizable
 
 from os import path
-
+from math import sqrt, pi
 
 
 def pset2Dict(ps):
@@ -150,3 +150,9 @@ def mapObjects(channel):
 
         _zzhelpers_object_maps_[channel] = objects
         return objects
+
+def deltaR(eta1, phi1, eta2, phi2):
+    dPhi = abs(phi2 - phi1)
+    while dPhi > pi:
+        dPhi -= 2*pi
+    return sqrt(dPhi**2 + (eta2 - eta1)**2)
