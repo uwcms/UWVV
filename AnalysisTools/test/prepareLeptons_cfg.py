@@ -162,6 +162,7 @@ outputCommands = cms.untracked.vstring(
     'keep *_packedGenParticles_*_*',
     'keep *_prunedGenParticles_*_*',
     'keep *_packedPFCandidates_*_*',
+    'keep *_offlineSlimmedPrimaryVertices_*_*',
     )
 for obj, objName in flow.finalTags().iteritems():
     print obj, objName
