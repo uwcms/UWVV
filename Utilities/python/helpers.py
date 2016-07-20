@@ -65,7 +65,7 @@ def parseChannels(channels):
         channels = channels.lower()
         if channels in ['4l', 'zz']:
             return ['eeee', 'eemm', 'mmmm']
-        elif channels in ['3l', 'zl', 'z+l']:
+        elif channels in ['3l', 'zl', 'z+l', 'wz']:
             return ['eee', 'eem', 'emm', 'mmm']
         elif channels in ['z', '2l', 'll']:
             return ['ee', 'mm']

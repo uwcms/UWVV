@@ -162,15 +162,16 @@ if zz:
 
     from UWVV.AnalysisTools.templates.ZKinematicFitting import ZKinematicFitting
     FlowSteps.append(ZKinematicFitting)
-    
+
+    # FSR and other ZZ/HZZ stuff
+    from UWVV.AnalysisTools.templates.ZZFlow import ZZFlow
+    FlowSteps.append(ZZFlow)
 elif zl or z:
     from UWVV.AnalysisTools.templates.ZPlusXBaseFlow import ZPlusXBaseFlow
+    from UWVV.AnalysisTools.templates.ZPlusXFinalStateBaseFlow import ZPlusXFinalStateBaseFlow
     FlowSteps.append(ZPlusXBaseFlow)
+    FlowSteps.append(ZPlusXFinalStateBaseFlow)
     
-# FSR and other ZZ/HZZ stuff
-from UWVV.AnalysisTools.templates.ZZFlow import ZZFlow
-FlowSteps.append(ZZFlow)
-
 # Lepton calibrations
 if options.eCalib:
     raise ValueError("Electron calibrations are not yet available in 80X")
