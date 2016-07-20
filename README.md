@@ -2,14 +2,14 @@
 Some tools for CMS analyses
 
 ## Setup
-Current supported CMSSW release: `CMSSW_8_0_8_patch3` (`8_0_14` coming very soon) 
+Current supported CMSSW release: `CMSSW_8_0_12` 
 
 ```bash
 scram pro -n uwvv CMSSW CMSSW_8_0_[current version]
 cd uwvv/src
 cmsenv
 git cms-init # do before anything else
-git clone git@github.com:nwoods/UWVV.git # or git clone https://github.com/nwoods/UWVV.git if you prefer that
+git clone https://github.com/nwoods/UWVV.git # or git clone git@github.com:nwoods/UWVV.git if you prefer that
 cd UWVV
 source recipe/setup.sh # install necessary packages
 pushd ..
