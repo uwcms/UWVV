@@ -181,7 +181,7 @@ int ZZCategoryEmbedder::getCategory(const CCand& cand, // cand do consider
     }
 
   // VBF 2-jet
-  if(cand.hasUserFloat("D_VBF2j") && cand.userFloat("D_VBF2j") > 0.536+665./(m4l+1530.) && nLep == 4 && 
+  if(cand.hasUserFloat("D_VBF2j") && cand.userFloat("D_VBF2j") > 1.043 - 460./(m4l+634.) && nLep == 4 && 
      ((nJets >= 2 && nJets < 4 && nBJets < 2) ||
       (nJets >= 4 && nBJets == 0)))
     return 2;
@@ -207,7 +207,7 @@ int ZZCategoryEmbedder::getCategory(const CCand& cand, // cand do consider
     return 5;
 
   // VBF 1-jet
-  if(nLep == 4 && nJets == 1 && cand.hasUserFloat("D_VBF1j") && cand.userFloat("D_VBF1j") > 0.815)
+  if(nLep == 4 && nJets == 1 && cand.hasUserFloat("D_VBF1j") && cand.userFloat("D_VBF1j") > 0.699)
     return 1;
   
   // untagged
@@ -228,7 +228,7 @@ int ZZCategoryEmbedder::getCategoryQG(const CCand& cand, // cand do consider
   unsigned nLep = nep + nem + nmp + nmm;
 
   // VBF 2-jet
-  if(cand.hasUserFloat("D_VBF2j_QG") && cand.userFloat("D_VBF2j_QG") > 0.926 && nLep == 4 && 
+  if(cand.hasUserFloat("D_VBF2j_QG") && cand.userFloat("D_VBF2j_QG") > 0.391 && nLep == 4 && 
      ((nJets >= 2 && nJets < 4 && nBJets < 2) ||
       (nJets >= 4 && nBJets == 0)))
     return 2;
@@ -254,7 +254,7 @@ int ZZCategoryEmbedder::getCategoryQG(const CCand& cand, // cand do consider
     return 5;
 
   // VBF 1-jet
-  if(nLep == 4 && nJets == 1 && cand.hasUserFloat("D_VBF1j_QG") && cand.userFloat("D_VBF1j_QG") > 0.829)
+  if(nLep == 4 && nJets == 1 && cand.hasUserFloat("D_VBF1j_QG") && cand.userFloat("D_VBF1j_QG") > 0.72)
     return 1;
   
   // untagged

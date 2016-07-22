@@ -3,6 +3,7 @@ import FWCore.ParameterSet.Config as cms
 
 zzDiscriminantBranches = cms.PSet(
     floats = cms.PSet(
+        D_sel_kin = cms.string('? hasUserFloat("D_sel_kin") ? userFloat("D_sel_kin") : -999.'),
         D_bkg_kin = cms.string('? hasUserFloat("D_bkg_kin") ? userFloat("D_bkg_kin") : -999.'),
         D_bkg = cms.string('? hasUserFloat("D_bkg") ? userFloat("D_bkg") : -999.'),
         D_gg = cms.string('? hasUserFloat("Dgg10_VAMCFM") ? userFloat("Dgg10_VAMCFM") : -999.'),
@@ -20,7 +21,7 @@ zzDiscriminantBranches = cms.PSet(
         jet2QGLikelihood = cms.string('jet2QGLikelihood'),
         ),
     uints = cms.PSet(
-        ZZCategory = cms.string('userInt("ZZCategory")'),
-        ZZCategoryQG = cms.string('userInt("ZZCategoryQG")'),
+        ZZCategory = cms.string('? hasUserInt("ZZCategory") ? userInt("ZZCategory") : 999'),
+        ZZCategoryQG = cms.string('? hasUserInt("ZZCategoryQG") ? userInt("ZZCategoryQG") : 999'),
         ),
     )
