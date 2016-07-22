@@ -42,6 +42,8 @@ private:
   std::unique_ptr<KalmanMuonCalibrator> calib;
 
   const bool isSync;
+
+  const float maxPt;
 };
 
 
@@ -50,7 +52,8 @@ PATMuonKalmanCorrector::PATMuonKalmanCorrector(const edm::ParameterSet& params) 
   corType(params.getParameter<std::string>("calibType")),
   isMC(corType.find("MC") != std::string::npos),
   calib(new KalmanMuonCalibrator(corType)),
-  isSync(params.exists("isSync") && isMC && params.getParameter<bool>("isSync"))
+  isSync(params.exists("isSync") && isMC && params.getParameter<bool>("isSync")),
+  maxPt(params.exists("maxPt") ? params.getParameter<double>("maxPt") : 200.)
 {
   produces<pat::MuonCollection>();
 }
@@ -69,12 +72,15 @@ PATMuonKalmanCorrector::produce(edm::Event& event, const edm::EventSetup& setup)
       edm::Ptr<pat::Muon> muIn = in->ptrAt(i);
 
       float pt = muIn->pt();
-      float eta = muIn->eta();
-      float phi = muIn->phi();
-      float ptErr = muIn->bestTrack()->ptError();
       
-      if(muIn->muonBestTrackType() == 1)
+      out->push_back(*muIn);
+
+      if(muIn->muonBestTrackType() == 1 && pt < maxPt)
         {
+          float eta = muIn->eta();
+          float phi = muIn->phi();
+          float ptErr = muIn->bestTrack()->ptError();
+
           if(isMC || (pt > 2. && fabs(eta) < 2.4))
             {
               pt = calib->getCorrectedPt(pt, eta, phi, muIn->charge());
@@ -89,12 +95,11 @@ PATMuonKalmanCorrector::produce(edm::Event& event, const edm::EventSetup& setup)
             }
 
           ptErr = pt * calib->getCorrectedError(pt, eta, ptErr/pt);
+
+          out->back().setP4(reco::Particle::PolarLorentzVector(pt, eta, phi, muIn->mass()));
+          out->back().addUserFloat("kalmanPtError", ptErr);
+          out->back().addUserCand("uncorrected", muIn);
         }
-        
-      out->push_back(*muIn);
-      out->back().setP4(reco::Particle::PolarLorentzVector(pt, eta, phi, muIn->mass()));
-      out->back().addUserFloat("kalmanPtError", ptErr);
-      out->back().addUserCand("uncorrected", muIn);
     }
 
   event.put(std::move(out));

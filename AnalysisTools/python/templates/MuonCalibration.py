@@ -25,6 +25,7 @@ class MuonCalibration(AnalysisFlowBase):
                 calibType = cms.string(calibType),
                 isMC = cms.bool(self.isMC),
                 isSync = cms.bool(self.isSync),
+                maxPt = cms.double(200),
                 )
 
             step.addModule('calibratedPatMuons', muCalibrator, 'm')
