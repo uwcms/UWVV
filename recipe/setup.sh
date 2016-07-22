@@ -27,6 +27,9 @@ if [ ! -d ./ZZMatrixElement ]; then
     git checkout -b from-v200p5 v2.0.0_patch5
     source setup.sh -j 12
     popd
+
+    # copy libraries dowloaded by MELA to lib so they get packaged and used by CONDOR
+    cp ZZMatrixElement/MELA/data/"$SCRAM_ARCH"/*.so "$CMSSW_BASE"/lib/"$SCRAM_ARCH"
 fi
 
 if [ ! -d ./KinZfitter ]; then
