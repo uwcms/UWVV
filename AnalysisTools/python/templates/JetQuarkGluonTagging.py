@@ -47,7 +47,7 @@ class JetQuarkGluonTagging(AnalysisFlowBase):
             step.addModule('QGTagger', self.process.QGTagger)
 
             embedQGLikelihood = cms.EDProducer(
-                "PATJetValueMapEmbedder",
+                "PATJetValueMapFloatEmbedder",
                 src = step.getObjTag('j'),
                 label = cms.string(self.qgLikelihoodLabel()),
                 valueSrc = cms.InputTag("QGTagger:qgLikelihood"),

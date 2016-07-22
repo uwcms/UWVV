@@ -31,7 +31,7 @@ class RecomputeElectronID(AnalysisFlowBase):
                        self.process.egmGsfElectronIDSequence)
 
         embedIDs = cms.EDProducer(
-            "PATElectronValueMapEmbedder",
+            "PATElectronValueMapFloatEmbedder",
             src = step.getObjTag('e'),
             label = cms.string("MVAIDNonTrig"),
             valueSrc = cms.InputTag("electronMVAValueMapProducer:ElectronMVAEstimatorRun2Spring16V1Values"),
