@@ -48,7 +48,11 @@ private:
 
   const edm::EDGetTokenT<edm::View<T>> srcToken_;
   const std::vector<std::string> floatLabels_;
+  const std::vector<std::string> boolLabels_;
+  const std::vector<std::string> intLabels_;
   const std::vector<edm::EDGetTokenT<edm::ValueMap<float>>> floatValTokens_;
+  const std::vector<edm::EDGetTokenT<edm::ValueMap<bool>>> boolValTokens_;
+  const std::vector<edm::EDGetTokenT<edm::ValueMap<int>>> intValTokens_;
 };
 
 
@@ -56,10 +60,17 @@ template<typename T>
 PATObjectValueMapEmbedder<T>::PATObjectValueMapEmbedder(const edm::ParameterSet& iConfig) :
   srcToken_(consumes<edm::View<T> >(iConfig.getParameter<edm::InputTag>("src"))),
   floatLabels_(iConfig.getUntrackedParameter<std::vector<std::string>>("floatLabels", std::vector<std::string>())),
+  boolLabels_(iConfig.getUntrackedParameter<std::vector<std::string>>("boolLabels", std::vector<std::string>())),
+  intLabels_(iConfig.getUntrackedParameter<std::vector<std::string>>("intLabels", std::vector<std::string>())),
   floatValTokens_(edm::vector_transform(iConfig.getUntrackedParameter<std::vector<edm::InputTag> >(
     "floatVals", std::vector<edm::InputTag>()), 
-      [this](edm::InputTag const& tag){return consumes<edm::ValueMap<float> >(tag);})
-  )
+      [this](edm::InputTag const& tag){return consumes<edm::ValueMap<float> >(tag);})),
+  boolValTokens_(edm::vector_transform(iConfig.getUntrackedParameter<std::vector<edm::InputTag> >(
+    "boolVals", std::vector<edm::InputTag>()), 
+      [this](edm::InputTag const& tag){return consumes<edm::ValueMap<bool> >(tag);})),
+  intValTokens_(edm::vector_transform(iConfig.getUntrackedParameter<std::vector<edm::InputTag> >(
+    "intVals", std::vector<edm::InputTag>()), 
+      [this](edm::InputTag const& tag){return consumes<edm::ValueMap<int> >(tag);}))
 {
   produces<std::vector<T> >();
 }
@@ -72,27 +83,53 @@ void PATObjectValueMapEmbedder<T>::produce(edm::Event& iEvent,
   std::unique_ptr<std::vector<T> > out(new std::vector<T>);
   edm::Handle<edm::View<T> > in;
   iEvent.getByToken(srcToken_, in);
-  
+
+  //TODO: template, cleanup 
   if (floatValTokens_.size() != floatLabels_.size())
     {
       throw cms::Exception("InvalidParams")
         << "Must have equal number of values and labels";
     }
-  
-  for (size_t i = 0; i < floatValTokens_.size(); i++)
+  if (boolValTokens_.size() != boolLabels_.size())
     {
-      edm::Handle<edm::ValueMap<float> > floatVals;
-      iEvent.getByToken(floatValTokens_[i], floatVals);
-
-      for(size_t j = 0; j < in->size(); ++j)
-        {
-          edm::Ptr<T> t = in->ptrAt(j);
-
-          out->push_back(*t);
-          embedValue(out->back(), (*floatVals)[t], floatLabels_[i]);
-        }
+      throw cms::Exception("InvalidParams")
+        << "Must have equal number of values and labels";
     }
-  iEvent.put(std::move(out));
+  if (intValTokens_.size() != intLabels_.size())
+    {
+      throw cms::Exception("InvalidParams")
+        << "Must have equal number of values and labels";
+    }
+  std::vector<size_t> lengths = {floatLabels_.size(), boolLabels_.size(), intLabels_.size()};
+
+  for(size_t j = 0; j < in->size(); ++j)
+    {
+      edm::Ptr<T> t = in->ptrAt(j);
+      T obj = in->at(j);
+      for (size_t i = 0; i < (*std::max_element(lengths.begin(), lengths.end())); i++)
+        {
+          if(i < floatLabels_.size())
+            {
+              edm::Handle<edm::ValueMap<float> > floatVals;
+              iEvent.getByToken(floatValTokens_[i], floatVals);
+              embedValue(obj, (*floatVals)[t], floatLabels_[i]);
+            }
+          if(i < boolLabels_.size())
+            {
+              edm::Handle<edm::ValueMap<bool> > boolVals;
+              iEvent.getByToken(boolValTokens_[i], boolVals);
+              embedValue(obj, (*boolVals)[t], boolLabels_[i]);
+            }
+          if(i < intLabels_.size())
+            {
+              edm::Handle<edm::ValueMap<int> > intVals;
+              iEvent.getByToken(intValTokens_[i], intVals);
+              embedValue(obj, (*intVals)[t], intLabels_[i]);
+            }
+        }
+        out->push_back(obj);
+    }
+   iEvent.put(std::move(out));
 }
 
 template<typename T>
