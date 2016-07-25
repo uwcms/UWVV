@@ -29,9 +29,10 @@
 #include "DataFormats/PatCandidates/interface/CompositeCandidate.h"
 #include "DataFormats/Common/interface/ValueMap.h"
 #include "DataFormats/Common/interface/View.h"
+#include "FWCore/Utilities/interface/transform.h"
 
 
-template<typename T, typename V>
+template<typename T>
 class PATObjectValueMapEmbedder : public edm::stream::EDProducer<>
 {
 
@@ -45,78 +46,78 @@ private:
   void embedValue(T& object, const int& value, const std::string& label) const;
   void embedValue(T& object, const float& value, const std::string& label) const;
 
-  const edm::EDGetTokenT<edm::View<T> > srcToken;
-  const edm::EDGetTokenT<edm::ValueMap<V> > valToken;
-  const std::string label;
+  const edm::EDGetTokenT<edm::View<T>> srcToken_;
+  const std::vector<std::string> floatLabels_;
+  const std::vector<edm::EDGetTokenT<edm::ValueMap<float>>> floatValTokens_;
 };
 
 
-template<typename T, typename V>
-PATObjectValueMapEmbedder<T,V>::PATObjectValueMapEmbedder(const edm::ParameterSet& iConfig) :
-  srcToken(consumes<edm::View<T> >(iConfig.getParameter<edm::InputTag>("src"))),
-  valToken(consumes<edm::ValueMap<V> >(iConfig.getParameter<edm::InputTag>("valueSrc"))),
-  label(iConfig.getParameter<std::string>("label"))
+template<typename T>
+PATObjectValueMapEmbedder<T>::PATObjectValueMapEmbedder(const edm::ParameterSet& iConfig) :
+  srcToken_(consumes<edm::View<T> >(iConfig.getParameter<edm::InputTag>("src"))),
+  floatLabels_(iConfig.getUntrackedParameter<std::vector<std::string>>("floatLabels", std::vector<std::string>())),
+  floatValTokens_(edm::vector_transform(iConfig.getUntrackedParameter<std::vector<edm::InputTag> >(
+    "floatVals", std::vector<edm::InputTag>()), 
+      [this](edm::InputTag const& tag){return consumes<edm::ValueMap<float> >(tag);})
+  )
 {
   produces<std::vector<T> >();
 }
 
 
-template<typename T, typename V>
-void PATObjectValueMapEmbedder<T,V>::produce(edm::Event& iEvent,
+template<typename T>
+void PATObjectValueMapEmbedder<T>::produce(edm::Event& iEvent,
                                            const edm::EventSetup& iSetup)
 {
-  edm::Handle<edm::View<T> > in;
   std::unique_ptr<std::vector<T> > out(new std::vector<T>);
-  edm::Handle<edm::ValueMap<V> > values;
-
-  iEvent.getByToken(srcToken, in);
-  iEvent.getByToken(valToken, values);
-
-  for(size_t i = 0; i < in->size(); ++i)
+  edm::Handle<edm::View<T> > in;
+  iEvent.getByToken(srcToken_, in);
+  
+  if (floatValTokens_.size() != floatLabels_.size())
     {
-      edm::Ptr<T> t = in->ptrAt(i);
-
-      out->push_back(*t);
-      //out->back().addUserFloat(label, (*values)[t]);
-      embedValue(out->back(), (*values)[t], label);
+      throw cms::Exception("InvalidParams")
+        << "Must have equal number of values and labels";
     }
+  
+  for (size_t i = 0; i < floatValTokens_.size(); i++)
+    {
+      edm::Handle<edm::ValueMap<float> > floatVals;
+      iEvent.getByToken(floatValTokens_[i], floatVals);
 
+      for(size_t j = 0; j < in->size(); ++j)
+        {
+          edm::Ptr<T> t = in->ptrAt(j);
+
+          out->push_back(*t);
+          embedValue(out->back(), (*floatVals)[t], floatLabels_[i]);
+        }
+    }
   iEvent.put(std::move(out));
 }
 
-template<typename T, typename V>
-void PATObjectValueMapEmbedder<T,V>::embedValue(T& object,
+template<typename T>
+void PATObjectValueMapEmbedder<T>::embedValue(T& object,
                                 const float& value, const std::string& label) const
 {
   object.addUserFloat(label, value);
 }
 
-template<typename T, typename V>
-void PATObjectValueMapEmbedder<T,V>::embedValue(T& object,
+template<typename T>
+void PATObjectValueMapEmbedder<T>::embedValue(T& object,
                                 const int& value, const std::string& label) const
 {
   object.addUserInt(label, value);
 }
 
 
-typedef PATObjectValueMapEmbedder<pat::Electron, float> PATElectronValueMapFloatEmbedder;
-typedef PATObjectValueMapEmbedder<pat::Muon, float> PATMuonValueMapFloatEmbedder;
-typedef PATObjectValueMapEmbedder<pat::Tau, float> PATTauValueMapFloatEmbedder;
-typedef PATObjectValueMapEmbedder<pat::Jet, float> PATJetValueMapFloatEmbedder;
-typedef PATObjectValueMapEmbedder<pat::CompositeCandidate, float> PATCompositeCandidateValueMapFloatEmbedder;
-typedef PATObjectValueMapEmbedder<pat::Electron, int> PATElectronValueMapIntEmbedder;
-typedef PATObjectValueMapEmbedder<pat::Muon, int> PATMuonValueMapIntEmbedder;
-typedef PATObjectValueMapEmbedder<pat::Tau, int> PATTauValueMapIntEmbedder;
-typedef PATObjectValueMapEmbedder<pat::Jet, int> PATJetValueMapIntEmbedder;
-typedef PATObjectValueMapEmbedder<pat::CompositeCandidate, int> PATCompositeCandidateValueMapIntEmbedder;
+typedef PATObjectValueMapEmbedder<pat::Electron> PATElectronValueMapEmbedder;
+typedef PATObjectValueMapEmbedder<pat::Muon> PATMuonValueMapEmbedder;
+typedef PATObjectValueMapEmbedder<pat::Tau> PATTauValueMapEmbedder;
+typedef PATObjectValueMapEmbedder<pat::Jet> PATJetValueMapEmbedder;
+typedef PATObjectValueMapEmbedder<pat::CompositeCandidate> PATCompositeCandidateValueMapEmbedder;
 
-DEFINE_FWK_MODULE(PATElectronValueMapFloatEmbedder);
-DEFINE_FWK_MODULE(PATMuonValueMapFloatEmbedder);
-DEFINE_FWK_MODULE(PATTauValueMapFloatEmbedder);
-DEFINE_FWK_MODULE(PATJetValueMapFloatEmbedder);
-DEFINE_FWK_MODULE(PATCompositeCandidateValueMapFloatEmbedder);
-DEFINE_FWK_MODULE(PATElectronValueMapIntEmbedder);
-DEFINE_FWK_MODULE(PATMuonValueMapIntEmbedder);
-DEFINE_FWK_MODULE(PATTauValueMapIntEmbedder);
-DEFINE_FWK_MODULE(PATJetValueMapIntEmbedder);
-DEFINE_FWK_MODULE(PATCompositeCandidateValueMapIntEmbedder);
+DEFINE_FWK_MODULE(PATElectronValueMapEmbedder);
+DEFINE_FWK_MODULE(PATMuonValueMapEmbedder);
+DEFINE_FWK_MODULE(PATTauValueMapEmbedder);
+DEFINE_FWK_MODULE(PATJetValueMapEmbedder);
+DEFINE_FWK_MODULE(PATCompositeCandidateValueMapEmbedder);
