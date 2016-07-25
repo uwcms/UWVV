@@ -1,6 +1,5 @@
 import FWCore.ParameterSet.Config as cms
 
-
 muonBranches = cms.PSet(
     floats = cms.PSet(
         RelPFIsoDB = cms.string('(pfIsolationR03.sumChargedParticlePt'
@@ -21,6 +20,10 @@ muonBranches = cms.PSet(
         IsPFMuon = cms.string('IsPFMuon'),
         IsGlobal = cms.string('IsGlobal'),
         IsTracker = cms.string('IsTracker'),
+        IsLooseMuon = cms.string('isLooseMuon'),
+        IsMediumMuon = cms.string('isMediumMuon'),
+        isTightMuon = cms.string('userInt("isTightMuon")'),
+        isMediumMuonICHEP = cms.string('userInt("isMediumMuonICHEP")'),
 
         HighPtID = cms.string('? hasUserFloat("ZZIDPassHighPt") ? '
                               'userFloat("ZZIDPassHighPt") : 0.'),
