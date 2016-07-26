@@ -87,7 +87,7 @@ def writeFarmoutCommand(cfg, jobid, dataset, fullDataset,
         cmds.append("'outputFile=$outputFileName'")
 
     if args.get('applyLumiMask', False):
-        lumiMask = 'Cert_271036-276384_13TeV_PromptReco_Collisions16_JSON_NoL1T.txt' # 9.17/fb
+        lumiMask = 'Cert_271036-276811_13TeV_PromptReco_Collisions16_JSON.txt' # 12.9/fb
         if args.get('lumiMaskJSON', ''):
             lumiMask = args.get('lumiMaskJSON')
         lumiMask = os.path.join('/afs/cern.ch/cms/CAF/CMSCOMM/COMM_DQM/certification/Collisions16/13TeV', 
