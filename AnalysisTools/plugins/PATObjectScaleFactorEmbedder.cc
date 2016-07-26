@@ -61,7 +61,9 @@ template<typename T>
 PATObjectScaleFactorEmbedder<T>::PATObjectScaleFactorEmbedder(const edm::ParameterSet& iConfig) :
   srcToken(consumes<edm::View<T> >(iConfig.getParameter<edm::InputTag>("src"))),
   file(new TFile(iConfig.getParameter<std::string>("fileName").c_str())),
-  h((TH2F*)(file->Get(iConfig.getParameter<std::string>("histName").c_str())->Clone())),
+  h((file->IsOpen() && !file->IsZombie()) ? 
+    (TH2F*)(file->Get(iConfig.getParameter<std::string>("histName").c_str())->Clone()) :
+    new TH2F("h","h",1,0.,1.,1,0.,1.)),
   label(iConfig.getParameter<std::string>("label")),
   xFunction(iConfig.exists("xValue") ?
             iConfig.getParameter<std::string>("xValue") :
