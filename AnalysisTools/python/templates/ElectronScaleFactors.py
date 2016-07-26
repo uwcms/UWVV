@@ -17,7 +17,7 @@ class ElectronScaleFactors(AnalysisFlowBase):
         if stepName == 'embedding' and self.isMC:
 
             sfFile = path.join(UWVV_BASE_PATH, 'data', 'LeptonScaleFactors',
-                               'ele_scale_factors_v1.root')
+                               'ele_scale_factors_v2.root')
 
             scaleFactorEmbedder = cms.EDProducer(
                 "PATElectronScaleFactorEmbedder",
@@ -40,5 +40,19 @@ class ElectronScaleFactors(AnalysisFlowBase):
                 yValue = cms.string('pt'),
                 )
             step.addModule('scaleFactorEmbedderEGap', scaleFactorEmbedderGap, 'e')
+
+            trkRecoSFFile = path.join(UWVV_BASE_PATH, 'data', 'LeptonScaleFactors',
+                                      'ele_gsfTrackRecoEff_ichep12p9.root')
+
+            gsfTrackRecoScaleFactorEmbedder = cms.EDProducer(
+                "PATElectronScaleFactorEmbedder",
+                src = step.getObjTag('e'),
+                fileName = cms.string(trkRecoSFFile),
+                histName = cms.string('EGamma_SF2D'),
+                label = cms.string("trkRecoEffScaleFactor"),
+                xValue = cms.string('superCluster.eta'),
+                yValue = cms.string('pt'),
+                )
+            step.addModule('gsfTrackRecoScaleFactorEmbedder', gsfTrackRecoScaleFactorEmbedder, 'e')
 
         return step

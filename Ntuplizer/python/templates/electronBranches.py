@@ -20,11 +20,23 @@ electronBranches = cms.PSet(
         SCEnergy = cms.string('superCluster.energy'),
         SCRawEnergy = cms.string('superCluster.rawEnergy'),
 
-        EffScaleFactor = cms.string('? isGap ? '
-                                    '(? hasUserFloat("effScaleFactorGap") ?'
-                                    ' userFloat("effScaleFactorGap") : 1.) :'
-                                    '(? hasUserFloat("effScaleFactor") ? '
-                                    'userFloat("effScaleFactor") : 1.)'),
+        IDIsoEffScaleFactor = cms.string('? isGap ? '
+                                         '(? hasUserFloat("effScaleFactorGap") ?'
+                                         ' userFloat("effScaleFactorGap") : 1.) :'
+                                         '(? hasUserFloat("effScaleFactor") ? '
+                                         'userFloat("effScaleFactor") : 1.)'),
+        TrkRecoEffScaleFactor = cms.string('? hasUserFloat("trkRecoEffScaleFactor") ? '
+                                           'userFloat("trkRecoEffScaleFactor") : 1.'),
+        EffScaleFactor = cms.string('(? isGap ? '
+                                    ' (? hasUserFloat("effScaleFactorGap") ?'
+                                    '  userFloat("effScaleFactorGap") : 1.) :'
+                                    ' (? hasUserFloat("effScaleFactor") ? '
+                                    '  userFloat("effScaleFactor") : 1.) '
+                                    ') * '
+                                    '(? hasUserFloat("trkRecoEffScaleFactor") ? '
+                                    ' userFloat("trkRecoEffScaleFactor") : '
+                                    ' 1. '
+                                    ')'),
         ),
 
     uints = cms.PSet(

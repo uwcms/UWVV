@@ -15,7 +15,7 @@ if [ ! -d ./EgammaAnalysis ]; then
     git checkout -b from-277de3c 277de3c
 
     pushd EgammaAnalysis/ElectronTools/data
-    git clone -b ICHEP2016_approval_7p65fb https://github.com/emanueledimarco/ScalesSmearings.git
+    git clone -b ICHEP2016_v2 https://github.com/emanueledimarco/ScalesSmearings.git
     popd
 fi
 

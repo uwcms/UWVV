@@ -28,7 +28,7 @@ class ElectronCalibration(AnalysisFlowBase):
                 gbrForestName = cms.string("gedelectron_p4combination_25ns"),
                 isMC = cms.bool(self.isMC),
                 isSynchronization = cms.bool(self.isSync),
-                correctionFile = cms.string('EgammaAnalysis/ElectronTools/data/ScalesSmearings/80X_DCS05July_plus_Golden22'),
+                correctionFile = cms.string('EgammaAnalysis/ElectronTools/data/ScalesSmearings/80X_ichepV1_2016_ele'),
                 )
 
             step.addModule('calibratedPatElectrons', calibratedPatElectrons, 'e')

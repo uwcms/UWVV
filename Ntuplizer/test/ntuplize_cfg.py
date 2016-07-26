@@ -192,6 +192,11 @@ if options.muCalib:
     from UWVV.AnalysisTools.templates.MuonCalibration import MuonCalibration
     FlowSteps.append(MuonCalibration)
 
+# k factors if a gg sample
+if any('GluGlu' in f for f in options.inputFiles):
+    from UWVV.AnalysisTools.templates.GGHZZKFactors import GGHZZKFactors
+    FlowSteps.append(GGHZZKFactors)
+
 # Turn all these into a single flow class
 FlowClass = createFlow(*FlowSteps)
 flow = FlowClass('flow', process, 

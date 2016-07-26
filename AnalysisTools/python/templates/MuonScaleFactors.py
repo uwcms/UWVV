@@ -17,7 +17,7 @@ class MuonScaleFactors(AnalysisFlowBase):
         if stepName == 'embedding' and self.isMC:
 
             sfFile = path.join(UWVV_BASE_PATH, 'data', 'LeptonScaleFactors',
-                               'muEfficiencySF_HZZ_ICHEP16_prelim.root')
+                               'muEfficiencySF_all_HZZ_ICHEP16_final.root')
             sfName = 'FINAL'
 
             scaleFactorEmbedder = cms.EDProducer(
@@ -45,18 +45,19 @@ class MuonScaleFactors(AnalysisFlowBase):
             step.addModule('scaleFactorErrorEmbedderM', 
                            scaleFactorErrorEmbedder, 'm')
 
-            trkRecoSFFile = path.join(UWVV_BASE_PATH, 'data', 'LeptonScaleFactors',
-                                      'muonTrackRecoEff_ICHEP.root')
-            trkRecoScaleFactorEmbedder = cms.EDProducer(
-                "PATMuonScaleFactorEmbedder",
-                src = step.getObjTag('m'),
-                fileName = cms.string(trkRecoSFFile),
-                histName = cms.string("muTrkEffSF"),
-                label = cms.string("trkRecoEffScaleFactor"),
-                xValue = cms.string('eta'),
-                yValue = cms.string('pt'),
-                )
-            step.addModule('trkRecoScaleFactorEmbedderM', trkRecoScaleFactorEmbedder, 'm')
+            ## Track reco efficiency scale factors are now included in the above histos for muons
+            # trkRecoSFFile = path.join(UWVV_BASE_PATH, 'data', 'LeptonScaleFactors',
+            #                           'muonTrackRecoEff_ICHEP.root')
+            # trkRecoScaleFactorEmbedder = cms.EDProducer(
+            #     "PATMuonScaleFactorEmbedder",
+            #     src = step.getObjTag('m'),
+            #     fileName = cms.string(trkRecoSFFile),
+            #     histName = cms.string("muTrkEffSF"),
+            #     label = cms.string("trkRecoEffScaleFactor"),
+            #     xValue = cms.string('eta'),
+            #     yValue = cms.string('pt'),
+            #     )
+            # step.addModule('trkRecoScaleFactorEmbedderM', trkRecoScaleFactorEmbedder, 'm')
 
         return step
 
