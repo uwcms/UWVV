@@ -171,6 +171,13 @@ elif zl or z:
     from UWVV.AnalysisTools.templates.ZPlusXFinalStateBaseFlow import ZPlusXFinalStateBaseFlow
     FlowSteps.append(ZPlusXBaseFlow)
     FlowSteps.append(ZPlusXFinalStateBaseFlow)
+    # FSR and other ZZ/HZZ stuff
+    from UWVV.AnalysisTools.templates.ZZID import ZZID
+    from UWVV.AnalysisTools.templates.ZZIso import ZZIso
+    from UWVV.AnalysisTools.templates.ZZFSR import ZZFSR
+    FlowSteps.append(ZZID)
+    FlowSteps.append(ZZFSR)
+    FlowSteps.append(ZZIso)
     
 # Lepton calibrations
 if options.eCalib:
