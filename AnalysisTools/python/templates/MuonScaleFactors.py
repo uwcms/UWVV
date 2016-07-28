@@ -8,7 +8,7 @@ import FWCore.ParameterSet.Config as cms
 class MuonScaleFactors(AnalysisFlowBase):
     def __init__(self, *args, **kwargs):
         if not hasattr(self, 'isMC'):
-            self.isMC = kwargs.get('isMC', True)
+            self.isMC = kwargs.pop('isMC', True)
         super(MuonScaleFactors, self).__init__(*args, **kwargs)
 
     def makeAnalysisStep(self, stepName, **inputs):
@@ -17,7 +17,7 @@ class MuonScaleFactors(AnalysisFlowBase):
         if stepName == 'embedding' and self.isMC:
 
             sfFile = path.join(UWVV_BASE_PATH, 'data', 'LeptonScaleFactors',
-                               'muEfficiencySF_HZZ_ICHEP16_prelim.root')
+                               'muEfficiencySF_all_HZZ_ICHEP16_final.root')
             sfName = 'FINAL'
 
             scaleFactorEmbedder = cms.EDProducer(
@@ -26,8 +26,10 @@ class MuonScaleFactors(AnalysisFlowBase):
                 fileName = cms.string(sfFile),
                 histName = cms.string(sfName),
                 label = cms.string("effScaleFactor"),
+                xValue = cms.string('eta'),
+                yValue = cms.string('pt'),
                 )
-            step.addModule('scaleFactorEmbedder', scaleFactorEmbedder, 'm')
+            step.addModule('scaleFactorEmbedderM', scaleFactorEmbedder, 'm')
 
             sfErrName = 'ERROR'
 
@@ -37,9 +39,25 @@ class MuonScaleFactors(AnalysisFlowBase):
                 fileName = cms.string(sfFile),
                 histName = cms.string(sfErrName),
                 label = cms.string("effScaleFactorError"),
+                xValue = cms.string('eta'),
+                yValue = cms.string('pt'),
                 )
-            step.addModule('scaleFactorErrorEmbedder', 
+            step.addModule('scaleFactorErrorEmbedderM', 
                            scaleFactorErrorEmbedder, 'm')
+
+            ## Track reco efficiency scale factors are now included in the above histos for muons
+            # trkRecoSFFile = path.join(UWVV_BASE_PATH, 'data', 'LeptonScaleFactors',
+            #                           'muonTrackRecoEff_ICHEP.root')
+            # trkRecoScaleFactorEmbedder = cms.EDProducer(
+            #     "PATMuonScaleFactorEmbedder",
+            #     src = step.getObjTag('m'),
+            #     fileName = cms.string(trkRecoSFFile),
+            #     histName = cms.string("muTrkEffSF"),
+            #     label = cms.string("trkRecoEffScaleFactor"),
+            #     xValue = cms.string('eta'),
+            #     yValue = cms.string('pt'),
+            #     )
+            # step.addModule('trkRecoScaleFactorEmbedderM', trkRecoScaleFactorEmbedder, 'm')
 
         return step
 

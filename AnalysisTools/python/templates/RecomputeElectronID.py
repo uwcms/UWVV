@@ -13,7 +13,7 @@ class RecomputeElectronID(AnalysisFlowBase):
     def makeAnalysisStep(self, stepName, **inputs):
         step = super(RecomputeElectronID, self).makeAnalysisStep(stepName, **inputs)
 
-        if stepName == 'preliminary':
+        if stepName == 'embedding':
             self.addElectronIDEmbedding(step)
 
         return step
@@ -26,6 +26,10 @@ class RecomputeElectronID(AnalysisFlowBase):
         setupAllVIDIdsInModule(self.process, 
                                'RecoEgamma.ElectronIdentification.Identification.mvaElectronID_Spring16_V1_cff',
                                setupVIDElectronSelection)
+
+        self.process.egmGsfElectronIDs.physicsObjectSrc = step.getObjTag('e')
+        self.process.electronMVAValueMapProducer.srcMiniAOD = step.getObjTag('e')
+        self.process.electronRegressionValueMapProducer.srcMiniAOD = step.getObjTag('e')
 
         step.addModule('egmGsfElectronIDSequence', 
                        self.process.egmGsfElectronIDSequence)

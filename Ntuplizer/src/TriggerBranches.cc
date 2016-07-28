@@ -8,8 +8,10 @@ using namespace uwvv;
 
 TriggerBranch::TriggerBranch(const std::string& name, 
                              const std::vector<std::string>& pathExps,
-                             TTree* const tree) :
-  name(name)
+                             TTree* const tree,
+                             bool checkPrescale) :
+  name(name),
+  checkPrescale(checkPrescale)
 {
   if(!pathExps.size())
     throw cms::Exception("BadTriggerPath")
@@ -19,7 +21,8 @@ TriggerBranch::TriggerBranch(const std::string& name,
     paths.push_back(expr);
   
   tree->Branch((name+"Pass").c_str(), &pass);
-  tree->Branch((name+"Prescale").c_str(), &prescale);
+  if(checkPrescale)
+    tree->Branch((name+"Prescale").c_str(), &prescale);
 }
 
 
@@ -33,19 +36,33 @@ void TriggerBranch::setup(const edm::TriggerNames& names)
 void TriggerBranch::fill(const edm::TriggerResults& results,
                          const pat::PackedTriggerPrescales& prescales)
 {
-  // don't need to check for validity (paths do that)
-
-  prescale = paths.at(0).prescale(prescales);
-  pass = false;
-  for(auto& path : paths)
+  if(checkPrescale)
     {
-      if(path.prescale(prescales) != prescale)
-        throw cms::Exception("InvalidPrescale")
-          << "ERROR: trying to take OR of paths with different prescales "
-          << "(" << paths.at(0).name() << " and " << path.name() << ")"
-          << std::endl;
+      // don't need to check for validity (paths do that)
+      prescale = paths.at(0).prescale(prescales);
+      pass = false;
+      for(auto& path : paths)
+        {
+          if(path.prescale(prescales) != prescale)
+            {
+              if(checkPrescale)
+                throw cms::Exception("InvalidPrescale")
+                  << "ERROR: trying to take OR of paths with different prescales "
+                  << "(" << paths.at(0).name() << " and " << path.name() << ")"
+                  << std::endl;
+            }
 
-      pass |= path.pass(results);
+          pass |= path.pass(results);
+        }
+    }
+  else
+    {
+      pass = false;
+      for(auto& path : paths)
+        {
+          pass = path.pass(results);
+          if(pass) break;
+        }
     }
 }
 
@@ -57,7 +74,10 @@ TriggerBranches::TriggerBranches(edm::ConsumesCollector cc,
                                  TTree* const tree) :
   resultsToken(cc.consumes<edm::TriggerResults>(config.getParameter<edm::InputTag>("trigResultsSrc"))),
   prescalesToken(cc.consumes<pat::PackedTriggerPrescales>(config.getParameter<edm::InputTag>("trigPrescaleSrc"))),
-  isValid(false)
+  isValid(false),
+  checkPrescale(config.exists("checkPrescale") ?
+                config.getParameter<bool>("checkPrescale") :
+                true)
 {
   std::vector<std::string> names = 
     config.getParameter<std::vector<std::string> >("trigNames");
@@ -67,7 +87,7 @@ TriggerBranches::TriggerBranches(edm::ConsumesCollector cc,
       std::vector<std::string> paths = 
         config.getParameter<std::vector<std::string> >(name + "Paths");
       
-      branches[name] = std::unique_ptr<TriggerBranch>(new TriggerBranch(name, paths, tree));
+      branches[name] = std::unique_ptr<TriggerBranch>(new TriggerBranch(name, paths, tree, checkPrescale));
     }
 }
 

@@ -17,6 +17,10 @@ class ZZClassification(JetQuarkGluonTagging):
                 jetSrc = step.getObjTag('j'),
                 fsrLabel = cms.string(self.getFSRLabel()),
                 qgDiscriminator = cms.string(self.qgLikelihoodLabel()),
+                skimDecisionLabels = cms.vstring(
+                    '{}Tight'.format(self.getZZIDLabel()),
+                    self.getZZIsoLabel(),
+                    ),
                 )
             step.addModule('meEmbedding4e', meEmbedding4e, 'eeee')
                 
@@ -26,6 +30,10 @@ class ZZClassification(JetQuarkGluonTagging):
                 jetSrc = step.getObjTag('j'),
                 fsrLabel = cms.string(self.getFSRLabel()),
                 qgDiscriminator = cms.string(self.qgLikelihoodLabel()),
+                skimDecisionLabels = cms.vstring(
+                    '{}Tight'.format(self.getZZIDLabel()),
+                    self.getZZIsoLabel(),
+                    ),
                 )
             step.addModule('meEmbedding2e2m', meEmbedding2e2m, 'eemm')
                 
@@ -35,6 +43,10 @@ class ZZClassification(JetQuarkGluonTagging):
                 jetSrc = step.getObjTag('j'),
                 fsrLabel = cms.string(self.getFSRLabel()),
                 qgDiscriminator = cms.string(self.qgLikelihoodLabel()),
+                skimDecisionLabels = cms.vstring(
+                    '{}Tight'.format(self.getZZIDLabel()),
+                    self.getZZIsoLabel(),
+                    ),
                 )
             step.addModule('meEmbedding4m', meEmbedding4m, 'mmmm')
                 

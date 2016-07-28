@@ -30,6 +30,7 @@ class ZZFSR(AnalysisFlowBase):
                 nIsoVetoDR = cms.double(0.01),
                 chIsoVetoDR = cms.double(0.0001),
                 relIsoCut = cms.double(1.8),
+                eMuCrossCleaningDR = cms.double(0.05),
                 )
             step.addModule('fsrEmbedder', leptonFSREmbedder, 'e', 'm')
 

@@ -5,9 +5,9 @@ import FWCore.ParameterSet.Config as cms
 class ElectronCalibration(AnalysisFlowBase):
     def __init__(self, *args, **kwargs):
         if not hasattr(self, 'isMC'):
-            self.isMC = kwargs.get('isMC', True)
+            self.isMC = kwargs.pop('isMC', True)
         if not hasattr(self, 'isSync'):
-            self.isSync = self.isMC and kwargs.get('isSync', False)
+            self.isSync = self.isMC and kwargs.pop('isSync', False)
         super(ElectronCalibration, self).__init__(*args, **kwargs)
 
     def makeAnalysisStep(self, stepName, **inputs):
@@ -22,15 +22,16 @@ class ElectronCalibration(AnalysisFlowBase):
                 initialSeed = cms.untracked.uint32(987),
                 )
             
-            self.process.load('EgammaAnalysis.ElectronTools.calibratedElectronsRun2_cfi')
+            calibratedPatElectrons = cms.EDProducer(
+                "CalibratedPatElectronProducerRun2",
+                electrons = step.getObjTag('e'),
+                gbrForestName = cms.string("gedelectron_p4combination_25ns"),
+                isMC = cms.bool(self.isMC),
+                isSynchronization = cms.bool(self.isSync),
+                correctionFile = cms.string('EgammaAnalysis/ElectronTools/data/ScalesSmearings/80X_ichepV1_2016_ele'),
+                )
 
-            self.process.calibratedPatElectrons.electrons = step.getObjTag('e')
-            self.process.calibratedPatElectrons.isMC = cms.bool(self.isMC)
-            self.process.calibratedPatElectrons.isSynchronization = cms.bool(self.isSync)
-
-            step.addModule('calibratedPatElectrons', 
-                           self.process.calibratedPatElectrons,
-                           'e')
+            step.addModule('calibratedPatElectrons', calibratedPatElectrons, 'e')
 
         return step
 

@@ -133,10 +133,16 @@ void PATElectronZZIDEmbedder::produce(edm::Event& iEvent, const edm::EventSetup&
 
       out->push_back(*ei); // copy electron to save correctly in event
 
-      bool idResult = selector(*eptr) && (passKinematics(eptr) && passVertex(eptr) && passMissingHits(eptr));
+      bool vtxResult = passVertex(eptr);
+      bool kinResult = passKinematics(eptr);
+      bool missingHitsResult = passMissingHits(eptr);
+      bool idResultNoVtx = selector(*eptr) && kinResult && missingHitsResult;
+      bool idResult = idResultNoVtx && vtxResult;
 
+      out->back().addUserFloat(idLabel_+"NoVtx", float(idResultNoVtx)); // 1 for true, 0 for false
       out->back().addUserFloat(idLabel_, float(idResult)); // 1 for true, 0 for false
 
+      out->back().addUserFloat(idLabel_+"TightNoVtx", float(idResultNoVtx && passBDT(eptr))); // 1 for true, 0 for false
       out->back().addUserFloat(idLabel_+"Tight", float(idResult && passBDT(eptr))); // 1 for true, 0 for false
     }
 

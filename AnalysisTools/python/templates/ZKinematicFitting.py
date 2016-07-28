@@ -6,7 +6,7 @@ import FWCore.ParameterSet.Config as cms
 class ZKinematicFitting(AnalysisFlowBase):
     def __init__(self, *args, **kwargs):
         if not hasattr(self, 'isMC'):
-            self.isMC = kwargs.get('isMC', True)
+            self.isMC = kwargs.pop('isMC', True)
         super(ZKinematicFitting, self).__init__(*args, **kwargs)
 
     def makeAnalysisStep(self, stepName, **inputs):

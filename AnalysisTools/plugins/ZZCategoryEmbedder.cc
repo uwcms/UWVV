@@ -47,6 +47,10 @@ class ZZCategoryEmbedder : public edm::stream::EDProducer<>
                   const unsigned nep, const unsigned nem, // # e+, e-
                   const unsigned nmp, const unsigned nmm, // # mu+, mu-
                   const unsigned nJets, const unsigned nBJets) const;
+  int getCategoryQG(const CCand& cand, // cand do consider
+                    const unsigned nep, const unsigned nem, // # e+, e-
+                    const unsigned nmp, const unsigned nmm, // # mu+, mu-
+                    const unsigned nJets, const unsigned nBJets) const;
 
   // Tag of final state collection
   edm::EDGetTokenT<edm::View<CCand> > srcToken;
@@ -142,6 +146,9 @@ void ZZCategoryEmbedder::produce(edm::Event& iEvent, const edm::EventSetup& iSet
       out->back().addUserInt("ZZCategory", 
                              getCategory(out->back(), nep, nem, nmp, nmm, 
                                          nJets, nBJets));
+      out->back().addUserInt("ZZCategoryQG", 
+                             getCategoryQG(out->back(), nep, nem, nmp, nmm, 
+                                           nJets, nBJets));
     }
 
   iEvent.put(std::move(out));
@@ -160,15 +167,29 @@ int ZZCategoryEmbedder::getCategory(const CCand& cand, // cand do consider
 
   unsigned nLep = nep + nem + nmp + nmm;
 
+  float m4l = cand.mass();
+  if(cand.hasUserInt("nfsrCands"))
+    {
+      size_t nCands = (size_t)cand.userInt("nfsrCands");
+      if(nCands)
+        {
+          auto p4 = cand.p4();
+          for(size_t i = 0; i < nCands; ++i)
+            p4 += cand.userCand("fsr"+std::to_string(i))->p4();
+          m4l = p4.mass();
+        }
+    }
+
   // VBF 2-jet
-  if(cand.userFloat("D_VBF2j") > 0.38 && nLep == 4 && 
+  if(cand.hasUserFloat("D_VBF2j") && cand.userFloat("D_VBF2j") > 1.043 - 460./(m4l+634.) && nLep == 4 && 
      ((nJets >= 2 && nJets < 4 && nBJets < 2) ||
       (nJets >= 4 && nBJets == 0)))
     return 2;
 
   // VH hadronic
   if(nLep == 4 && 
-     (((cand.userFloat("D_WHh") > 0.999 || cand.userFloat("D_ZHh") > 0.999) && 
+     ((((cand.hasUserFloat("D_WHh") && cand.userFloat("D_WHh") > 0.959) || 
+        (cand.hasUserFloat("D_ZHh") && cand.userFloat("D_ZHh") > 0.9946)) && 
        ((nJets >= 2 && nJets < 4 && nBJets < 2) ||
         (nJets >= 4 && nBJets == 0))
        ) ||
@@ -186,7 +207,54 @@ int ZZCategoryEmbedder::getCategory(const CCand& cand, // cand do consider
     return 5;
 
   // VBF 1-jet
-  if(nLep == 4 && nJets == 1 && cand.userFloat("D_VBF1j") > 0.56)
+  if(nLep == 4 && nJets == 1 && cand.hasUserFloat("D_VBF1j") && cand.userFloat("D_VBF1j") > 0.699)
+    return 1;
+  
+  // untagged
+  return 0;
+}
+
+
+int ZZCategoryEmbedder::getCategoryQG(const CCand& cand, // cand do consider
+                                      const unsigned nep, const unsigned nem, // # e+, e-
+                                      const unsigned nmp, const unsigned nmm, // # mu+, mu-
+                                      const unsigned nJets, const unsigned nBJets) const
+{
+  // Do we care at all?
+  if(!((nep >= 2 && nem >= 2) || (nmp >= 2 && nmm >= 2) ||
+       (nep && nem && nmp && nmm)))
+    return -1;
+
+  unsigned nLep = nep + nem + nmp + nmm;
+
+  // VBF 2-jet
+  if(cand.hasUserFloat("D_VBF2j_QG") && cand.userFloat("D_VBF2j_QG") > 0.391 && nLep == 4 && 
+     ((nJets >= 2 && nJets < 4 && nBJets < 2) ||
+      (nJets >= 4 && nBJets == 0)))
+    return 2;
+
+  // VH hadronic
+  if(nLep == 4 && 
+     ((((cand.hasUserFloat("D_WHh_QG") && cand.userFloat("D_WHh_QG") > 0.973) || 
+        (cand.hasUserFloat("D_ZHh_QG") && cand.userFloat("D_ZHh_QG") > 0.996)) && 
+       ((nJets >= 2 && nJets < 4 && nBJets < 2) ||
+        (nJets >= 4 && nBJets == 0))
+       ) ||
+      (nJets >= 2 && nJets < 4 && nBJets >= 2)))
+    return 4;
+  
+  // VH leptonic
+  if((nJets == 0 && nLep >= 5) ||
+     (nJets < 4 && nBJets == 0 &&
+      (nLep == 5 || (nLep == 6 && nep == nem && nmp == nmm))))
+    return 3;
+
+  // ttH
+  if((nJets >= 4 && nBJets >= 1) || nLep >= 5)
+    return 5;
+
+  // VBF 1-jet
+  if(nLep == 4 && nJets == 1 && cand.hasUserFloat("D_VBF1j_QG") && cand.userFloat("D_VBF1j_QG") > 0.72)
     return 1;
   
   // untagged

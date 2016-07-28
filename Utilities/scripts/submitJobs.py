@@ -75,15 +75,19 @@ def writeFarmoutCommand(cfg, jobid, dataset, fullDataset,
         '--input-file-list={}'.format(inputListFile),
         '--assume-input-files-exist',
         '--input-dir=/',
-        '{}-{}'.format(jobid, dataset),
-        cfg,
-        "'inputFiles=$inputFileNames'",
-        "'outputFile=$outputFileName'",
         ]
 
+    if args.get('extraUsercodeFiles', []):
+        cmds.append('--extra-usercode-files="{}"'.format(' '.join(args.get('extraUsercodeFiles'))))
+
+
+        cmds.append('{}-{}'.format(jobid, dataset))
+        cmds.append(cfg)
+        cmds.append("'inputFiles=$inputFileNames'")
+        cmds.append("'outputFile=$outputFileName'")
+
     if args.get('applyLumiMask', False):
-        lumiMask = 'Cert_271036-274443_13TeV_PromptReco_Collisions16_JSON.txt' # 2.6/fb
-        #'Cert_271036-274421_13TeV_PromptReco_Collisions16_JSON.txt' # 2.07/fb
+        lumiMask = 'Cert_271036-276811_13TeV_PromptReco_Collisions16_JSON.txt' # 12.9/fb
         if args.get('lumiMaskJSON', ''):
             lumiMask = args.get('lumiMaskJSON')
         lumiMask = os.path.join('/afs/cern.ch/cms/CAF/CMSCOMM/COMM_DQM/certification/Collisions16/13TeV', 
@@ -171,6 +175,10 @@ if __name__ == '__main__':
                         help = 'Where to put the output.  Default: %(default)s.')
     parser.add_argument('--filesPerJob', type=int, default=1,
                         help="Number of input files to pass to each job.")
+    parser.add_argument('--extraUsercodeFiles', nargs='*', type=str, 
+                        help='List of extra directories that need to be '
+                        'included in the user_code tarball sent with the job. '
+                        'Paths relative to $CMSSW_BASE.')
     parser.add_argument('-o', type=str, dest="scriptFile", default="", required=False, 
                         help='File to write output bash script to (default: stdout).')
     parser.add_argument('cmsRunArgs', nargs=argparse.REMAINDER,
@@ -182,5 +190,6 @@ if __name__ == '__main__':
                 *args.samples, applyLumiMask=args.applyLumiMask, 
                 lumiMaskJSON=args.lumiMaskJSON, campaign=args.campaign,
                 dataEra=args.dataEra, filesPerJob=args.filesPerJob, 
+                extraUsercodeFiles=args.extraUsercodeFiles,
                 cmsRunArgs=args.cmsRunArgs)
                         

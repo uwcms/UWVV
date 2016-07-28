@@ -106,15 +106,23 @@ void PATMuonZZIDEmbedder::produce(edm::Event& iEvent, const edm::EventSetup& iSe
 
       out->push_back(*mi); // copy muon to save correctly in event
 
-      bool idResult = (passKinematics(mptr) && passVertex(mptr) && passType(mptr));
+      bool vtxResult = passVertex(mptr);
+      bool kinResult = passKinematics(mptr);
+      bool typeResult = passType(mptr);
+      bool idResultNoVtx = kinResult && typeResult;
+      bool idResult = idResultNoVtx && vtxResult;
       out->back().addUserFloat(idLabel_, float(idResult)); // 1 for true, 0 for false
+      out->back().addUserFloat(idLabel_+"NoVtx", float(idResultNoVtx)); // 1 for true, 0 for false
 
       out->back().addUserFloat(idLabel_+"PF", float(idResult && mi->isPFMuon())); // 1 for true, 0 for false
+      out->back().addUserFloat(idLabel_+"PFNoVtx", float(idResultNoVtx && mi->isPFMuon())); // 1 for true, 0 for false
 
       bool trackerHighPtID = passTrackerHighPtID(mptr);
 
       out->back().addUserFloat(idLabel_+"HighPt", float(idResult && trackerHighPtID));
       out->back().addUserFloat(idLabel_+"Tight", float(idResult && (mi->isPFMuon() || trackerHighPtID)));
+      out->back().addUserFloat(idLabel_+"HighPtNoVtx", float(idResultNoVtx && trackerHighPtID));
+      out->back().addUserFloat(idLabel_+"TightNoVtx", float(idResultNoVtx && (mi->isPFMuon() || trackerHighPtID)));
     }
 
   iEvent.put(out);
@@ -158,7 +166,8 @@ bool PATMuonZZIDEmbedder::passTrackerHighPtID(const edm::Ptr<pat::Muon>& mu) con
           mu->dB() < 0.2 &&
           fabs(mu->muonBestTrack()->dz(vertices->at(0).position())) < 0.5 &&
           mu->innerTrack()->hitPattern().numberOfValidPixelHits() > 0 &&
-          mu->innerTrack()->hitPattern().trackerLayersWithMeasurement() > 5);
+          mu->innerTrack()->hitPattern().trackerLayersWithMeasurement() > 5 &&
+          mu->muonBestTrack()->ptError() / mu->muonBestTrack()->pt() < 0.3);
 }
 
 

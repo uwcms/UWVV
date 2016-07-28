@@ -93,12 +93,23 @@ ZKinematicFitEmbedder<T12,T34>::produce(edm::Event& iEvent,
 
       bool flip = uwvv::helpers::zMassDistance(p4Z1) > uwvv::helpers::zMassDistance(p4Z2);
 
-      std::vector<const reco::Candidate*> leptons;
+      std::vector<reco::Candidate*> leptons;
+      // std::vector<const reco::Candidate*> leptons;
 
-      leptons.push_back((flip ? z2 : z1)->daughter(0)->masterClone().get());
-      leptons.push_back((flip ? z2 : z1)->daughter(1)->masterClone().get());
-      leptons.push_back((flip ? z1 : z2)->daughter(0)->masterClone().get());
-      leptons.push_back((flip ? z1 : z2)->daughter(1)->masterClone().get());
+      std::unique_ptr<reco::Candidate> l11((flip ? z2 : z1)->daughter(0)->masterClone().get()->clone());
+      std::unique_ptr<reco::Candidate> l12((flip ? z2 : z1)->daughter(1)->masterClone().get()->clone());
+      std::unique_ptr<reco::Candidate> l21((flip ? z1 : z2)->daughter(0)->masterClone().get()->clone());
+      std::unique_ptr<reco::Candidate> l22((flip ? z1 : z2)->daughter(1)->masterClone().get()->clone());
+
+      leptons.push_back(l11.get());
+      leptons.push_back(l12.get());
+      leptons.push_back(l21.get());
+      leptons.push_back(l22.get());
+
+      // leptons.push_back((flip ? z2 : z1)->daughter(0)->masterClone().get());
+      // leptons.push_back((flip ? z2 : z1)->daughter(1)->masterClone().get());
+      // leptons.push_back((flip ? z1 : z2)->daughter(0)->masterClone().get());
+      // leptons.push_back((flip ? z1 : z2)->daughter(1)->masterClone().get());
 
       bool lepsGood = true;
       for(auto& lep : leptons)

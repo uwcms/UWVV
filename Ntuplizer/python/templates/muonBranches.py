@@ -12,6 +12,23 @@ muonBranches = cms.PSet(
         PFPhotonIso = cms.string('pfIsolationR03.sumPhotonEt'),
         PFNeutralIso = cms.string('pfIsolationR03.sumNeutralHadronEt'),
         PFPUIso = cms.string('pfIsolationR03.sumPUPt'),
+
+        PtErr = cms.string('? hasUserFloat("kalmanPtError") ? '
+                           'userFloat("kalmanPtError") : '
+                           'bestTrack.ptError'),
+
+        PtUncorrected = cms.string('? hasUserCand("uncorrected") ? '
+                                   'userCand("uncorrected").pt : '
+                                   'pt'),
+        PtErrUncorrected = cms.string('? hasUserCand("uncorrected") ? '
+                                      'userCand("uncorrected").bestTrack.ptError : '
+                                      'bestTrack.ptError'),
+        EffScaleFactor = cms.string('? hasUserFloat("effScaleFactor") ? '
+                                    'userFloat("effScaleFactor") : 1.'),
+        EffScaleFactorError = cms.string('? hasUserFloat("effScaleFactorError") ? '
+                                         'userFloat("effScaleFactorError") : 0.'),
+        # TrkRecoEffScaleFactor = cms.string('? hasUserFloat("trkRecoEffScaleFactor") ? '
+        #                                    'userFloat("trkRecoEffScaleFactor") : 1.'),
         ),
     uints = cms.PSet(
         MatchedStations = cms.string('MatchedStations'),
@@ -26,5 +43,9 @@ muonBranches = cms.PSet(
                               'userFloat("ZZIDPassHighPt") : 0.'),
         PFID = cms.string('? hasUserFloat("ZZIDPassPF") ? '
                           'userFloat("ZZIDPassPF") : 0.'),
+        HighPtIDNoVtx = cms.string('? hasUserFloat("ZZIDPassHighPtNoVtx") ? '
+                                   'userFloat("ZZIDPassHighPtNoVtx") : 0.'),
+        PFIDNoVtx = cms.string('? hasUserFloat("ZZIDPassPFNoVtx") ? '
+                               'userFloat("ZZIDPassPFNoVtx") : 0.'),
         ),
     )

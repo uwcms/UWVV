@@ -3,7 +3,7 @@
 //    PATObjectScaleFactorEmbedder                                           //
 //                                                                           //
 //    Takes a TH2F and a collection of PAT objects and embeds the            //
-//    content of the bin at (obj.pt(), obj.eta()) as a userFloat             //
+//    content of the bin the object would fill as a userFloat                //
 //                                                                           //
 //    Nate Woods, U. Wisconsin                                               //
 //                                                                           //
@@ -29,6 +29,7 @@
 #include "DataFormats/PatCandidates/interface/Photon.h"
 #include "DataFormats/PatCandidates/interface/CompositeCandidate.h"
 #include "DataFormats/Common/interface/View.h"
+#include "CommonTools/Utils/interface/StringObjectFunction.h"
 
 // ROOT includes
 #include "TH2F.h"
@@ -50,6 +51,9 @@ private:
   const std::unique_ptr<TFile> file;
   const std::unique_ptr<TH2F> h;
   const std::string label;
+
+  StringObjectFunction<T> xFunction;
+  StringObjectFunction<T> yFunction;
 };
 
 
@@ -57,8 +61,16 @@ template<typename T>
 PATObjectScaleFactorEmbedder<T>::PATObjectScaleFactorEmbedder(const edm::ParameterSet& iConfig) :
   srcToken(consumes<edm::View<T> >(iConfig.getParameter<edm::InputTag>("src"))),
   file(new TFile(iConfig.getParameter<std::string>("fileName").c_str())),
-  h((TH2F*)(file->Get(iConfig.getParameter<std::string>("histName").c_str())->Clone())),
-  label(iConfig.getParameter<std::string>("label"))
+  h((file->IsOpen() && !file->IsZombie()) ? 
+    (TH2F*)(file->Get(iConfig.getParameter<std::string>("histName").c_str())->Clone()) :
+    new TH2F("h","h",1,0.,1.,1,0.,1.)),
+  label(iConfig.getParameter<std::string>("label")),
+  xFunction(iConfig.exists("xValue") ?
+            iConfig.getParameter<std::string>("xValue") :
+            "eta"),
+  yFunction(iConfig.exists("yValue") ?
+            iConfig.getParameter<std::string>("yValue") :
+            "pt")
 {
   if(file->IsZombie())
     throw cms::Exception("InvalidFile") 
@@ -82,9 +94,37 @@ void PATObjectScaleFactorEmbedder<T>::produce(edm::Event& iEvent,
     {
       const T& t = in->at(i);
 
-      float value = h->GetBinContent(h->FindBin(t.pt(), t.eta()));
+      float x = xFunction(t);
+      float y = yFunction(t);
 
-      out->push_back(t);
+      // don't just give 0 for under/overflow
+      int bin = h->FindBin(x, y);
+      if(h->IsBinOverflow(bin))
+        {
+          int binx, biny, binz;
+          h->GetBinXYZ(bin, binx, biny, binz);
+          if(binx > h->GetNbinsX())
+            binx -= 1;
+          if(biny > h->GetNbinsY())
+            biny -= 1;
+          
+          bin = h->GetBin(binx, biny, binz);
+        }
+      if(h->IsBinUnderflow(bin))
+        {
+          int binx, biny, binz;
+          h->GetBinXYZ(bin, binx, biny, binz);
+          if(!binx)
+            binx += 1;
+          if(!biny)
+            biny += 1;
+          
+          bin = h->GetBin(binx, biny, binz);
+        }
+
+      float value = h->GetBinContent(bin);
+
+      out->push_back(t); // copies with ownership
       out->back().addUserFloat(label, value);
     }
 

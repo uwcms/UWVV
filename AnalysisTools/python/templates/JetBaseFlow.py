@@ -6,7 +6,7 @@ from PhysicsTools.PatAlgos.tools.jetTools import updateJetCollection
 class JetBaseFlow(AnalysisFlowBase):
     def __init__(self, *args, **kwargs):
         if not hasattr(self, 'isMC'):
-            self.isMC = kwargs.get('isMC', True)
+            self.isMC = kwargs.pop('isMC', True)
         super(JetBaseFlow, self).__init__(*args, **kwargs)
 
     def makeAnalysisStep(self, stepName, **inputs):

@@ -5,14 +5,9 @@ import FWCore.ParameterSet.Types as CfgTypes
 
 from UWVV.AnalysisTools.analysisFlowMaker import createFlow
 
-from UWVV.Utilities.helpers import parseChannels, expandChannelName
-from UWVV.Ntuplizer.makeBranchSet import makeBranchSet
-from UWVV.Ntuplizer.eventParams import makeEventParams
-from UWVV.Ntuplizer.templates.triggerBranches import triggerBranches    
-
 import os
 
-process = cms.Process("Ntuple")
+process = cms.Process("LEPTONS")
 
 options = VarParsing.VarParsing('analysis')
 
@@ -20,10 +15,6 @@ options.inputFiles = '/store/mc/RunIIFall15MiniAODv2/GluGluHToZZTo4L_M2500_13TeV
 options.outputFile = 'ntuplize.root'
 options.maxEvents = -1
 
-options.register('channels', "zz", 
-                 VarParsing.VarParsing.multiplicity.singleton,
-                 VarParsing.VarParsing.varType.string,
-                 "Channel to make ntuples for. May be comma-separated list and/or several presets like 'zz'")
 options.register('globalTag', "", 
                  VarParsing.VarParsing.multiplicity.singleton,
                  VarParsing.VarParsing.varType.string,
@@ -52,38 +43,26 @@ options.register('lumiMask', '',
                  VarParsing.VarParsing.multiplicity.singleton,
                  VarParsing.VarParsing.varType.string,
                  "Lumi mask (for data only).")
-options.register('profile', 0,
-                 VarParsing.VarParsing.multiplicity.singleton,
-                 VarParsing.VarParsing.varType.int,
-                 "Set nonzero to run igprof.")
-
 
 options.parseArguments()
 
 
-channels = parseChannels(options.channels)
-zz = any(len(c) == 4 for c in channels)
-zl = any(len(c) == 3 for c in channels)
-z  = any(len(c) == 2 for c in channels)
-l  = any(len(c) == 1 for c in channels)
 
-
-### To use IgProf's neat memory profiling tools, run with the profile 
-### option and igprof like so:
-###      $ igprof -d -mp -z -o igprof.mp.gz cmsRun profile=1 ... 
+### To use IgProf's neat memory profiling tools, uncomment the following 
+### lines then run this cfg with igprof like so:
+###      $ igprof -d -mp -z -o igprof.mp.gz cmsRun ... 
 ### this will create a memory profile every 250 events so you can track use
 ### Turn the profile into text with
 ###      $ igprof-analyse -d -v -g -r MEM_LIVE igprof.yourOutputFile.gz > igreport_live.res
 ### To do a performance profile instead of a memory profile, change -mp to -pp
 ### in the first command and remove  -r MEM_LIVE from the second
 ### For interpretation of the output, see http://igprof.org/text-output-format.html
-if options.profile:
-    from IgTools.IgProf.IgProfTrigger import igprof
-    process.load("IgTools.IgProf.IgProfTrigger")
-    process.igprofPath = cms.Path(process.igprof)
-    process.igprof.reportEventInterval     = cms.untracked.int32(250)
-    process.igprof.reportToFileAtBeginJob  = cms.untracked.string("|gzip -c>igprof.begin-job.gz")
-    process.igprof.reportToFileAtEvent = cms.untracked.string("|gzip -c>igprof.%I.%E.%L.%R.event.gz")
+# from IgTools.IgProf.IgProfTrigger import igprof
+# process.load("IgTools.IgProf.IgProfTrigger")
+# process.igprofPath = cms.Path(process.igprof)
+# process.igprof.reportEventInterval     = cms.untracked.int32(250)
+# process.igprof.reportToFileAtBeginJob  = cms.untracked.string("|gzip -c>igprof.begin-job.gz")
+# process.igprof.reportToFileAtEvent = cms.untracked.string("|gzip -c>igprof.%I.%E.%L.%R.event.gz")
 
 
 # Basic stuff for all jobs
@@ -122,11 +101,6 @@ if options.lumiMask:
     lumisToProcess.extend(lumiList.getCMSSWString().split(','))
     process.source.lumisToProcess = lumisToProcess
 
-process.TFileService = cms.Service(
-    "TFileService",
-    fileName = cms.string(options.outputFile),
-    )
-
 process.maxEvents = cms.untracked.PSet(
     input=cms.untracked.int32(options.maxEvents)
     )
@@ -152,8 +126,6 @@ FlowSteps.append(MuonBaseFlow)
 
 from UWVV.AnalysisTools.templates.MuonScaleFactors import MuonScaleFactors
 FlowSteps.append(MuonScaleFactors)
-from UWVV.AnalysisTools.templates.ElectronScaleFactors import ElectronScaleFactors
-FlowSteps.append(ElectronScaleFactors)
 
 # jet energy corrections and basic preselection
 from UWVV.AnalysisTools.templates.JetBaseFlow import JetBaseFlow
@@ -162,26 +134,6 @@ if options.isMC:
     from UWVV.AnalysisTools.templates.JetEnergySmearing import JetEnergySmearing
     FlowSteps.append(JetEnergySmearing)
 
-
-# make final states
-if zz:
-    from UWVV.AnalysisTools.templates.ZZFinalStateBaseFlow import ZZFinalStateBaseFlow
-    FlowSteps.append(ZZFinalStateBaseFlow)
-
-    # HZZ discriminants and categorization
-    from UWVV.AnalysisTools.templates.ZZClassification import ZZClassification
-    FlowSteps.append(ZZClassification)
-
-    from UWVV.AnalysisTools.templates.ZKinematicFitting import ZKinematicFitting
-    FlowSteps.append(ZKinematicFitting)
-    
-elif zl or z:
-    from UWVV.AnalysisTools.templates.ZPlusXBaseFlow import ZPlusXBaseFlow
-    FlowSteps.append(ZPlusXBaseFlow)
-    
-# FSR and other ZZ/HZZ stuff
-from UWVV.AnalysisTools.templates.ZZFlow import ZZFlow
-FlowSteps.append(ZZFlow)
 
 # Lepton calibrations
 if options.eCalib:
@@ -192,53 +144,38 @@ if options.muCalib:
     from UWVV.AnalysisTools.templates.MuonCalibration import MuonCalibration
     FlowSteps.append(MuonCalibration)
 
-# k factors if a gg sample
-if any('GluGlu' in f for f in options.inputFiles):
-    from UWVV.AnalysisTools.templates.GGHZZKFactors import GGHZZKFactors
-    FlowSteps.append(GGHZZKFactors)
+# ZZ stuff
+from UWVV.AnalysisTools.templates.ZZFlow import ZZFlow
+FlowSteps.append(ZZFlow)
+
+# but not actually the Z/ZZ combinations
+from UWVV.AnalysisTools.templates.NoCombinedStates import NoCombinedStates
+FlowSteps.append(NoCombinedStates)
 
 # Turn all these into a single flow class
 FlowClass = createFlow(*FlowSteps)
 flow = FlowClass('flow', process, 
                  isMC=bool(options.isMC), isSync=bool(options.isSync))
 
-### Set up tree makers
-
-# meta info tree first
-process.metaInfo = cms.EDAnalyzer(
-    'MetaTreeGenerator',
-    eventParams = makeEventParams(flow.finalTags()),
+outputCommands = cms.untracked.vstring(
+    'drop *',
+    'keep *_packedGenParticles_*_*',
+    'keep *_prunedGenParticles_*_*',
+    'keep *_packedPFCandidates_*_*',
+    'keep *_offlineSlimmedPrimaryVertices_*_*',
     )
-process.treeSequence = cms.Sequence(process.metaInfo)
+for obj, objName in flow.finalTags().iteritems():
+    print obj, objName
+    outputCommands.append('keep *_{}_*_*'.format(objName.split(':')[0]))
 
-# Trigger info is only in MC from reHLT campaign
-if options.isMC and 'reHLT' not in options.inputFiles[0]:
-    trgBranches = cms.PSet(
-        trigNames=cms.vstring(),
-        trigResultsSrc = cms.InputTag("TriggerResults", "", "HLT"),
-        trigPrescaleSrc = cms.InputTag("patTrigger"),
-        )
-else:
-    trgBranches = triggerBranches
+process.out = cms.OutputModule(
+    "PoolOutputModule",
+    fileName = cms.untracked.string(options.outputFile),
+    dropMetaData = cms.untracked.string("ALL"),
+    outputCommands = outputCommands,
+    )
 
-    if 'reHLT' in options.inputFiles[0]:
-        trgBranches = trgBranches.clone(trigResultsSrc=cms.InputTag("TriggerResults", "", "HLT2"))
+process.save = cms.EndPath(process.out)
 
-
-# then the ntuples
-for chan in channels:
-    mod = cms.EDAnalyzer(
-        'TreeGenerator{}'.format(expandChannelName(chan)),
-        src = flow.finalObjTag(chan),
-        branches = makeBranchSet(chan),
-        eventParams = makeEventParams(flow.finalTags()),
-        triggers = trgBranches,
-        )
-
-    setattr(process, chan, mod)
-    process.treeSequence += mod
-
-p = flow.getPath()
-p += process.treeSequence
-
-process.schedule.append(p)
+process.schedule.append(flow.getPath())
+process.schedule.append(process.save)

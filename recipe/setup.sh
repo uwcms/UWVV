@@ -8,24 +8,38 @@ if [ ! -d ./RecoEgamma ]; then
     git clone https://github.com/Werbellin/RecoEgamma_8X RecoEgamma
 fi
 
-if [ ! -d ZZMatrixElement ]; then
+if [ ! -d ./EgammaAnalysis ]; then
+    echo "Setting up electron energy scale corrections"
+    git remote add -f -t ecal_smear_fix_80X emanueledimarco https://github.com/emanueledimarco/cmssw.git
+    git cms-addpkg EgammaAnalysis/ElectronTools
+    git checkout -b from-277de3c 277de3c
+
+    pushd EgammaAnalysis/ElectronTools/data
+    git clone -b ICHEP2016_v2 https://github.com/emanueledimarco/ScalesSmearings.git
+    popd
+fi
+
+if [ ! -d ./ZZMatrixElement ]; then
     echo "Setting up ZZ matrix element stuff"
     git clone https://github.com/cms-analysis/HiggsAnalysis-ZZMatrixElement.git ZZMatrixElement
 
     pushd ZZMatrixElement
-    git checkout -b from-v200p4 v2.0.0_patch4
+    git checkout -b from-v200p5 v2.0.0_patch5
     source setup.sh -j 12
     popd
+
+    # copy libraries dowloaded by MELA to lib so they get packaged and used by CONDOR
+    cp ZZMatrixElement/MELA/data/"$SCRAM_ARCH"/*.so "$CMSSW_BASE"/lib/"$SCRAM_ARCH"
 fi
 
 if [ ! -d ./KinZfitter ]; then
     echo "Setting up Z kinematic fit stuff"
-    git clone -b segfaultFix https://github.com/nwoods/KinZfitter.git
+    git clone https://github.com/VBF-HZZ/KinZfitter.git
 fi
 
 if [ ! -d ./KaMuCa ]; then
     echo "Setting up muon calibration"
-    git clone https://github.com/bachtis/analysis.git -b KaMuCa_V3 KaMuCa
+    git clone https://github.com/bachtis/analysis.git -b KaMuCa_V4 KaMuCa
 fi
 
 popd
