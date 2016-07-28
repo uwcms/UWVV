@@ -17,8 +17,8 @@ import sys
 from socket import gethostname
 import logging
 import fnmatch
-
 from UWVV.Utilities.dbsinterface import get_das_info
+import datetime
 
 
 log = logging.getLogger("submitJobs")
@@ -80,11 +80,10 @@ def writeFarmoutCommand(cfg, jobid, dataset, fullDataset,
     if args.get('extraUsercodeFiles', []):
         cmds.append('--extra-usercode-files="{}"'.format(' '.join(args.get('extraUsercodeFiles'))))
 
-
-        cmds.append('{}-{}'.format(jobid, dataset))
-        cmds.append(cfg)
-        cmds.append("'inputFiles=$inputFileNames'")
-        cmds.append("'outputFile=$outputFileName'")
+    cmds.append('{}-{}'.format(jobid, dataset))
+    cmds.append(cfg)
+    cmds.append("'inputFiles=$inputFileNames'")
+    cmds.append("'outputFile=$outputFileName'")
 
     if args.get('applyLumiMask', False):
         lumiMask = 'Cert_271036-276811_13TeV_PromptReco_Collisions16_JSON.txt' # 12.9/fb
@@ -116,6 +115,9 @@ def buildScript(cfg, jobid, scriptFile='',
     args: command line arguments    
     '''
     lines = []
+    lines.append('# Condor submission script\n')
+    lines.append('# Generated with submit_job.py at %s\n' % datetime.datetime.now())
+    lines.append('# The command was: %s\n\n' % ' '.join(sys.argv))
 
     campaign = args.get('campaign', '')
     dataEra = args.get('dataEra', '')
@@ -139,6 +141,7 @@ def buildScript(cfg, jobid, scriptFile='',
             if fnmatch.fnmatchcase(name, pattern):
                 lines.append(writeFarmoutCommand(cfg, jobid, name, dataset,
                                                  outdir, **args))
+                lines.append("\n") # Separate each command by new line
                 break
 
     if not lines:
