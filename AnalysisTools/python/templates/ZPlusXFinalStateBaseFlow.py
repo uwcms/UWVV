@@ -22,9 +22,9 @@ class ZPlusXFinalStateBaseFlow(ZPlusXBaseFlow):
 
     def addZPlusXCreation(self, step):
         '''
-        Add modules to combine Zs into 4l candidates
+        Add modules to combine Zs into 3l candidates
         '''
-        for chan in parseChannels('wz'):
+        for chan in parseChannels('zl'):
             #z1Name = 'z{}1'.format(chan[0])
             #z2Name = 'z{}{}'.format(chan[2], 2 if chan[0] == chan[2] else 1)
             mod = cms.EDProducer(
@@ -46,7 +46,7 @@ class ZPlusXFinalStateBaseFlow(ZPlusXBaseFlow):
         '''
         Add modules to embed alternate lepton pair (e.g. e1+m1) info.
         '''
-        for chan in parseChannels('wz'):
+        for chan in parseChannels('zl'):
             mod = cms.EDProducer(
                 'AlternateDaughterInfoEmbedder',
                 src = step.getObjTag(chan),
