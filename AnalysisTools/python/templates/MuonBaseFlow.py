@@ -9,10 +9,11 @@ class MuonBaseFlow(AnalysisFlowBase):
 
     def makeAnalysisStep(self, stepName, **inputs):
         step = super(MuonBaseFlow, self).makeAnalysisStep(stepName, **inputs)
-
+        
         if stepName == 'preselection':
             self.addGhostCleaning(step)
             step.addBasicSelector('m', 'pt > 5 && (isGlobalMuon || isTrackerMuon)')
+        elif stepName == 'embedding':
             self.addMuonPOGIDs(step)
         return step
 
@@ -36,6 +37,6 @@ class MuonBaseFlow(AnalysisFlowBase):
         embedMuId = cms.EDProducer(
                 "MuonIdEmbedder",
                 src = step.getObjTag('m'),
-                vertexSrc = cms.InputTag('offlineSlimmedPrimaryVertices')
+                vertexSrc = step.getObjTag('v')
             )
         step.addModule("muonIDembedding", embedMuId, 'm')

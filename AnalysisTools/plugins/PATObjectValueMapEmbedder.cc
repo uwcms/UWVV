@@ -102,34 +102,47 @@ void PATObjectValueMapEmbedder<T>::produce(edm::Event& iEvent,
     }
   std::vector<size_t> lengths = {floatLabels_.size(), boolLabels_.size(), intLabels_.size()};
 
-  for(size_t j = 0; j < in->size(); ++j)
+  for (size_t i = 0; i < in->size(); i++) 
     {
-      edm::Ptr<T> t = in->ptrAt(j);
-      T obj = in->at(j);
-      for (size_t i = 0; i < (*std::max_element(lengths.begin(), lengths.end())); i++)
+      out->push_back(in->at(i));
+    }
+  for (size_t i = 0; i < (*std::max_element(lengths.begin(), lengths.end())); i++)
+    {
+      edm::Handle<edm::ValueMap<float> > floatVals;
+      edm::Handle<edm::ValueMap<bool> > boolVals;
+      edm::Handle<edm::ValueMap<int> > intVals;
+      if(i < floatLabels_.size())
         {
+          iEvent.getByToken(floatValTokens_[i], floatVals);
+        }
+      if(i < boolLabels_.size())
+        {
+          iEvent.getByToken(boolValTokens_[i], boolVals);
+        }
+      if(i < intLabels_.size())
+        {
+          iEvent.getByToken(intValTokens_[i], intVals);
+        }
+      
+      for(size_t j = 0; j < in->size(); ++j)
+        {
+          T& obj = out->at(j);
+          edm::Ptr<T> t = in->ptrAt(j);
           if(i < floatLabels_.size())
             {
-              edm::Handle<edm::ValueMap<float> > floatVals;
-              iEvent.getByToken(floatValTokens_[i], floatVals);
               embedValue(obj, (*floatVals)[t], floatLabels_[i]);
             }
           if(i < boolLabels_.size())
             {
-              edm::Handle<edm::ValueMap<bool> > boolVals;
-              iEvent.getByToken(boolValTokens_[i], boolVals);
               embedValue(obj, (*boolVals)[t], boolLabels_[i]);
             }
           if(i < intLabels_.size())
             {
-              edm::Handle<edm::ValueMap<int> > intVals;
-              iEvent.getByToken(intValTokens_[i], intVals);
               embedValue(obj, (*intVals)[t], intLabels_[i]);
             }
         }
-        out->push_back(obj);
     }
-   iEvent.put(std::move(out));
+  iEvent.put(std::move(out));
 }
 
 template<typename T>
