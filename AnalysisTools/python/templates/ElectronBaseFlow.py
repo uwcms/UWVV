@@ -15,6 +15,7 @@ class ElectronBaseFlow(AnalysisFlowBase):
         if stepName == 'embedding':
             self.addElectronEAEmbedding(step)
             self.addElectronRhoEmbedding(step)
+            self.addElectronIDCounters(step)
 
         return step
 
@@ -39,7 +40,15 @@ class ElectronBaseFlow(AnalysisFlowBase):
 
         step.addModule('electronRhoEmbedding', mod, 'e')
     
+    def addElectronIDCounters(self, step):
+        mod = cms.EDProducer(
+            "PATElectronCountEmbedder",
+            src = step.getObjTag('e'),
+            label = cms.string('VIDCBtight'),
+            cut = cms.untracked.string('userInt("CBVIDtight")'),
+            )
 
+        step.addModule('tightElectronCounter', mod)
 
 
 

@@ -13,7 +13,7 @@ class RecomputeElectronID(AnalysisFlowBase):
     def makeAnalysisStep(self, stepName, **inputs):
         step = super(RecomputeElectronID, self).makeAnalysisStep(stepName, **inputs)
 
-        if stepName == 'embedding':
+        if stepName == 'preliminary':
             self.addElectronIDEmbedding(step)
 
         return step
