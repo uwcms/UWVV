@@ -15,6 +15,8 @@ class MuonBaseFlow(AnalysisFlowBase):
             step.addBasicSelector('m', 'pt > 5 && (isGlobalMuon || isTrackerMuon)')
         elif stepName == 'embedding':
             self.addMuonPOGIDs(step)
+            self.addMuonIDCounters(step)
+
         return step
 
 
@@ -40,3 +42,16 @@ class MuonBaseFlow(AnalysisFlowBase):
                 vertexSrc = step.getObjTag('v')
             )
         step.addModule("muonIDembedding", embedMuId, 'm')
+    
+    def addMuonIDCounters(self, step):
+        counters = {"tightMuonCounter" : "TightMuon",
+            "medMuonCounter" : "MediumMuonICHEP",
+        }
+        for moduleName, cut in counters.iteritems():
+            mod = cms.EDProducer(
+                "PATMuonCounter",
+                src = step.getObjTag('m'),
+                label = cms.string(cut),
+                cut = cms.untracked.string('userInt("is%s")' % cut),
+                )
+            step.addModule(moduleName, mod)

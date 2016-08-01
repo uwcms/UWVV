@@ -1,9 +1,9 @@
 ///////////////////////////////////////////////////////////////////////////////
 //                                                                           //
-//    PATObjectCountEmbedder                                                 //
+//    PATObjectCounter                                                       //
 //                                                                           //
-//    Takes a collection of PAT objects and embeds number of objects         //
-//    passing the (otional) specified cut                                    //
+//    Takes a collection of PAT objects and adss and int of the     //
+//    number of objects passing the (otional) specified cut to the event     //
 //                                                                           //
 //    Kenneth Long, U. Wisconsin                                             //
 //                                                                           //
@@ -32,12 +32,12 @@
 
 
 template<typename T>
-class PATObjectCountEmbedder : public edm::stream::EDProducer<>
+class PATObjectCounter : public edm::stream::EDProducer<>
 {
 
 public:
-  explicit PATObjectCountEmbedder(const edm::ParameterSet& iConfig);
-  virtual ~PATObjectCountEmbedder() {};
+  explicit PATObjectCounter(const edm::ParameterSet& iConfig);
+  virtual ~PATObjectCounter() {};
 
 private:
   virtual void produce(edm::Event& iEvent, const edm::EventSetup& iSetup);
@@ -49,23 +49,23 @@ private:
 
 
 template<typename T>
-PATObjectCountEmbedder<T>::PATObjectCountEmbedder(const edm::ParameterSet& iConfig) :
+PATObjectCounter<T>::PATObjectCounter(const edm::ParameterSet& iConfig) :
   srcToken_(consumes<edm::View<T> >(iConfig.getParameter<edm::InputTag>("src"))),
   cut_(iConfig.getUntrackedParameter<std::string>("cut", "")),
   label_(iConfig.getParameter<std::string>("label"))
 {
-  produces<unsigned int>();
+  produces<int>(label_);
 }
 
 
 template<typename T>
-void PATObjectCountEmbedder<T>::produce(edm::Event& iEvent,
+void PATObjectCounter<T>::produce(edm::Event& iEvent,
                                          const edm::EventSetup& iSetup)
 {
   edm::Handle<edm::View<T> > in;
   iEvent.getByToken(srcToken_, in);
   
-  std::unique_ptr<unsigned int> num(new unsigned int(0));
+  std::unique_ptr<int> num(new int(0));
   for(size_t i = 0; i < in->size(); ++i)
     {
       if (cut_(in->at(i)))
@@ -74,14 +74,14 @@ void PATObjectCountEmbedder<T>::produce(edm::Event& iEvent,
   iEvent.put(std::move(num), label_);
 }
 
-typedef PATObjectCountEmbedder<pat::Electron> PATElectronCountEmbedder;
-typedef PATObjectCountEmbedder<pat::Muon> PATMuonCountEmbedder;
-typedef PATObjectCountEmbedder<pat::Tau> PATTauCountEmbedder;
-typedef PATObjectCountEmbedder<pat::Jet> PATJetCountEmbedder;
-typedef PATObjectCountEmbedder<pat::CompositeCandidate> PATCompositeCandidateCountEmbedder;
+typedef PATObjectCounter<pat::Electron> PATElectronCounter;
+typedef PATObjectCounter<pat::Muon> PATMuonCounter;
+typedef PATObjectCounter<pat::Tau> PATTauCounter;
+typedef PATObjectCounter<pat::Jet> PATJetCounter;
+typedef PATObjectCounter<pat::CompositeCandidate> PATCompositeCandidateCounter;
 
-DEFINE_FWK_MODULE(PATElectronCountEmbedder);
-DEFINE_FWK_MODULE(PATMuonCountEmbedder);
-DEFINE_FWK_MODULE(PATTauCountEmbedder);
-DEFINE_FWK_MODULE(PATJetCountEmbedder);
-DEFINE_FWK_MODULE(PATCompositeCandidateCountEmbedder);
+DEFINE_FWK_MODULE(PATElectronCounter);
+DEFINE_FWK_MODULE(PATMuonCounter);
+DEFINE_FWK_MODULE(PATTauCounter);
+DEFINE_FWK_MODULE(PATJetCounter);
+DEFINE_FWK_MODULE(PATCompositeCandidateCounter);
