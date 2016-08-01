@@ -42,8 +42,11 @@ electronBranches = cms.PSet(
     uints = cms.PSet(
         MissingHits = cms.string('MissingHits'),
         ),
-
     bools = cms.PSet(
         IsGap = cms.string('isGap'),
-        ),
+
+        IsCBVIDtight = cms.string('userInt("CBVIDtight")'),
+        IsCBVIDmedium = cms.string('userInt("CBVIDmedium")'),
+        IsCBVIDloose = cms.string('userInt("CBVIDloose")'),
+        )
     )

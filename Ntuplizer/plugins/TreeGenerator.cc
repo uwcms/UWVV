@@ -114,11 +114,31 @@ typedef TreeGenerator<CompositeDaughter<CompositeDaughter<pat::Muon, pat::Muon>,
                                         CompositeDaughter<pat::Muon, pat::Muon> 
                                         > 
                       > TreeGeneratorMuMuMuMu;
+typedef TreeGenerator<CompositeDaughter<CompositeDaughter<pat::Electron, pat::Electron>,
+                                        pat::Electron
+                                        > 
+                      > TreeGeneratorEEE;
+typedef TreeGenerator<CompositeDaughter<CompositeDaughter<pat::Muon, pat::Muon>,
+                                        pat::Muon
+                                        > 
+                      > TreeGeneratorMuMuMu;
+typedef TreeGenerator<CompositeDaughter<CompositeDaughter<pat::Electron, pat::Electron>,
+                                        pat::Muon
+                                        > 
+                      > TreeGeneratorEEMu;
+typedef TreeGenerator<CompositeDaughter<CompositeDaughter<pat::Muon, pat::Muon>,
+                                        pat::Electron
+                                        > 
+                      > TreeGeneratorEMuMu;
 
 #include "FWCore/Framework/interface/MakerMacros.h"
 
 DEFINE_FWK_MODULE(TreeGeneratorEEEE);
 DEFINE_FWK_MODULE(TreeGeneratorEEMuMu);
 DEFINE_FWK_MODULE(TreeGeneratorMuMuMuMu);
+DEFINE_FWK_MODULE(TreeGeneratorEEE);
+DEFINE_FWK_MODULE(TreeGeneratorMuMuMu);
+DEFINE_FWK_MODULE(TreeGeneratorEEMu);
+DEFINE_FWK_MODULE(TreeGeneratorEMuMu);
 
 
