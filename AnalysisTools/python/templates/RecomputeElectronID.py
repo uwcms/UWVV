@@ -26,6 +26,9 @@ class RecomputeElectronID(AnalysisFlowBase):
         setupAllVIDIdsInModule(self.process, 
                                'RecoEgamma.ElectronIdentification.Identification.mvaElectronID_Spring16_V1_cff',
                                setupVIDElectronSelection)
+        setupAllVIDIdsInModule(self.process, 
+                               'RecoEgamma.ElectronIdentification.Identification.cutBasedElectronID_Spring15_25ns_V1_cff',
+                               setupVIDElectronSelection)
 
         self.process.egmGsfElectronIDs.physicsObjectSrc = step.getObjTag('e')
         self.process.electronMVAValueMapProducer.srcMiniAOD = step.getObjTag('e')
@@ -37,11 +40,17 @@ class RecomputeElectronID(AnalysisFlowBase):
         embedIDs = cms.EDProducer(
             "PATElectronValueMapEmbedder",
             src = step.getObjTag('e'),
-            label = cms.string("MVAIDNonTrig"),
-            valueSrc = cms.InputTag("electronMVAValueMapProducer:ElectronMVAEstimatorRun2Spring16V1Values"),
+            floatLabels = cms.untracked.vstring("MVAIDNonTrig"),
+            floatVals = cms.untracked.VInputTag("electronMVAValueMapProducer:ElectronMVAEstimatorRun2Spring16V1Values"),
+            boolLabels = cms.untracked.vstring("CBVIDtight", "CBVIDmedium", "CBVIDloose"),
+            boolVals = cms.untracked.VInputTag(
+                cms.InputTag("egmGsfElectronIDs:cutBasedElectronID-Spring15-25ns-V1-standalone-tight"),
+                cms.InputTag("egmGsfElectronIDs:cutBasedElectronID-Spring15-25ns-V1-standalone-medium"),
+                cms.InputTag("egmGsfElectronIDs:cutBasedElectronID-Spring15-25ns-V1-standalone-loose")
+                )
             )
 
-        step.addModule('electronMVAIDEmbedding', embedIDs, 'e')
+        step.addModule('electronIDEmbedding', embedIDs, 'e')
 
         
 

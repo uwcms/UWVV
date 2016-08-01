@@ -174,15 +174,23 @@ if zz:
 
     from UWVV.AnalysisTools.templates.ZKinematicFitting import ZKinematicFitting
     FlowSteps.append(ZKinematicFitting)
-    
+
+    # FSR and other ZZ/HZZ stuff
+    from UWVV.AnalysisTools.templates.ZZFlow import ZZFlow
+    FlowSteps.append(ZZFlow)
 elif zl or z:
     from UWVV.AnalysisTools.templates.ZPlusXBaseFlow import ZPlusXBaseFlow
+    from UWVV.AnalysisTools.templates.ZPlusXFinalStateBaseFlow import ZPlusXFinalStateBaseFlow
     FlowSteps.append(ZPlusXBaseFlow)
+    FlowSteps.append(ZPlusXFinalStateBaseFlow)
+    # FSR and other ZZ/HZZ stuff
+    from UWVV.AnalysisTools.templates.ZZID import ZZID
+    from UWVV.AnalysisTools.templates.ZZIso import ZZIso
+    from UWVV.AnalysisTools.templates.ZZFSR import ZZFSR
+    FlowSteps.append(ZZID)
+    FlowSteps.append(ZZFSR)
+    FlowSteps.append(ZZIso)
     
-# FSR and other ZZ/HZZ stuff
-from UWVV.AnalysisTools.templates.ZZFlow import ZZFlow
-FlowSteps.append(ZZFlow)
-
 # Lepton calibrations
 if options.eCalib:
     from UWVV.AnalysisTools.templates.ElectronCalibration import ElectronCalibration
