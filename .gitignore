@@ -55,6 +55,8 @@ docs/_build/
 
 # ROOT files
 *.root
+# but root files in data should be tracked
+!data/*/*.root
 
 *.txt
 
