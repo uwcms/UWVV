@@ -1,6 +1,6 @@
 # Building an analysis flow
 
-UWVV analysis flows are intended to be as modular as possible, to allow multiple analyses to live together in harmony, and to make modifications and additions to analyses as painless as possible. For every discrete task you want to do, like calculating electron IDs and embedding them in the `pat::Electron` objects, you make a Python class that sets up the desired action. These classes are combined into one Flow class that by the magic of multiple inheritance puts all desired EDM modules into several `AnalysisStep` objects which handle the collection input tags and similar sundries.
+UWVV analysis flows are intended to be as modular as possible, to allow multiple analyses to live together in harmony, and to make modifications and additions to analyses as painless as possible. For every discrete task you want to do, like calculating electron IDs and embedding them in the `pat::Electron` objects, you make a Python class that sets up the desired action. These classes are combined into one Flow class that by the magic of multiple inheritance puts all desired EDM modules into several AnalysisStep objects which handle the collection input tags and similar sundries.
 
 
 ## Building and executing a flow
@@ -117,6 +117,11 @@ where each `otherObjects` argument is a dictionary specifying the distance for c
 step.addCrossSelector('j', 'pt>30.', m={'deltaR':0.4,'selection':'pt>10.'})
 ```
 
+### Order of modules within a step
+
+The order of modules within a step is determined by the order in which the Flow base classes that embed them are passed into `createFlow`. The first Flow class's modules will be first, the last Flow class's modules will be last. In general, this should not matter, but it comes up on occasion, e.g. when an `edm::ValueMap` is keyed to a specific particle collection and not a copy of the collection. 
+
+
 ## Flow base classes
 
 Each action in the analysis flow is represented by a class which derives from `AnalysisFlowBase`. 
@@ -125,9 +130,9 @@ Each action in the analysis flow is represented by a class which derives from `A
 
 The class sets up its modules in a method called `makeAnalysisStep` which should have the following properties:
 * Arguments are `stepName`, a string giving the name of the step, and keyword arguments `**inputs` which should be passed along but not otherwise used.
-  * This method is called once for every step, so use `stepName` to ensure the action is only done at the appropriate step. See below for the list of standard step names.
-  * The `inputs` keyword arguments represent the initial collection input tags for the step. Unless your module happens to be the first one in its step, they will be wrong, so don't use them. The correct input tags for the modules should be retrieved from the `AnalysisStep` (see below).
-* The `AnalysisStep` to modify is obtained from `super(ThisClass, self).makeAnalysisStep(stepName, **inputs)`.
+  * This method is called once for every step, so use `stepName` to ensure the action is only done at the appropriate step. See above for the list of standard step names.
+  * The `inputs` keyword arguments represent the initial collection input tags for the step. Unless your module happens to be the first one in its step, they will be wrong, so don't use them. The correct input tags for the modules should be retrieved from the AnalysisStep (see above).
+* The AnalysisStep to modify is obtained from `super(ThisClass, self).makeAnalysisStep(stepName, **inputs)`.
 * Necessary EDM modules are created and added to the step. 
   * They do not need to be added to the `Process` here.
 * Return the step.
@@ -146,7 +151,20 @@ from UWVV.AnalysisTools.AnalysisFlowBase import AnalysisFlowBase
 import FWCore.ParameterSet.Config as cms
 
 class JetID(AnalysisFlowBase):
+    def __init__(self, *args, **kwargs):
+        '''
+        Example of how to get an extra argument
+        '''
+        if not hasattr(self, 'isMC'):
+            self.isMC = kwargs.pop('isMC') # remove from kwargs
+        
+        super(JetID, self).__init__(*args, **kwargs)
+
+
     def makeAnalysisStep(self, stepName, **inputs):
+        '''
+        Add jet ID embedding to the preliminary step
+        '''
         # Get the step to modify
         step = super(JetID, self).makeAnalysisStep(stepName, **inputs)
 
@@ -167,12 +185,12 @@ class JetID(AnalysisFlowBase):
 
 ### Getting the final collection tags
 
-To use objects after the flow is completed, you can get the final tags from the Flow
+To use objects after the Flow is completed, you can get the final tags from the Flow
 
 ```python
 eTag = flow.finalObjTag('e') # final cms.InputTag for the electron collection
 mTagString = flow.finalObjTagString('m') # string for final muon collection tag
-tagStringList = flow.finalTags() # all final tags, as strings
+tagStringDict = flow.finalTags() # all final tags, as strings
 ```
 
 
@@ -196,7 +214,8 @@ zEEMod = cms.EDProducer(
     checkCharge = cms.bool(True),
     setPdgId = cms.int32(23),
     )
-step.addModule('zEECreation', zEEMod, 'ee')
+
+step.addModule('zEECreation', zEEMod, 'ee') # Step now tracks this collection as 'ee'
 ```
 
 ZZ->4e candidates would then be built like this
@@ -213,7 +232,7 @@ for chan in parseChannels('zz'):
         setPdgId = cms.int32(25),
         )
             
-step.addModule('eeeeProducer', eeeeMod, 'eeee')
+step.addModule('eeeeProducer', eeeeMod, 'eeee')# Step now tracks this collection as 'eeee'
 ```
 
 ### Accessing the daughters
