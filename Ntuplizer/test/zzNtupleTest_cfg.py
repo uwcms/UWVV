@@ -3,7 +3,7 @@ import FWCore.ParameterSet.Config as cms
 from UWVV.AnalysisTools.analysisFlowMaker import createFlow
 from UWVV.AnalysisTools.templates.ZZFlow import ZZFlow
 from UWVV.AnalysisTools.templates.VertexCleaning import VertexCleaning
-from UWVV.AnalysisTools.templates.ZZFinalStateBaseFlow import ZZFinalStateBaseFlow
+from UWVV.AnalysisTools.templates.ZZInitialStateBaseFlow import ZZInitialStateBaseFlow
 from UWVV.Ntuplizer.makeBranchSet import makeBranchSet
 from UWVV.Ntuplizer.eventParams import makeEventParams
 from UWVV.Ntuplizer.templates.triggerBranches import triggerBranches
@@ -34,7 +34,7 @@ process.TFileService = cms.Service(
 
 process.maxEvents = cms.untracked.PSet(input=cms.untracked.int32(10000))
 
-ZZFlowClass = createFlow(VertexCleaning, ZZFinalStateBaseFlow, ZZFlow)
+ZZFlowClass = createFlow(VertexCleaning, ZZInitialStateBaseFlow, ZZFlow)
 zzFlow = ZZFlowClass('zzFlow', process)
 
 process.treeMakerEEEE = cms.EDAnalyzer(

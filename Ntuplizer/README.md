@@ -1,6 +1,6 @@
 # UWVV ntuples
 
-Each row in a UWVV ntuple represents one initial state candidate (not one event). The columns are information about the candidate, its daughters (and their daughters, recursively), and the event they live in. The format is essentially the same as in [FSA ntuples](https://github.com/uwcms/FinalStateAnalysis/tree/miniAOD_dev_80X/NtupleTools/test). 
+Each row in a UWVV ntuple represents one initial state candidate (not one event). The columns are information about the candidate, its daughters (and their daughters, recursively), and the event they live in. The format is essentially the same as in [FSA ntuples](https://github.com/uwcms/InitialStateAnalysis/tree/miniAOD_dev_80X/NtupleTools/test). 
 
 
 ## Tree generation

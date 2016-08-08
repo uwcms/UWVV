@@ -9,7 +9,6 @@ from UWVV.Utilities.helpers import getObjTypes, getObjName
 from collections import OrderedDict
 
 
-nProc = 0
 
 class AnalysisStep(object):
     '''

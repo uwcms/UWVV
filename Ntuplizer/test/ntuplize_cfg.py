@@ -165,8 +165,8 @@ if options.isMC:
 
 # make final states
 if zz:
-    from UWVV.AnalysisTools.templates.ZZFinalStateBaseFlow import ZZFinalStateBaseFlow
-    FlowSteps.append(ZZFinalStateBaseFlow)
+    from UWVV.AnalysisTools.templates.ZZInitialStateBaseFlow import ZZInitialStateBaseFlow
+    FlowSteps.append(ZZInitialStateBaseFlow)
 
     # HZZ discriminants and categorization
     from UWVV.AnalysisTools.templates.ZZClassification import ZZClassification
@@ -180,9 +180,9 @@ if zz:
     FlowSteps.append(ZZFlow)
 elif zl or z:
     from UWVV.AnalysisTools.templates.ZPlusXBaseFlow import ZPlusXBaseFlow
-    from UWVV.AnalysisTools.templates.ZPlusXFinalStateBaseFlow import ZPlusXFinalStateBaseFlow
+    from UWVV.AnalysisTools.templates.ZPlusXInitialStateBaseFlow import ZPlusXInitialStateBaseFlow
     FlowSteps.append(ZPlusXBaseFlow)
-    FlowSteps.append(ZPlusXFinalStateBaseFlow)
+    FlowSteps.append(ZPlusXInitialStateBaseFlow)
     # FSR and other ZZ/HZZ stuff
     from UWVV.AnalysisTools.templates.ZZID import ZZID
     from UWVV.AnalysisTools.templates.ZZIso import ZZIso

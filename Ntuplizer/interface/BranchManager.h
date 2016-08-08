@@ -29,9 +29,7 @@ namespace uwvv
   template<class Obj1, class Obj2> struct CompositeDaughter {};
   
   
-  template<class... Ts> class BranchManager;
-  
-  template<class T> class BranchManager<T>
+  template<class T> class BranchManager
   {
    public:
     BranchManager() {;}

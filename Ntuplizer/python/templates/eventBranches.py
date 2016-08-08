@@ -14,7 +14,6 @@ eventBranches = cms.PSet(
         jet2Pt = cms.string('jet2Pt'),
         ),
     bools = cms.PSet(
-        SS = cms.string('SS'),
         pvIsValid = cms.string('pvIsValid'),
         pvIdFake = cms.string('pvIsFake'),
         ),

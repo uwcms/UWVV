@@ -3,7 +3,7 @@ import FWCore.ParameterSet.Config as cms
 from UWVV.AnalysisTools.analysisFlowMaker import createFlow
 from UWVV.AnalysisTools.templates.ElectronBaseFlow import ElectronBaseFlow 
 from UWVV.AnalysisTools.templates.MuonBaseFlow import MuonBaseFlow
-from UWVV.AnalysisTools.templates.ZZFinalStateBaseFlow import ZZFinalStateBaseFlow
+from UWVV.AnalysisTools.templates.ZZInitialStateBaseFlow import ZZInitialStateBaseFlow
     
 
 process = cms.Process("PrintZZ")
@@ -29,23 +29,23 @@ process.maxEvents = cms.untracked.PSet(input=cms.untracked.int32(100))
 LeptonFlowClass = createFlow(ElectronBaseFlow, MuonBaseFlow)
 leptonFlow = LeptonFlowClass('leptonFlow', process)
 
-FinalStateFlowClass = createFlow(ZZFinalStateBaseFlow)
-finalStateFlow = FinalStateFlowClass('finalStateFlow', process,
-                                     **leptonFlow.outputs[-1])
+InitialStateFlowClass = createFlow(ZZInitialStateBaseFlow)
+initialStateFlow = InitialStateFlowClass('initialStateFlow', process,
+                                       **leptonFlow.outputs[-1])
 
 process.print4ECands = cms.EDAnalyzer(
     'CandidatePrinter',
-    src = cms.InputTag(finalStateFlow.finalObjTag('zz4e')),
+    src = cms.InputTag(initialStateFlow.finalObjTag('zz4e')),
     )
 
 process.print2E2MuCands = cms.EDAnalyzer(
     'CandidatePrinter',
-    src = cms.InputTag(finalStateFlow.finalObjTag('zz2e2m')),
+    src = cms.InputTag(initialStateFlow.finalObjTag('zz2e2m')),
     )
 
 process.print4MuCands = cms.EDAnalyzer(
     'CandidatePrinter',
-    src = cms.InputTag(finalStateFlow.finalObjTag('zz4m')),
+    src = cms.InputTag(initialStateFlow.finalObjTag('zz4m')),
     )
 
 process.printCands = cms.EndPath(

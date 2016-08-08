@@ -55,12 +55,10 @@ A Flow class may define any desired step by inserting it into the list of step n
   * `intermediateStateCreation` for making Z candidates and other composite objects
   * `intermediateStateEmbedding` for variable embedding and manipulation of the intermediate composite objects
   * `intermediateStateSelection` for selecting the intermediate composites that will be built into final composite objects
-* Final states [1]
-  * `finalStateCreation` for building final composite objects, e.g. Higgs boson candidates
-  * `finalStateEmbedding` for variable embedding and manipulation of the final composite objects
-  * `finalStateSelection` for cuts on the final composite objects
-
-[1] The unfortunate term "final state" is historical, and actually means "initial state". The point is, if the final state particles decayed from one object, this is that object.
+* Initial states
+  * `initialStateCreation` for building full composite objects out of intermediate state objects, e.g. building Higgs boson candidates out of Z candidates
+  * `initialStateEmbedding` for variable embedding and manipulation of the full composite objects
+  * `initialStateSelection` for cuts on the full composite objects
 
 Steps happen in this order. It's fine to do nothing in a step.
 
