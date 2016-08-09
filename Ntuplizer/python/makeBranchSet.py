@@ -1,13 +1,12 @@
 import FWCore.ParameterSet.Config as cms
 
 from UWVV.Ntuplizer.templates.eventBranches import eventBranches
-from UWVV.Ntuplizer.templates.initialStateBranches import initialStateBranches, kinFitBranches
 from UWVV.Ntuplizer.templates.zBranches import zBranches
 from UWVV.Ntuplizer.templates.objectBranches import objectBranches
 from UWVV.Ntuplizer.templates.leptonBranches import leptonBranches
 from UWVV.Ntuplizer.templates.electronBranches import electronBranches
 from UWVV.Ntuplizer.templates.muonBranches import muonBranches
-from UWVV.Ntuplizer.templates.zzDiscriminantBranches import zzDiscriminantBranches
+from UWVV.Ntuplizer.templates.zzDiscriminantBranches import zzDiscriminantBranches, kinFitBranches
 from UWVV.Ntuplizer.templates.crossDaughterBranches import makeCrossDaughterBranches
 
 from UWVV.Utilities.helpers import pset2Dict, dict2PSet, \
@@ -54,7 +53,7 @@ def makeZBranchSet(lep, n, addName=False):
     return branchSet
 
 def makeBranchSet(channel):
-    branches = [eventBranches, initialStateBranches, objectBranches]
+    branches = [eventBranches, objectBranches]
 
     finalObjects = mapObjects(channel)
 
