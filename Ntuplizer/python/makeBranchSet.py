@@ -3,6 +3,7 @@ import FWCore.ParameterSet.Config as cms
 from UWVV.Ntuplizer.templates.eventBranches import eventBranches
 from UWVV.Ntuplizer.templates.zBranches import zBranches
 from UWVV.Ntuplizer.templates.objectBranches import objectBranches
+from UWVV.Ntuplizer.templates.compositeObjectBranches import compositeObjectBranches
 from UWVV.Ntuplizer.templates.leptonBranches import leptonBranches
 from UWVV.Ntuplizer.templates.electronBranches import electronBranches
 from UWVV.Ntuplizer.templates.muonBranches import muonBranches
@@ -33,7 +34,7 @@ def makeZBranchSet(lep, n, addName=False):
     (or whatever) at the start of the branch names so these branches can have
     the necessary names while the object stays nameless for event variables.
     '''
-    branchSet = combinePSets(objectBranches, zBranches)
+    branchSet = combinePSets(objectBranches, compositeObjectBranches, zBranches)
 
     daughterNames = [lep[0]+str(i) for i in [n*2-1,n*2]]
 
@@ -62,6 +63,7 @@ def makeBranchSet(channel):
         branches.append(makeZBranchSet(channel[0], 1, False))
     else:
         branches.append(objectBranches)
+        branches.append(compositeObjectBranches)
         
     if len(channel) == 3: # Z+l
         if channel[0] != channel[1]: # emm -> mme
@@ -89,9 +91,6 @@ def makeBranchSet(channel):
 
         branches.append(kinFitBranches)
 
-        # include FSR when ordering Zs
-        branches.append(cms.PSet(fsrLabel=cms.string("fsr")))
-            
         daughterSets = [
             makeZBranchSet(channel[0], 1),
             makeZBranchSet(channel[2], int(finalObjects[3][1])/2),

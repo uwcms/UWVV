@@ -49,7 +49,6 @@ The definitions of the branches are passed to the TreeGenerator as a cms.PSet ca
   * `ulls` (unsigned long long ints)
 * `daughterNames`, a cms.vstring with the names of the first daughters, if any
 * `daughterParams`, a cms.VPSet containing exactly one cms.PSet for each daughter, containing the exact same items as in this list, to define the branches related to the daughters
-* `fsrLabel` (cms.string), if your analysis uses this
 
 A very simple tree, containing just the pt of a Z and its daughter electrons, would be defined like this
 ```python

@@ -4,7 +4,7 @@
 //                                                                           //
 //    Takes a collection of PAT CompositeCandidates, checks their daughters  //
 //    to see if the daughters have userCands with a given label, and if so   //
-//    adds them to the CompositeCandidates as userCands.                     //
+//    adds them to the CompositeCandidates as new daughters.                 //
 //                                                                           //
 //    Nate Woods, U. Wisconsin                                               //
 //                                                                           //
@@ -38,36 +38,13 @@ namespace
 {
 
   template<class T>
-  std::vector<CandPtr> getCands(const edm::Ptr<T>& cand,
-                                      const std::string& label)
+  CandPtr getUserCand(const T& cand,
+                      const std::string& label)
   {
-    std::vector<CandPtr> out;
+    if(cand.hasUserCand(label))
+      return cand.userCand(label);
 
-    if(cand->hasUserCand(label))
-      out.push_back(cand->userCand(label));
-
-    return out;
-  }
-
-  // This is technically bad form. Whatever.
-  template<>
-  std::vector<CandPtr> getCands(const CCandPtr& cand,
-                                      const std::string& label)
-  {
-    std::vector<CandPtr> out;
-
-    if(cand->hasUserInt("n"+label+"Cands"))
-      {
-        size_t nCands = (size_t)cand->userInt("n"+label+"Cands");
-        for(size_t i = 0; i < nCands; ++i)
-          {
-            CandPtr c = cand->userCand(label+std::to_string(i));
-            if(c.isNonnull())
-              out.push_back(c);
-          }
-      }
-
-    return out;
+    return CandPtr(NULL, 0);
   }
 
 }
@@ -109,29 +86,31 @@ void PATCompositeUserCandPromoter<T1,T2>::produce(edm::Event& iEvent,
 
   for(size_t i = 0; i < in->size(); ++i)
     {
-      CCandPtr c = in->ptrAt(i);
+      CCandPtr cPtr = in->ptrAt(i);
+      out->push_back(*cPtr);
+      CCand& c = out->back();
 
-      edm::Ptr<T1> dau1 = c->daughter(0)->masterClone().castTo<edm::Ptr<T1> >();
-      std::vector<CandPtr> cands1 = ::getCands(dau1, label);
-      edm::Ptr<T2> dau2 = c->daughter(1)->masterClone().castTo<edm::Ptr<T2> >();
-      std::vector<CandPtr> cands2 = ::getCands(dau2, label);
+      c.addUserCand("withoutFSR", cPtr);
 
-      out->push_back(*c);
+      const T1* dau1 = static_cast<const T1*>(c.daughter(0)->masterClone().get());
+      CandPtr fsr1 = ::getUserCand(*dau1, label);
+      const T2* dau2 = static_cast<const T2*>(c.daughter(1)->masterClone().get());
+      CandPtr fsr2 = ::getUserCand(*dau2, label);
 
-      size_t nCand = 0;
+      size_t nFSR = 0;
 
-      for(size_t i = 0; i < cands1.size(); ++i)
+      if(fsr1.isNonnull())
         {
-          out->back().addUserCand(label + std::to_string(nCand), cands1.at(i));
-          nCand++;
+          c.addDaughter(*fsr1, label + std::to_string(nFSR));
+          nFSR++;
         }
-      for(size_t i = 0; i < cands2.size(); ++i)
+      if(fsr2.isNonnull())
         {
-          out->back().addUserCand(label + std::to_string(nCand), cands2.at(i));
-          nCand++;
+          c.addDaughter(*fsr2, label + std::to_string(nFSR));
+          nFSR++;
         }
 
-      out->back().addUserInt("n"+label+"Cands", nCand);
+      out->back().addUserInt("n"+label+"Cands", nFSR);
     }
 
   iEvent.put(std::move(out));
@@ -140,9 +119,7 @@ void PATCompositeUserCandPromoter<T1,T2>::produce(edm::Event& iEvent,
 
 typedef PATCompositeUserCandPromoter<pat::Electron, pat::Electron> PATElectronCompositeUserCandPromoter;
 typedef PATCompositeUserCandPromoter<pat::Muon, pat::Muon> PATMuonCompositeUserCandPromoter;
-typedef PATCompositeUserCandPromoter<CCand, CCand> PATCompositeCompositeUserCandPromoter;
 
 DEFINE_FWK_MODULE(PATElectronCompositeUserCandPromoter);
 DEFINE_FWK_MODULE(PATMuonCompositeUserCandPromoter);
-DEFINE_FWK_MODULE(PATCompositeCompositeUserCandPromoter);
 

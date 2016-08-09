@@ -8,6 +8,7 @@
 
 #include "UWVV/Ntuplizer/interface/EventInfo.h"
 #include "UWVV/Ntuplizer/interface/StringFunctionMaker.h"
+#include "UWVV/Utilities/interface/helpers.h"
 
 #include "DataFormats/PatCandidates/interface/Electron.h"
 #include "DataFormats/PatCandidates/interface/Muon.h"
@@ -72,30 +73,6 @@ namespace
           std::function<FType>([](const edm::Ptr<T>& obj, uwvv::EventInfo& evt)
                                {
                                  return (evt.genEventInfo().isValid() ? evt.genEventInfo()->weight() : 0.);
-                               });
-
-        addTo["ptFSR"] = 
-          std::function<FType>([](const edm::Ptr<T>& obj, uwvv::EventInfo& evt)
-                               {
-                                 if(obj->hasUserCand("fsr"))
-                                   return (obj->userCand("fsr")->p4() + obj->p4()).pt();
-                                 return obj->pt();
-                               });
-
-        addTo["etaFSR"] = 
-          std::function<FType>([](const edm::Ptr<T>& obj, uwvv::EventInfo& evt)
-                               {
-                                 if(obj->hasUserCand("fsr"))
-                                   return (obj->userCand("fsr")->p4() + obj->p4()).eta();
-                                 return obj->eta();
-                               });
-
-        addTo["phiFSR"] = 
-          std::function<FType>([](const edm::Ptr<T>& obj, uwvv::EventInfo& evt)
-                               {
-                                 if(obj->hasUserCand("fsr"))
-                                   return (obj->userCand("fsr")->p4() + obj->p4()).phi();
-                                 return obj->phi();
                                });
 
         addTo["mtToMET"] = 
@@ -372,74 +349,35 @@ namespace
                                                      obj->daughter(1)->p4());
                                });
 
-        addTo["massFSR"] = 
+        addTo["massNoFSR"] = 
           std::function<FType>([](const edm::Ptr<T>& obj, uwvv::EventInfo& evt)
                                {
-                                 if(obj->hasUserInt("nfsrCands"))
-                                   {
-                                     size_t nCands = (size_t)obj->userInt("nfsrCands");
-                                     if(nCands)
-                                       {
-                                         auto p4 = obj->p4();
-                                         for(size_t i = 0; i < nCands; ++i)
-                                           p4 += obj->userCand("fsr"+std::to_string(i))->p4();
-                                         return p4.mass();
-                                       }
-                                   }
-                                 return obj->mass();
+                                 return uwvv::helpers::p4WithoutFSR(obj).mass();
                                });
 
-        addTo["ptFSR"] = 
+        addTo["ptNoFSR"] = 
           std::function<FType>([](const edm::Ptr<T>& obj, uwvv::EventInfo& evt)
                                {
-                                 if(obj->hasUserInt("nfsrCands"))
-                                   {
-                                     size_t nCands = (size_t)obj->userInt("nfsrCands");
-                                     if(nCands)
-                                       {
-                                         auto p4 = obj->p4();
-                                         for(size_t i = 0; i < nCands; ++i)
-                                           p4 += obj->userCand("fsr"+std::to_string(i))->p4();
-                                         return p4.pt();
-                                       }
-                                   }
-                                 return obj->pt();
+                                 return uwvv::helpers::p4WithoutFSR(obj).pt();
                                });
 
-        addTo["etaFSR"] = 
+        addTo["etaNoFSR"] = 
           std::function<FType>([](const edm::Ptr<T>& obj, uwvv::EventInfo& evt)
                                {
-                                 if(obj->hasUserInt("nfsrCands"))
-                                   {
-                                     size_t nCands = (size_t)obj->userInt("nfsrCands");
-                                     if(nCands)
-                                       {
-                                         auto p4 = obj->p4();
-                                         for(size_t i = 0; i < nCands; ++i)
-                                           p4 += obj->userCand("fsr"+std::to_string(i))->p4();
-                                         return p4.eta();
-                                       }
-                                   }
-                                 return obj->eta();
+                                 return uwvv::helpers::p4WithoutFSR(obj).eta();
                                });
 
-        addTo["phiFSR"] = 
+        addTo["phiNoFSR"] = 
           std::function<FType>([](const edm::Ptr<T>& obj, uwvv::EventInfo& evt)
                                {
-                                 if(obj->hasUserInt("nfsrCands"))
-                                   {
-                                     size_t nCands = (size_t)obj->userInt("nfsrCands");
-                                     if(nCands)
-                                       {
-                                         auto p4 = obj->p4();
-                                         for(size_t i = 0; i < nCands; ++i)
-                                           p4 += obj->userCand("fsr"+std::to_string(i))->p4();
-                                         return p4.phi();
-                                       }
-                                   }
-                                 return obj->phi();
+                                 return uwvv::helpers::p4WithoutFSR(obj).phi();
                                });
 
+        addTo["energyNoFSR"] = 
+          std::function<FType>([](const edm::Ptr<T>& obj, uwvv::EventInfo& evt)
+                               {
+                                 return uwvv::helpers::p4WithoutFSR(obj).energy();
+                               });
       }
     };
   

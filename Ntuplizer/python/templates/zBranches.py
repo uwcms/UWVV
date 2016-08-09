@@ -5,7 +5,8 @@ zBranches = cms.PSet(
     floats = cms.PSet(
         DR = cms.string('DR'),
         Mt = cms.string('mt'),
-        MassFSR = cms.string('massFSR'),
+        Mass = cms.string('mass'),
+        MassNoFSR = cms.string('massNoFSR'),
         ),
     bools = cms.PSet(
         SS = cms.string('SS'),

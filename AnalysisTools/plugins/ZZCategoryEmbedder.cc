@@ -168,17 +168,6 @@ int ZZCategoryEmbedder::getCategory(const CCand& cand, // cand do consider
   unsigned nLep = nep + nem + nmp + nmm;
 
   float m4l = cand.mass();
-  if(cand.hasUserInt("nfsrCands"))
-    {
-      size_t nCands = (size_t)cand.userInt("nfsrCands");
-      if(nCands)
-        {
-          auto p4 = cand.p4();
-          for(size_t i = 0; i < nCands; ++i)
-            p4 += cand.userCand("fsr"+std::to_string(i))->p4();
-          m4l = p4.mass();
-        }
-    }
 
   // VBF 2-jet
   if(cand.hasUserFloat("D_VBF2j") && cand.userFloat("D_VBF2j") > 1.043 - 460./(m4l+634.) && nLep == 4 && 

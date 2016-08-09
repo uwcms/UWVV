@@ -18,35 +18,30 @@ namespace uwvv
   {
     // Get an object's four-momentum with FSR included (if any).
     template<class T>
-      math::XYZTLorentzVector p4WithFSR(const T& cand,
-                                        const std::string& fsrLabel)
+      math::XYZTLorentzVector p4WithoutFSR(const T& cand)
       {
-        math::XYZTLorentzVector p4 = cand.p4();
-        if(cand.hasUserCand(fsrLabel))
-          p4 += cand.userCand(fsrLabel)->p4();
+        // if it's not a composite, FSR isn't included by definition
+        if(cand.numberOfDaughters() == 0)
+          return cand.p4();
 
-        return p4;
+        const pat::CompositeCandidate& ccand = dynamic_cast<const pat::CompositeCandidate&>(cand);
+        return p4WithoutFSR(ccand);
       }
 
     template<>
-      math::XYZTLorentzVector p4WithFSR(const pat::CompositeCandidate& cand,
-                                        const std::string& fsrLabel)
+      math::XYZTLorentzVector p4WithoutFSR(const pat::CompositeCandidate& cand)
       {
-        math::XYZTLorentzVector p4 = cand.p4();
-        if(cand.hasUserInt("n"+fsrLabel+"Cands") && cand.userInt("n"+fsrLabel+"Cands") > 0)
-          {
-            for(size_t i = 0; i < size_t(cand.userInt("n"+fsrLabel+"Cands")); ++i)
-              p4 += cand.userCand(fsrLabel+std::to_string(i))->p4();
-          }
+        math::XYZTLorentzVector out = p4WithoutFSR(*(cand.daughter(0)->masterClone().get()));
+        if(cand.numberOfDaughters() >= 2)
+          out += p4WithoutFSR(*(cand.daughter(1)->masterClone().get()));
 
-        return p4;
+        return out;
       }
 
     template<class T>
-      math::XYZTLorentzVector p4WithFSR(const edm::Ptr<T>& cand,
-                                        const std::string& fsrLabel)
+      math::XYZTLorentzVector p4WithoutFSR(const edm::Ptr<T>& cand)
       {
-        return p4WithFSR(*cand, fsrLabel);
+        return p4WithoutFSR(*cand);
       }
 
     float zMassDistance(const float m)
@@ -64,35 +59,14 @@ namespace uwvv
       return zMassDistance(v.mass());
     }
 
-    // Return true if the first daughter (made of leptons of type T12) is 
-    // farther from the nominal Z mass than the second daughter (made of 
-    // leptons of type T34). FSR is included if fsrLabel is non-empty.
+    // Return true if the first daughter is 
+    // farther from the nominal Z mass than the second daughter
     template<class T12, class T34>
-      bool zsNeedReorder(const edm::Ptr<pat::CompositeCandidate>& cand, 
-                         const std::string& fsrLabel)
+      bool zsNeedReorder(const edm::Ptr<pat::CompositeCandidate>& cand)
     {
       math::XYZTLorentzVector p4a = cand->daughter(0)->p4();
       math::XYZTLorentzVector p4b = cand->daughter(1)->p4();
-    
-      if(!fsrLabel.empty())
-        {
-          const T12* z1l1 = static_cast<const T12*>(cand->daughter(0)->daughter(0)->masterClone().get());
-          if(z1l1->hasUserCand(fsrLabel))
-            p4a += z1l1->userCand(fsrLabel)->p4();
       
-          const T12* z1l2 = static_cast<const T12*>(cand->daughter(0)->daughter(1)->masterClone().get());
-          if(z1l2->hasUserCand(fsrLabel))
-            p4a += z1l2->userCand(fsrLabel)->p4();
-      
-          const T34* z2l1 = static_cast<const T34*>(cand->daughter(1)->daughter(0)->masterClone().get());
-          if(z2l1->hasUserCand(fsrLabel))
-            p4b += z2l1->userCand(fsrLabel)->p4();
-      
-          const T34* z2l2 = static_cast<const T34*>(cand->daughter(1)->daughter(1)->masterClone().get());
-          if(z2l2->hasUserCand(fsrLabel))
-            p4b += z2l2->userCand(fsrLabel)->p4();
-        }
-  
       return std::abs(p4b.mass() - 91.1876) < std::abs(p4a.mass() - 91.1876);
     }
 
