@@ -180,9 +180,10 @@ if zz:
     FlowSteps.append(ZZFlow)
 elif zl or z:
     from UWVV.AnalysisTools.templates.ZPlusXBaseFlow import ZPlusXBaseFlow
-    from UWVV.AnalysisTools.templates.ZPlusXInitialStateBaseFlow import ZPlusXInitialStateBaseFlow
     FlowSteps.append(ZPlusXBaseFlow)
-    FlowSteps.append(ZPlusXInitialStateBaseFlow)
+    if zl:
+        from UWVV.AnalysisTools.templates.ZPlusXInitialStateBaseFlow import ZPlusXInitialStateBaseFlow
+        FlowSteps.append(ZPlusXInitialStateBaseFlow)
     # FSR and other ZZ/HZZ stuff
     from UWVV.AnalysisTools.templates.ZZID import ZZID
     from UWVV.AnalysisTools.templates.ZZIso import ZZIso
@@ -190,6 +191,7 @@ elif zl or z:
     FlowSteps.append(ZZID)
     FlowSteps.append(ZZFSR)
     FlowSteps.append(ZZIso)
+
     
 # Lepton calibrations
 if options.eCalib:

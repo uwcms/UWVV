@@ -60,7 +60,7 @@ def makeBranchSet(channel):
 
     if len(channel) == 2: # single Z
         assert channel[0] == channel[1], '{} does not make a valid Z'.format(channel)
-        branches.append(makeZBranchSet(channel[0], 1, True))
+        branches.append(makeZBranchSet(channel[0], 1, False))
     else:
         branches.append(objectBranches)
         
