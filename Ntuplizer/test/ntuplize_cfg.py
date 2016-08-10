@@ -56,6 +56,11 @@ options.register('profile', 0,
                  VarParsing.VarParsing.multiplicity.singleton,
                  VarParsing.VarParsing.varType.int,
                  "Set nonzero to run igprof.")
+options.register('hzzExtra', 0, 
+                 VarParsing.VarParsing.multiplicity.singleton,
+                 VarParsing.VarParsing.varType.int,
+                 "1 if extra HZZ quantities like matrix element "
+                 "discriminators and Z kinematic refit are desired.")
 
 
 options.parseArguments()
@@ -131,6 +136,11 @@ process.maxEvents = cms.untracked.PSet(
     input=cms.untracked.int32(options.maxEvents)
     )
 
+# option-dependent branches go here
+extraInitialStateBranches = []
+extraIntermediateStateBranches = []
+extraFinalObjectBranches = {}
+
 #############################################################################
 #    Make the analysis flow. It is assembled from a list of classes, each   #
 #    of which adds related steps to the sequence.                           #
@@ -168,12 +178,16 @@ if zz:
     from UWVV.AnalysisTools.templates.ZZInitialStateBaseFlow import ZZInitialStateBaseFlow
     FlowSteps.append(ZZInitialStateBaseFlow)
 
-    # HZZ discriminants and categorization
-    from UWVV.AnalysisTools.templates.ZZClassification import ZZClassification
-    FlowSteps.append(ZZClassification)
+    if options.hzzExtra:
+        # HZZ discriminants and categorization
+        from UWVV.AnalysisTools.templates.ZZClassification import ZZClassification
+        FlowSteps.append(ZZClassification)
 
-    from UWVV.AnalysisTools.templates.ZKinematicFitting import ZKinematicFitting
-    FlowSteps.append(ZKinematicFitting)
+        from UWVV.AnalysisTools.templates.ZKinematicFitting import ZKinematicFitting
+        FlowSteps.append(ZKinematicFitting)
+
+        from UWVV.Ntuplizer.templates.zzDiscriminantBranches import zzDiscriminantBranches, kinFitBranches
+        extraInitialStateBranches += [zzDiscriminantBranches, kinFitBranches]
 
     # FSR and other ZZ/HZZ stuff
     from UWVV.AnalysisTools.templates.ZZFlow import ZZFlow
@@ -240,7 +254,9 @@ for chan in channels:
     mod = cms.EDAnalyzer(
         'TreeGenerator{}'.format(expandChannelName(chan)),
         src = flow.finalObjTag(chan),
-        branches = makeBranchSet(chan),
+        branches = makeBranchSet(chan, extraInitialStateBranches, 
+                                 extraIntermediateStateBranches, 
+                                 **extraFinalObjectBranches),
         eventParams = makeEventParams(flow.finalTags()),
         triggers = trgBranches,
         )
