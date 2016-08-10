@@ -139,7 +139,7 @@ process.maxEvents = cms.untracked.PSet(
 # option-dependent branches go here
 extraInitialStateBranches = []
 extraIntermediateStateBranches = []
-extraFinalObjectBranches = {}
+extraFinalObjectBranches = {'e':[],'m':[]}
 
 #############################################################################
 #    Make the analysis flow. It is assembled from a list of classes, each   #
@@ -172,6 +172,11 @@ if options.isMC:
     from UWVV.AnalysisTools.templates.JetEnergySmearing import JetEnergySmearing
     FlowSteps.append(JetEnergySmearing)
 
+    from UWVV.Ntuplizer.templates.eventBranches import eventGenBranches
+    extraInitialStateBranches.append(eventGenBranches)
+    from UWVV.Ntuplizer.templates.leptonBranches import leptonGenBranches
+    extraFinalObjectBranches['e'].append(leptonGenBranches)
+    extraFinalObjectBranches['m'].append(leptonGenBranches)
 
 # make final states
 if zz:
@@ -179,6 +184,11 @@ if zz:
     FlowSteps.append(ZZInitialStateBaseFlow)
 
     if options.hzzExtra:
+        # k factors if a gg sample
+        if options.isMC and any('GluGlu' in f for f in options.inputFiles):
+            from UWVV.AnalysisTools.templates.GGHZZKFactors import GGHZZKFactors
+            FlowSteps.append(GGHZZKFactors)
+
         # HZZ discriminants and categorization
         from UWVV.AnalysisTools.templates.ZZClassification import ZZClassification
         FlowSteps.append(ZZClassification)
@@ -216,10 +226,9 @@ if options.muCalib:
     from UWVV.AnalysisTools.templates.MuonCalibration import MuonCalibration
     FlowSteps.append(MuonCalibration)
 
-# k factors if a gg sample
-if any('GluGlu' in f for f in options.inputFiles):
-    from UWVV.AnalysisTools.templates.GGHZZKFactors import GGHZZKFactors
-    FlowSteps.append(GGHZZKFactors)
+    from UWVV.Ntuplizer.templates.muonBranches import muonCalibrationBranches
+    extraFinalObjectBranches['m'].append(muonCalibrationBranches)
+
 
 # Turn all these into a single flow class
 FlowClass = createFlow(*FlowSteps)
