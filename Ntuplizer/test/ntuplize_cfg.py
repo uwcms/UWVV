@@ -216,6 +216,14 @@ elif zl or z:
     FlowSteps.append(ZZFSR)
     FlowSteps.append(ZZIso)
 
+for f in FlowSteps:
+    if f.__name__ in ['ZZFSR', 'ZZFlow']:
+        from UWVV.Ntuplizer.templates.fsrBranches import compositeObjectFSRBranches, leptonFSRBranches
+        extraInitialStateBranches.append(compositeObjectFSRBranches)
+        extraIntermediateStateBranches.append(compositeObjectFSRBranches)
+        extraFinalObjectBranches['e'].append(leptonFSRBranches)
+        extraFinalObjectBranches['m'].append(leptonFSRBranches)
+        break
     
 # Lepton calibrations
 if options.eCalib:

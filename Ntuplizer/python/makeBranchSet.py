@@ -3,7 +3,6 @@ import FWCore.ParameterSet.Config as cms
 from UWVV.Ntuplizer.templates.eventBranches import eventBranches
 from UWVV.Ntuplizer.templates.zBranches import zBranches
 from UWVV.Ntuplizer.templates.objectBranches import objectBranches
-from UWVV.Ntuplizer.templates.compositeObjectBranches import compositeObjectBranches
 from UWVV.Ntuplizer.templates.leptonBranches import leptonBranches
 from UWVV.Ntuplizer.templates.electronBranches import electronBranches
 from UWVV.Ntuplizer.templates.muonBranches import muonBranches
@@ -41,7 +40,7 @@ def makeZBranchSet(lep, n, extraBranches=[], extraLepBranches=[], addName=False)
     extraBranches: see makeBranchSet extraIntermediateBranches
     extraLepBranches: see makeBranchSet extraFinalObjectBranches
     '''
-    branches = [objectBranches, compositeObjectBranches, zBranches]
+    branches = [objectBranches, zBranches]
     if hasattr(extraBranches, '__iter__'):
         for b in extraBranches:
             branches.append(b)
@@ -94,7 +93,6 @@ def makeBranchSet(channel, extraInitialStateBranches=[],
                                        extraFinalObjectBranches.get(channel[0], [])))
     else:
         branches.append(objectBranches)
-        branches.append(compositeObjectBranches)
         
     if len(channel) == 3: # Z+l
         if channel[0] != channel[1]: # emm -> mme
