@@ -90,8 +90,6 @@ void PATCompositeUserCandPromoter<T1,T2>::produce(edm::Event& iEvent,
       out->push_back(*cPtr);
       CCand& c = out->back();
 
-      c.addUserCand("withoutFSR", cPtr);
-
       const T1* dau1 = static_cast<const T1*>(c.daughter(0)->masterClone().get());
       CandPtr fsr1 = ::getUserCand(*dau1, label);
       const T2* dau2 = static_cast<const T2*>(c.daughter(1)->masterClone().get());
@@ -101,11 +99,13 @@ void PATCompositeUserCandPromoter<T1,T2>::produce(edm::Event& iEvent,
 
       if(fsr1.isNonnull())
         {
+          c.setP4(c.p4() + fsr1->p4());
           c.addDaughter(*fsr1, label + std::to_string(nFSR));
           nFSR++;
         }
       if(fsr2.isNonnull())
         {
+          c.setP4(c.p4() + fsr2->p4());
           c.addDaughter(*fsr2, label + std::to_string(nFSR));
           nFSR++;
         }
