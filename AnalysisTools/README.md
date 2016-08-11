@@ -230,14 +230,16 @@ for chan in parseChannels('zz'):
         setPdgId = cms.int32(25),
         )
             
-step.addModule('eeeeProducer', eeeeMod, 'eeee')# Step now tracks this collection as 'eeee'
+step.addModule('eeeeProducer', eeeeMod, 'eeee') # Step now tracks this collection as 'eeee'
 ```
+
+The combiner module automatically checks for daughter overlaps. This is done recursively, so you won't get the same final state object twice in one initial state. If for some reason you don't want this checked, the combiner will accept the option `checkOverlap = cms.bool(False)`. UWVV has a utility to do remove overlaps for 3- and 4-object final states, if you for some reason want to do it yourself.
 
 ### Accessing the daughters
 
 As an example, we'll access information from a `pat::Electron` which is the 0th daughter of a Z candidate stored as an `edm::Ptr<pat::CompositeCandidate>`.
 
-If you need only basic information, just use the bare daughter clone
+If you need only basic information, just use the bare daughter shallow clone
 ```c++
 float pt = cand->daughter(0)->pt();
 ```
@@ -253,6 +255,6 @@ The preferred idiom in UWVV is to use templating to guarantee the type rather th
 
 If you need the full EDM reference
 ```c++
-edm::Ptr<pat::Electron> = cand->daughter(0)->masterClone().castTo<edm::Ptr<pat::Electron> >();
+edm::Ptr<pat::Electron> ePtr = cand->daughter(0)->masterClone().castTo<edm::Ptr<pat::Electron> >();
 ```
 
