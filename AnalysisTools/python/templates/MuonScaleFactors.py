@@ -45,20 +45,6 @@ class MuonScaleFactors(AnalysisFlowBase):
             step.addModule('scaleFactorErrorEmbedderM', 
                            scaleFactorErrorEmbedder, 'm')
 
-            ## Track reco efficiency scale factors are now included in the above histos for muons
-            # trkRecoSFFile = path.join(UWVV_BASE_PATH, 'data', 'LeptonScaleFactors',
-            #                           'muonTrackRecoEff_ICHEP.root')
-            # trkRecoScaleFactorEmbedder = cms.EDProducer(
-            #     "PATMuonScaleFactorEmbedder",
-            #     src = step.getObjTag('m'),
-            #     fileName = cms.string(trkRecoSFFile),
-            #     histName = cms.string("muTrkEffSF"),
-            #     label = cms.string("trkRecoEffScaleFactor"),
-            #     xValue = cms.string('eta'),
-            #     yValue = cms.string('pt'),
-            #     )
-            # step.addModule('trkRecoScaleFactorEmbedderM', trkRecoScaleFactorEmbedder, 'm')
-
         return step
 
 
