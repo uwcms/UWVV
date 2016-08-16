@@ -59,7 +59,7 @@ private:
   // user cands
   template<class T>
   const edm::Ptr<reco::Candidate>
-  getFSRCand(const edm::Ptr<T>& obj) const;
+  getFSRCand(const T& obj) const;
 
   typedef const edm::Ptr<reco::Candidate> (FType) (const reco::Candidate* const);
   std::vector<std::function<FType> > fsrGetters;
@@ -89,8 +89,11 @@ AlternateDaughterInfoEmbedder::AlternateDaughterInfoEmbedder(const edm::Paramete
         {
           fsrGetters.push_back(std::function<FType>([this](const reco::Candidate* const obj)
             {
-              edm::Ptr<pat::Electron> e = obj->masterClone().castTo<edm::Ptr<pat::Electron> >();
-              return getFSRCand(e);
+              const pat::Electron* e = dynamic_cast<const pat::Electron*>(obj->masterClone().get());
+              if(e)
+                return getFSRCand(*e);
+              
+              return edm::Ptr<reco::Candidate>(NULL, 0);
             }));
         }
       else
@@ -103,8 +106,11 @@ AlternateDaughterInfoEmbedder::AlternateDaughterInfoEmbedder(const edm::Paramete
 
           fsrGetters.push_back(std::function<FType>([this](const reco::Candidate* const obj)
             {
-              edm::Ptr<pat::Muon> m = obj->masterClone().castTo<edm::Ptr<pat::Muon> >();
-              return getFSRCand(m);
+              const pat::Muon* m = dynamic_cast<const pat::Muon*>(obj->masterClone().get());
+              if(m)
+                return getFSRCand(*m);
+              else
+                return edm::Ptr<reco::Candidate>(NULL, 0);
             }));
         }
     }
@@ -153,16 +159,21 @@ void AlternateDaughterInfoEmbedder::produce(edm::Event& iEvent,
               iName++;
 
               auto p4 = daughters.at(d1)->p4() + daughters.at(d2)->p4();
-              out->back().addUserFloat(name+"Mass", p4.M());
-              
-              if(!fsrLabel.empty())
+
+              if(fsrLabel.empty())
                 {
+                  out->back().addUserFloat(name+"Mass", p4.M());
+                }
+              else
+                {
+                  out->back().addUserFloat(name+"MassNoFSR", p4.M());
+
                   if(d1FSR.isNonnull())
                     p4 += d1FSR->p4();
                   if(d2FSR.isNonnull())
                     p4 += d2FSR->p4();
 
-                  out->back().addUserFloat(name+"MassFSR", p4.M());
+                  out->back().addUserFloat(name+"Mass", p4.M());
                 }
 
               out->back().addUserFloat(name+"DR",  deltaR(daughters.at(d1)->p4(), daughters.at(d2)->p4()));
@@ -200,10 +211,10 @@ AlternateDaughterInfoEmbedder::makePairNames(const std::vector<std::string>& dau
 
 template<class T>
 const edm::Ptr<reco::Candidate>
-AlternateDaughterInfoEmbedder::getFSRCand(const edm::Ptr<T>& obj) const
+AlternateDaughterInfoEmbedder::getFSRCand(const T& obj) const
 {
-  if(obj->hasUserCand(fsrLabel))
-    return obj->userCand(fsrLabel);
+  if(obj.hasUserCand(fsrLabel))
+    return obj.userCand(fsrLabel);
   return edm::Ptr<reco::Candidate>(NULL, 0);
 }
 

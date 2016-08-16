@@ -10,7 +10,7 @@ class ZZClassification(JetQuarkGluonTagging):
     def makeAnalysisStep(self, stepName, **inputs):
         step = super(ZZClassification, self).makeAnalysisStep(stepName, **inputs)
 
-        if stepName == 'finalStateEmbedding':
+        if stepName == 'initialStateEmbedding':
             meEmbedding4e = cms.EDProducer(
                 "ZZDiscriminantEmbedderEEEE",
                 src = step.getObjTag('eeee'),

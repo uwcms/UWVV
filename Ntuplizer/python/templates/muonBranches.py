@@ -23,12 +23,6 @@ muonBranches = cms.PSet(
                            'userFloat("kalmanPtError") : '
                            'bestTrack.ptError'),
 
-        PtUncorrected = cms.string('? hasUserCand("uncorrected") ? '
-                                   'userCand("uncorrected").pt : '
-                                   'pt'),
-        PtErrUncorrected = cms.string('? hasUserCand("uncorrected") ? '
-                                      'userCand("uncorrected").bestTrack.ptError : '
-                                      'bestTrack.ptError'),
         EffScaleFactor = cms.string('? hasUserFloat("effScaleFactor") ? '
                                     'userFloat("effScaleFactor") : 1.'),
         EffScaleFactorError = cms.string('? hasUserFloat("effScaleFactorError") ? '
@@ -57,5 +51,16 @@ muonBranches = cms.PSet(
                                    'userFloat("ZZIDPassHighPtNoVtx") : 0.'),
         PFIDNoVtx = cms.string('? hasUserFloat("ZZIDPassPFNoVtx") ? '
                                'userFloat("ZZIDPassPFNoVtx") : 0.'),
+        ),
+    )
+
+muonCalibrationBranches = cms.PSet(
+    floats = cms.PSet(
+        PtUncorrected = cms.string('? hasUserCand("uncorrected") ? '
+                                   'userCand("uncorrected").pt : '
+                                   'pt'),
+        PtErrUncorrected = cms.string('? hasUserCand("uncorrected") ? '
+                                      'userCand("uncorrected").bestTrack.ptError : '
+                                      'bestTrack.ptError'),
         ),
     )

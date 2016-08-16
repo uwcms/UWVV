@@ -29,9 +29,7 @@ namespace uwvv
   template<class Obj1, class Obj2> struct CompositeDaughter {};
   
   
-  template<class... Ts> class BranchManager;
-  
-  template<class T> class BranchManager<T>
+  template<class T> class BranchManager
   {
    public:
     BranchManager() {;}
@@ -88,7 +86,6 @@ namespace uwvv
 
     const std::string daughterName1;
     const std::string daughterName2;
-    const std::string fsrLabel;
   };
 
   
@@ -190,10 +187,7 @@ namespace uwvv
     daughterName1(extractDaughterName(0,
                                       config.getParameter<std::vector<std::string> >("daughterNames"))),
     daughterName2(extractDaughterName(1,
-                                      config.getParameter<std::vector<std::string> >("daughterNames"))),
-    fsrLabel(config.exists("fsrLabel") ? 
-             config.getParameter<std::string>("fsrLabel") :
-             "")
+                                      config.getParameter<std::vector<std::string> >("daughterNames")))
   {
     std::vector<edm::ParameterSet> daughterParams = 
       config.getParameter<std::vector<edm::ParameterSet> >("daughterParams");
@@ -246,7 +240,7 @@ namespace uwvv
   BranchManager<CompositeDaughter<T1, T2> >::fill(const edm::Ptr<pat::CompositeCandidate>& obj, 
                                                   EventInfo& evt)
   {
-    if(obj.isNull() || obj->numberOfDaughters() != 2)
+    if(obj.isNull() || obj->numberOfDaughters() < 2)
       throw cms::Exception("InvalidObject")
         << "Invalid " << this->getName() 
         <<" CompositeCandidate object passed to Ntuplizer";
@@ -292,13 +286,13 @@ namespace uwvv
     BranchManager<CompositeDaughter<CompositeDaughter<pat::Electron, pat::Electron>, 
     CompositeDaughter<pat::Electron, pat::Electron> > >::daughtersNeedReorder(const edm::Ptr<pat::CompositeCandidate>& cand) const
     {
-      return helpers::zsNeedReorder<pat::Electron, pat::Electron>(cand, fsrLabel);
+      return helpers::zsNeedReorder<pat::Electron, pat::Electron>(cand);
     }
   template<> bool
     BranchManager<CompositeDaughter<CompositeDaughter<pat::Muon, pat::Muon>, 
     CompositeDaughter<pat::Muon, pat::Muon> > >::daughtersNeedReorder(const edm::Ptr<pat::CompositeCandidate>& cand) const
     {
-      return helpers::zsNeedReorder<pat::Muon, pat::Muon>(cand, fsrLabel);
+      return helpers::zsNeedReorder<pat::Muon, pat::Muon>(cand);
     }
 
 } // namespace

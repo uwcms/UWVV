@@ -6,15 +6,12 @@ eventBranches = cms.PSet(
         pvndof = cms.string('pvndof'),
         pvZ = cms.string('pvZ'),
         pvRho = cms.string('pvRho'),
-        nTruePU = cms.string('nTruePU'),
         type1_pfMETEt = cms.string('type1_pfMETEt'),
         type1_pfMETPhi = cms.string('type1_pfMETPhi'),
-        genWeight = cms.string('genWeight'),
         jet1Pt = cms.string('jet1Pt'),
         jet2Pt = cms.string('jet2Pt'),
         ),
     bools = cms.PSet(
-        SS = cms.string('SS'),
         pvIsValid = cms.string('pvIsValid'),
         pvIdFake = cms.string('pvIsFake'),
         ),
@@ -31,5 +28,12 @@ eventBranches = cms.PSet(
         ),
     ulls = cms.PSet(
         evt = cms.string('evt'),
+        ),
+    )
+
+eventGenBranches = cms.PSet(
+    floats = cms.PSet(
+        genWeight = cms.string('genWeight'),
+        nTruePU = cms.string('nTruePU'),
         ),
     )

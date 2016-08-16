@@ -20,12 +20,9 @@ def makeCrossDaughterBranches(channel):
 
         name = '_'.join([pair[0], pair[1], ''])
 
-        params['floats'][name + 'Mass'] = cms.string('userFloat("{}")'.format(name+'Mass'))
-        params['floats'][name + 'DR'] = cms.string('userFloat("{}")'.format(name+'DR'))
-
-        params['bools'][name + 'SS'] = cms.string('userFloat("{}")'.format(name+'SS'))
-
-        params['floats'][name + 'MassFSR'] = cms.string('? hasUserFloat("{0}") ? '
-                                                        'userFloat("{0}") : -999.'.format(name+'MassFSR'))
+        params['floats'][name + 'Mass'] = cms.string('? hasUserFloat("{0}") ? userFloat("{0}") : -999.'.format(name+'Mass'))
+        params['floats'][name + 'MassNoFSR'] = cms.string('? hasUserFloat("{0}") ? userFloat("{0}") : -999.'.format(name+'MassNoFSR'))
+        params['bools'][name + 'SS'] = cms.string('? hasUserFloat("{0}") ? userFloat("{0}") : 0'.format(name+'SS'))
+        params['floats'][name + 'DR'] = cms.string('? hasUserFloat("{0}") ? userFloat("{0}") : -999.'.format(name+'DR'))
 
     return dict2PSet(params)

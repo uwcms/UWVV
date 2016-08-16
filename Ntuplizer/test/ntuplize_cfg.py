@@ -56,6 +56,11 @@ options.register('profile', 0,
                  VarParsing.VarParsing.multiplicity.singleton,
                  VarParsing.VarParsing.varType.int,
                  "Set nonzero to run igprof.")
+options.register('hzzExtra', 0, 
+                 VarParsing.VarParsing.multiplicity.singleton,
+                 VarParsing.VarParsing.varType.int,
+                 "1 if extra HZZ quantities like matrix element "
+                 "discriminators and Z kinematic refit are desired.")
 
 
 options.parseArguments()
@@ -131,6 +136,11 @@ process.maxEvents = cms.untracked.PSet(
     input=cms.untracked.int32(options.maxEvents)
     )
 
+# option-dependent branches go here
+extraInitialStateBranches = []
+extraIntermediateStateBranches = []
+extraFinalObjectBranches = {'e':[],'m':[]}
+
 #############################################################################
 #    Make the analysis flow. It is assembled from a list of classes, each   #
 #    of which adds related steps to the sequence.                           #
@@ -162,27 +172,42 @@ if options.isMC:
     from UWVV.AnalysisTools.templates.JetEnergySmearing import JetEnergySmearing
     FlowSteps.append(JetEnergySmearing)
 
+    from UWVV.Ntuplizer.templates.eventBranches import eventGenBranches
+    extraInitialStateBranches.append(eventGenBranches)
+    from UWVV.Ntuplizer.templates.leptonBranches import leptonGenBranches
+    extraFinalObjectBranches['e'].append(leptonGenBranches)
+    extraFinalObjectBranches['m'].append(leptonGenBranches)
 
 # make final states
 if zz:
-    from UWVV.AnalysisTools.templates.ZZFinalStateBaseFlow import ZZFinalStateBaseFlow
-    FlowSteps.append(ZZFinalStateBaseFlow)
+    from UWVV.AnalysisTools.templates.ZZInitialStateBaseFlow import ZZInitialStateBaseFlow
+    FlowSteps.append(ZZInitialStateBaseFlow)
 
-    # HZZ discriminants and categorization
-    from UWVV.AnalysisTools.templates.ZZClassification import ZZClassification
-    FlowSteps.append(ZZClassification)
+    if options.hzzExtra:
+        # k factors if a gg sample
+        if options.isMC and any('GluGlu' in f for f in options.inputFiles):
+            from UWVV.AnalysisTools.templates.GGHZZKFactors import GGHZZKFactors
+            FlowSteps.append(GGHZZKFactors)
 
-    from UWVV.AnalysisTools.templates.ZKinematicFitting import ZKinematicFitting
-    FlowSteps.append(ZKinematicFitting)
+        # HZZ discriminants and categorization
+        from UWVV.AnalysisTools.templates.ZZClassification import ZZClassification
+        FlowSteps.append(ZZClassification)
+
+        from UWVV.AnalysisTools.templates.ZKinematicFitting import ZKinematicFitting
+        FlowSteps.append(ZKinematicFitting)
+
+        from UWVV.Ntuplizer.templates.zzDiscriminantBranches import zzDiscriminantBranches, kinFitBranches
+        extraInitialStateBranches += [zzDiscriminantBranches, kinFitBranches]
 
     # FSR and other ZZ/HZZ stuff
     from UWVV.AnalysisTools.templates.ZZFlow import ZZFlow
     FlowSteps.append(ZZFlow)
 elif zl or z:
     from UWVV.AnalysisTools.templates.ZPlusXBaseFlow import ZPlusXBaseFlow
-    from UWVV.AnalysisTools.templates.ZPlusXFinalStateBaseFlow import ZPlusXFinalStateBaseFlow
     FlowSteps.append(ZPlusXBaseFlow)
-    FlowSteps.append(ZPlusXFinalStateBaseFlow)
+    if zl:
+        from UWVV.AnalysisTools.templates.ZPlusXInitialStateBaseFlow import ZPlusXInitialStateBaseFlow
+        FlowSteps.append(ZPlusXInitialStateBaseFlow)
     # FSR and other ZZ/HZZ stuff
     from UWVV.AnalysisTools.templates.ZZID import ZZID
     from UWVV.AnalysisTools.templates.ZZIso import ZZIso
@@ -190,6 +215,15 @@ elif zl or z:
     FlowSteps.append(ZZID)
     FlowSteps.append(ZZFSR)
     FlowSteps.append(ZZIso)
+
+for f in FlowSteps:
+    if f.__name__ in ['ZZFSR', 'ZZFlow']:
+        from UWVV.Ntuplizer.templates.fsrBranches import compositeObjectFSRBranches, leptonFSRBranches
+        extraInitialStateBranches.append(compositeObjectFSRBranches)
+        extraIntermediateStateBranches.append(compositeObjectFSRBranches)
+        extraFinalObjectBranches['e'].append(leptonFSRBranches)
+        extraFinalObjectBranches['m'].append(leptonFSRBranches)
+        break
     
 # Lepton calibrations
 if options.eCalib:
@@ -200,10 +234,9 @@ if options.muCalib:
     from UWVV.AnalysisTools.templates.MuonCalibration import MuonCalibration
     FlowSteps.append(MuonCalibration)
 
-# k factors if a gg sample
-if any('GluGlu' in f for f in options.inputFiles):
-    from UWVV.AnalysisTools.templates.GGHZZKFactors import GGHZZKFactors
-    FlowSteps.append(GGHZZKFactors)
+    from UWVV.Ntuplizer.templates.muonBranches import muonCalibrationBranches
+    extraFinalObjectBranches['m'].append(muonCalibrationBranches)
+
 
 # Turn all these into a single flow class
 FlowClass = createFlow(*FlowSteps)
@@ -238,7 +271,9 @@ for chan in channels:
     mod = cms.EDAnalyzer(
         'TreeGenerator{}'.format(expandChannelName(chan)),
         src = flow.finalObjTag(chan),
-        branches = makeBranchSet(chan),
+        branches = makeBranchSet(chan, extraInitialStateBranches, 
+                                 extraIntermediateStateBranches, 
+                                 **extraFinalObjectBranches),
         eventParams = makeEventParams(flow.finalTags()),
         triggers = trgBranches,
         )
