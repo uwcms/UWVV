@@ -17,7 +17,7 @@ class ElectronScaleFactors(AnalysisFlowBase):
         if stepName == 'embedding' and self.isMC:
 
             sfFile = path.join(UWVV_BASE_PATH, 'data', 'LeptonScaleFactors',
-                               'ele_scale_factors_v2.root')
+                               'ele_scale_factors_v3.root')
 
             scaleFactorEmbedder = cms.EDProducer(
                 "PATElectronScaleFactorEmbedder",

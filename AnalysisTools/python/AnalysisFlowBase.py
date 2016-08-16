@@ -72,8 +72,8 @@ class AnalysisFlowBase(object):
         return ['preliminary', 'preselection', 'embedding', 'selection',
                 'intermediateStateCreation', 'intermediateStateEmbedding',
                 'intermediateStateSelection',
-                'finalStateCreation', 'finalStateEmbedding', 
-                'finalStateSelection']
+                'initialStateCreation', 'initialStateEmbedding', 
+                'initialStateSelection']
 
 
     def makeAnalysisStep(self, step, **inputs):
@@ -118,10 +118,6 @@ class AnalysisFlowBase(object):
         assert not hasattr(super(AnalysisFlowBase, self), fName), \
             ("Analysis flow class {} does not derive from AnalysisFlowBase. "
              "Something is wrong.").format(super(AnalysisFlowBase, self).__class__.__name__)
-
-                                           
-    def getProcess(self):
-        return self.process
 
     def finalObjTag(self, obj):
         return cms.InputTag(self.outputs[-1][obj])

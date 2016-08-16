@@ -60,7 +60,7 @@ template<class T12, class T34>
 ZKinematicFitEmbedder<T12,T34>::ZKinematicFitEmbedder(const edm::ParameterSet& pset) :
   srcToken(consumes<edm::View<CCand> >(pset.getParameter<edm::InputTag>("src"))),
   fitter(pset.getParameter<bool>("isMC")),
-  fsrLabel(pset.exists("fsrLabel") ? 
+  fsrLabel(pset.exists("fsrLabel") ?
            pset.getParameter<std::string>("fsrLabel") : ""),
   lepSelector(pset.exists("leptonSelection") ?
               pset.getParameter<std::string>("leptonSelection") :
@@ -88,10 +88,7 @@ ZKinematicFitEmbedder<T12,T34>::produce(edm::Event& iEvent,
       const CCand* z1 = dynamic_cast<const CCand*>(cand.daughter(0)->masterClone().get());
       const CCand* z2 = dynamic_cast<const CCand*>(cand.daughter(1)->masterClone().get());
 
-      math::XYZTLorentzVector p4Z1 = uwvv::helpers::p4WithFSR(*z1, fsrLabel);
-      math::XYZTLorentzVector p4Z2 = uwvv::helpers::p4WithFSR(*z2, fsrLabel);
-
-      bool flip = uwvv::helpers::zMassDistance(p4Z1) > uwvv::helpers::zMassDistance(p4Z2);
+      bool flip = uwvv::helpers::zMassDistance(z1->p4()) > uwvv::helpers::zMassDistance(z2->p4());
 
       std::vector<reco::Candidate*> leptons;
       // std::vector<const reco::Candidate*> leptons;

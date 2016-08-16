@@ -27,3 +27,12 @@ zzDiscriminantBranches = cms.PSet(
         ZZCategoryQG = cms.string('? hasUserInt("ZZCategoryQG") ? userInt("ZZCategoryQG") : 999'),
         ),
     )
+
+kinFitBranches = cms.PSet(
+    floats = cms.PSet(
+        MassRefit = cms.string('? hasUserFloat("massRefit") ? '
+                               'userFloat("massRefit") : mass'),
+        MassRefitError = cms.string('? hasUserFloat("massRefitError") ? '
+                                    'userFloat("massRefitError") : mass'),
+        ),
+    )

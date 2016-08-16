@@ -4,17 +4,17 @@ from UWVV.Utilities.helpers import mapObjects, parseChannels
 import FWCore.ParameterSet.Config as cms
 
 
-class ZPlusXFinalStateBaseFlow(ZPlusXBaseFlow):
+class ZPlusXInitialStateBaseFlow(ZPlusXBaseFlow):
     def __init__(self, *args, **kwargs):
-        super(ZPlusXFinalStateBaseFlow, self).__init__(*args, **kwargs)
+        super(ZPlusXInitialStateBaseFlow, self).__init__(*args, **kwargs)
 
     def makeAnalysisStep(self, stepName, **inputs):
-        step = super(ZPlusXFinalStateBaseFlow, self).makeAnalysisStep(stepName, **inputs)
+        step = super(ZPlusXInitialStateBaseFlow, self).makeAnalysisStep(stepName, **inputs)
 
-        if stepName == 'finalStateCreation':
+        if stepName == 'initialStateCreation':
             self.addZPlusXCreation(step)
 
-        if stepName == 'finalStateEmbedding':
+        if stepName == 'initialStateEmbedding':
             self.addAlternatePairInfo(step)
 
         return step

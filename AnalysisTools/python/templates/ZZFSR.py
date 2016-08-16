@@ -1,6 +1,6 @@
 from UWVV.AnalysisTools.AnalysisFlowBase import AnalysisFlowBase
 from UWVV.AnalysisTools.templates.ZPlusXBaseFlow import ZPlusXBaseFlow
-from UWVV.AnalysisTools.templates.ZZFinalStateBaseFlow import ZZFinalStateBaseFlow
+from UWVV.AnalysisTools.templates.ZZInitialStateBaseFlow import ZZInitialStateBaseFlow
 
 import FWCore.ParameterSet.Config as cms
 
@@ -61,27 +61,6 @@ class ZZFSR(AnalysisFlowBase):
 
                 step.addModule('zeFSREmbedder', zeFSREmbedder, 'ee')
                 step.addModule('zmFSREmbedder', zmFSREmbedder, 'mm')
-
-        if stepName == 'finalStateEmbedding':
-            if isinstance(self, ZZFinalStateBaseFlow):
-                zz4eFSREmbedder = cms.EDProducer(
-                    'PATCompositeCompositeUserCandPromoter',
-                    src = step.getObjTag('eeee'),
-                    label = cms.string(self.getFSRLabel()),
-                    )
-                zz2e2mFSREmbedder = cms.EDProducer(
-                    'PATCompositeCompositeUserCandPromoter',
-                    src = step.getObjTag('eemm'),
-                    label = cms.string(self.getFSRLabel()),
-                    )
-                zz4mFSREmbedder = cms.EDProducer(
-                    'PATCompositeCompositeUserCandPromoter',
-                    src = step.getObjTag('mmmm'),
-                    label = cms.string(self.getFSRLabel()),
-                    )
-                step.addModule('zz4eFSREmbedder', zz4eFSREmbedder, 'eeee')
-                step.addModule('zz2e2mFSREmbedder', zz2e2mFSREmbedder, 'eemm')
-                step.addModule('zz4mFSREmbedder', zz4mFSREmbedder, 'mmmm')
 
         return step
 

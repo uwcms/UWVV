@@ -12,7 +12,7 @@ class ZKinematicFitting(AnalysisFlowBase):
     def makeAnalysisStep(self, stepName, **inputs):
         step = super(ZKinematicFitting, self).makeAnalysisStep(stepName, **inputs)
 
-        if stepName == 'finalStateEmbedding':
+        if stepName == 'initialStateEmbedding':
             kinFit4e = cms.EDProducer(
                 "ZKinematicFitEmbedderEEEE",
                 src = step.getObjTag('eeee'),

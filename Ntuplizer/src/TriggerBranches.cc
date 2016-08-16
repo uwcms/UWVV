@@ -73,7 +73,9 @@ TriggerBranches::TriggerBranches(edm::ConsumesCollector cc,
                                  const edm::ParameterSet& config,
                                  TTree* const tree) :
   resultsToken(cc.consumes<edm::TriggerResults>(config.getParameter<edm::InputTag>("trigResultsSrc"))),
-  prescalesToken(cc.consumes<pat::PackedTriggerPrescales>(config.getParameter<edm::InputTag>("trigPrescaleSrc"))),
+  prescalesToken(cc.consumes<pat::PackedTriggerPrescales>(config.exists("trigPrescaleSrc") ?
+                                                          config.getParameter<edm::InputTag>("trigPrescaleSrc") :
+                                                          edm::InputTag("patTrigger"))),
   isValid(false),
   checkPrescale(config.exists("checkPrescale") ?
                 config.getParameter<bool>("checkPrescale") :
@@ -95,7 +97,8 @@ TriggerBranches::TriggerBranches(edm::ConsumesCollector cc,
 void TriggerBranches::setEvent(const edm::Event& event)
 {
   event.getByToken(resultsToken, results);
-  event.getByToken(prescalesToken, prescales);
+  if(checkPrescale)
+    event.getByToken(prescalesToken, prescales);
 
   const edm::TriggerNames& names = event.triggerNames(*results);
 
