@@ -202,6 +202,10 @@ if zz:
     # FSR and other ZZ/HZZ stuff
     from UWVV.AnalysisTools.templates.ZZFlow import ZZFlow
     FlowSteps.append(ZZFlow)
+
+    from UWVV.AnalysisTools.templates.ZZSkim import ZZSkim
+    FlowSteps.append(ZZSkim)
+
 elif zl or z:
     from UWVV.AnalysisTools.templates.ZPlusXBaseFlow import ZPlusXBaseFlow
     FlowSteps.append(ZPlusXBaseFlow)
