@@ -20,11 +20,6 @@ eventBranches = cms.PSet(
         run = cms.string('run'),
         nvtx = cms.string('nvtx'),
         nJets = cms.string('nJets'),
-        nCBVIDTightElec = cms.string('userInt("nCBVIDTightElec")'),
-        nCBVIDMediumElec = cms.string('userInt("nCBVIDMediumElec")'),
-        nCBVIDLooseElec = cms.string('userInt("nCBVIDLooseElec")'),
-        nTightMuon = cms.string('userInt("nTightMuon")'),
-        nMediumMuonICHEP = cms.string('userInt("nMediumMuonICHEP")'),
         ),
     ulls = cms.PSet(
         evt = cms.string('evt'),

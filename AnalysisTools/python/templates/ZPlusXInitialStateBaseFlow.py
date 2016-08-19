@@ -16,8 +16,6 @@ class ZPlusXInitialStateBaseFlow(ZPlusXBaseFlow):
 
         if stepName == 'initialStateEmbedding':
             self.addAlternatePairInfo(step)
-            self.addElectronCountEmbedding(step)
-            self.addMuonCountEmbedding(step)
 
         return step
 
@@ -52,33 +50,3 @@ class ZPlusXInitialStateBaseFlow(ZPlusXBaseFlow):
                 )
             step.addModule(chan+'AlternatePairs', mod, chan)
 
-    def addElectronCountEmbedding(self, step):
-        counters = {
-            "nCBVIDTightElec" : "tightElectronCounter:CBVIDtight",
-            "nCBVIDMediumElec" : "medElectronCounter:CBVIDmedium",
-            "nCBVIDLooseElec" : "looseElectronCounter:CBVIDloose",
-        }
-        for key, value in counters.iteritems():
-            for chan in parseChannels('zl'):
-                mod = cms.EDProducer(
-                    "PATCompositeCandidateIntEmbedder",
-                    src = step.getObjTag(chan),
-                    label = cms.string(key),
-                    valueSrc = cms.InputTag(value),
-                    )
-                step.addModule(chan+key+"Counter", mod, chan)
-
-    def addMuonCountEmbedding(self, step):
-        counters = {
-            "nTightMuon" : "tightMuonCounter:TightMuon",
-            "nMediumMuonICHEP" : "medMuonCounter:MediumMuonICHEP",
-        }
-        for key, value in counters.iteritems():
-            for chan in parseChannels('zl'):
-                mod = cms.EDProducer(
-                    "PATCompositeCandidateIntEmbedder",
-                    src = step.getObjTag(chan),
-                    label = cms.string(key),
-                    valueSrc = cms.InputTag(value),
-                    )
-                step.addModule(chan+key+"Counter", mod, chan)

@@ -45,6 +45,7 @@ private:
   //void embedvalue(const T& object, const V& value, const std::string& label) const;
   void embedValue(T& object, const int& value, const std::string& label) const;
   void embedValue(T& object, const float& value, const std::string& label) const;
+  void embedValue(T& object, const bool& value, const std::string& label) const;
 
   const edm::EDGetTokenT<edm::View<T>> srcToken_;
   const std::vector<std::string> floatLabels_;
@@ -147,14 +148,21 @@ void PATObjectValueMapEmbedder<T>::produce(edm::Event& iEvent,
 
 template<typename T>
 void PATObjectValueMapEmbedder<T>::embedValue(T& object,
-                                const float& value, const std::string& label) const
+                                              const float& value, const std::string& label) const
 {
   object.addUserFloat(label, value);
 }
 
 template<typename T>
 void PATObjectValueMapEmbedder<T>::embedValue(T& object,
-                                const int& value, const std::string& label) const
+                                              const bool& value, const std::string& label) const
+{
+  object.addUserFloat(label, value);
+}
+
+template<typename T>
+void PATObjectValueMapEmbedder<T>::embedValue(T& object,
+                                              const int& value, const std::string& label) const
 {
   object.addUserInt(label, value);
 }
