@@ -13,7 +13,7 @@ class RecomputeElectronID(AnalysisFlowBase):
     def makeAnalysisStep(self, stepName, **inputs):
         step = super(RecomputeElectronID, self).makeAnalysisStep(stepName, **inputs)
 
-        if stepName == 'embedding':
+        if stepName == 'preliminary':
             self.addElectronIDEmbedding(step)
 
         return step
@@ -42,7 +42,7 @@ class RecomputeElectronID(AnalysisFlowBase):
             src = step.getObjTag('e'),
             floatLabels = cms.untracked.vstring("MVAIDNonTrig"),
             floatVals = cms.untracked.VInputTag("electronMVAValueMapProducer:ElectronMVAEstimatorRun2Spring16V1Values"),
-            boolLabels = cms.untracked.vstring("CBVIDtight", "CBVIDmedium", "CBVIDloose"),
+            boolLabels = cms.untracked.vstring("isCBVIDtight", "isCBVIDmedium", "isCBVIDloose"),
             boolVals = cms.untracked.VInputTag(
                 cms.InputTag("egmGsfElectronIDs:cutBasedElectronID-Spring15-25ns-V1-standalone-tight"),
                 cms.InputTag("egmGsfElectronIDs:cutBasedElectronID-Spring15-25ns-V1-standalone-medium"),

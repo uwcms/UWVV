@@ -202,12 +202,23 @@ if zz:
     # FSR and other ZZ/HZZ stuff
     from UWVV.AnalysisTools.templates.ZZFlow import ZZFlow
     FlowSteps.append(ZZFlow)
+
+    from UWVV.AnalysisTools.templates.ZZSkim import ZZSkim
+    FlowSteps.append(ZZSkim)
+
 elif zl or z:
     from UWVV.AnalysisTools.templates.ZPlusXBaseFlow import ZPlusXBaseFlow
     FlowSteps.append(ZPlusXBaseFlow)
     if zl:
         from UWVV.AnalysisTools.templates.ZPlusXInitialStateBaseFlow import ZPlusXInitialStateBaseFlow
         FlowSteps.append(ZPlusXInitialStateBaseFlow)
+
+        from UWVV.AnalysisTools.templates.WZLeptonCounters import WZLeptonCounters
+        FlowSteps.append(WZLeptonCounters)
+
+        from UWVV.Ntuplizer.templates.countBranches import wzCountBranches
+        extraInitialStateBranches.append(wzCountBranches)
+
     # FSR and other ZZ/HZZ stuff
     from UWVV.AnalysisTools.templates.ZZID import ZZID
     from UWVV.AnalysisTools.templates.ZZIso import ZZIso
@@ -216,6 +227,10 @@ elif zl or z:
     FlowSteps.append(ZZFSR)
     FlowSteps.append(ZZIso)
 
+    from UWVV.AnalysisTools.templates.ZZCrossCleaning import ZZCrossCleaning
+    FlowSteps.append(ZZCrossCleaning)
+        
+
 for f in FlowSteps:
     if f.__name__ in ['ZZFSR', 'ZZFlow']:
         from UWVV.Ntuplizer.templates.fsrBranches import compositeObjectFSRBranches, leptonFSRBranches
@@ -223,6 +238,13 @@ for f in FlowSteps:
         extraIntermediateStateBranches.append(compositeObjectFSRBranches)
         extraFinalObjectBranches['e'].append(leptonFSRBranches)
         extraFinalObjectBranches['m'].append(leptonFSRBranches)
+        break
+for f in FlowSteps:
+    if f.__name__ in ['ZZID', 'ZZIso', 'ZZFlow']:
+        from UWVV.AnalysisTools.templates.ZZLeptonCounters import ZZLeptonCounters
+        FlowSteps.append(ZZLeptonCounters)
+        from UWVV.Ntuplizer.templates.countBranches import zzCountBranches
+        extraInitialStateBranches.append(zzCountBranches)
         break
     
 # Lepton calibrations

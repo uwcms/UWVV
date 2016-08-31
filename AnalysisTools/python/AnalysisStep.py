@@ -80,11 +80,16 @@ class AnalysisStep(object):
     def addBasicSelector(self, obj, selection, name=''):
         '''
         Add a basic, no-frills string cut selector module for objects
-        of type obj ('e', 'm' etc.).
+        of type obj ('e', 'm' etc.). If obj is more than one letter, the
+        type is assumed to be pat::CompositeCandidate.
         If 'name' is empty, the module is called <obj>cleaning<stepName>.
         '''
+        if len(obj) > 1:
+            modName = 'PATCompositeCandidateRefSelector'
+        else:
+            modName = 'PAT{}RefSelector'.format(getObjName(obj, True))
         mod = cms.EDFilter(
-            'PAT{}RefSelector'.format(getObjName(obj, True)),
+            modName,
             src = self.getObjTag(obj),
             cut = cms.string(selection),
             filter = cms.bool(False),

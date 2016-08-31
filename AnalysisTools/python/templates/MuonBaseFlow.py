@@ -15,6 +15,7 @@ class MuonBaseFlow(AnalysisFlowBase):
             step.addBasicSelector('m', 'pt > 5 && (isGlobalMuon || isTrackerMuon)')
         elif stepName == 'embedding':
             self.addMuonPOGIDs(step)
+
         return step
 
 
@@ -29,6 +30,7 @@ class MuonBaseFlow(AnalysisFlowBase):
                              fractionOfSharedSegments = cms.double(0.499))
 
         step.addModule("muonGhostCleaning", mod, 'm')
+
     def addMuonPOGIDs(self, step):
         '''
         Add Muon POG IDs as UserInts
@@ -40,3 +42,4 @@ class MuonBaseFlow(AnalysisFlowBase):
                 vertexSrc = step.getObjTag('v')
             )
         step.addModule("muonIDembedding", embedMuId, 'm')
+

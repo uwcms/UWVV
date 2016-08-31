@@ -31,16 +31,11 @@ class ElectronBaseFlow(AnalysisFlowBase):
 
     def addElectronRhoEmbedding(self, step):
         mod = cms.EDProducer(
-            "PATElectronDoubleEmbedder",
+            "PATElectronValueEmbedder",
             src = step.getObjTag('e'),
-            label = cms.string('rho_fastjet'),
-            valueSrc = cms.InputTag("fixedGridRhoFastjetAll"),
+            doubleLabels = cms.vstring('rho_fastjet'),
+            doubleSrc = cms.VInputTag(cms.InputTag("fixedGridRhoFastjetAll")),
             )
 
         step.addModule('electronRhoEmbedding', mod, 'e')
-    
-
-
-
-
 
