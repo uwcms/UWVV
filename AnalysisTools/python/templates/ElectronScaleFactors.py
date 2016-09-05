@@ -41,6 +41,30 @@ class ElectronScaleFactors(AnalysisFlowBase):
                 )
             step.addModule('scaleFactorEmbedderEGap', scaleFactorEmbedderGap, 'e')
 
+            scaleFactorErrorEmbedder = cms.EDProducer(
+                "PATElectronScaleFactorEmbedder",
+                src = step.getObjTag('e'),
+                fileName = cms.string(sfFile),
+                histName = cms.string('ele_scale_factors_uncertainties'),
+                label = cms.string("effScaleFactorError"),
+                xValue = cms.string('abs(eta)'),
+                yValue = cms.string('pt'),
+                )
+            step.addModule('scaleFactorErrorEmbedderE', 
+                           scaleFactorErrorEmbedder, 'e')
+
+            scaleFactorErrorEmbedderGap = cms.EDProducer(
+                "PATElectronScaleFactorEmbedder",
+                src = step.getObjTag('e'),
+                fileName = cms.string(sfFile),
+                histName = cms.string('ele_scale_factors_gap_uncertainties'),
+                label = cms.string("effScaleFactorErrorGap"),
+                xValue = cms.string('abs(eta)'),
+                yValue = cms.string('pt'),
+                )
+            step.addModule('scaleFactorErrorEmbedderEGap', 
+                           scaleFactorErrorEmbedderGap, 'e')
+
             trkRecoSFFile = path.join(UWVV_BASE_PATH, 'data', 'LeptonScaleFactors',
                                       'ele_gsfTrackRecoEff_ichep12p9.root')
 

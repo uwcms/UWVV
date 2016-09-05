@@ -25,6 +25,11 @@ electronBranches = cms.PSet(
                                     ' userFloat("effScaleFactorGap") : 1.) :'
                                     '(? hasUserFloat("effScaleFactor") ? '
                                     'userFloat("effScaleFactor") : 1.)'),
+        EffScaleFactorError = cms.string('? isGap ? '
+                                         '(? hasUserFloat("effScaleFactorErrorGap") ?'
+                                         ' userFloat("effScaleFactorErrorGap") : 0.) :'
+                                         '(? hasUserFloat("effScaleFactorError") ? '
+                                         'userFloat("effScaleFactorError") : 0.)'),
         TrkRecoEffScaleFactor = cms.string('? hasUserFloat("trkRecoEffScaleFactor") ? '
                                            'userFloat("trkRecoEffScaleFactor") : 1.'),
         ),
