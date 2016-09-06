@@ -32,41 +32,41 @@ namespace uwvv
       isValid_(false)
         {;}
     ~EventInfoHolder() {;}
-  
+
     void setEvent(const edm::Event& event)
     {
       currentEvent_ = &event;
       isValid_ = false;
     }
-  
+
     const edm::Handle<T>& get()
     {
       if(isValid_)
         return handle_;
-  
+
       currentEvent_->getByToken(token_, handle_);
       isValid_ = true;
       return handle_;
     }
-  
+
    private:
     const edm::EDGetTokenT<T> token_;
     edm::Handle<T> handle_;
     const edm::Event* currentEvent_;
     bool isValid_;
   };
-   
-  
+
+
   class EventInfo
   {
    public:
     EventInfo(edm::ConsumesCollector cc, const edm::ParameterSet& config);
     ~EventInfo() {;}
-  
+
     void setEvent(const edm::Event& event);
-  
+
     const edm::EventID id() const {return currentEvent_->id();}
-  
+
     const edm::Ptr<reco::Vertex> pv() 
     {
       return (nVertices() ? vertices()->ptrAt(0) : edm::Ptr<reco::Vertex>(NULL, 0));
@@ -83,7 +83,7 @@ namespace uwvv
     const edm::Handle<pat::METCollection>& mets() {return mets_.get();}
     const edm::Handle<std::vector<PileupSummaryInfo> >& puInfo() {return puInfo_.get();}
     const edm::Handle<GenEventInfoProduct>& genEventInfo() {return genEventInfo_.get();}
-  
+
    private:
     const edm::Event* currentEvent_;
     EventInfoHolder<edm::View<reco::Vertex> > vertices_;

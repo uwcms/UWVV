@@ -49,7 +49,7 @@ namespace uwvv
 
     bool pass;
     unsigned prescale;
-    
+
     std::vector<TriggerPathInfo> paths;
   };
 
@@ -62,11 +62,11 @@ namespace uwvv
                     const edm::ParameterSet& config,
                     TTree* const tree);
     ~TriggerBranches() {;}
-  
+
     void setEvent(const edm::Event& event);
 
     void fill();    
-  
+
    private:
     const edm::EDGetTokenT<edm::TriggerResults> resultsToken;
     edm::Handle<edm::TriggerResults> results;
@@ -74,7 +74,7 @@ namespace uwvv
     edm::Handle<pat::PackedTriggerPrescales> prescales;
 
     edm::ParameterSetID id;
-    
+
     std::unordered_map<std::string, std::unique_ptr<TriggerBranch> > branches;
 
     bool isValid;

@@ -17,7 +17,7 @@ namespace uwvv
    public:
     TriggerPathInfo(const std::string& nameExp);
     ~TriggerPathInfo() {;}
-  
+
     // Set bit, name
     void setup(const edm::TriggerNames& names);
 
@@ -27,7 +27,7 @@ namespace uwvv
     prescale(const pat::PackedTriggerPrescales& prescales) const;
 
     std::string& name() {return name_;}
-  
+
    private:
     // for attempted uninitialized use
     void explode() const
