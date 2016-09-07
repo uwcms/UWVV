@@ -10,12 +10,13 @@ from collections import OrderedDict
 
 
 class AnalysisFlowBase(object):
-    def __init__(self, name, process=None, *args, **initialInputs):
+    def __init__(self, name, process=None, suffix='', *args, **initialInputs):
         '''
         Keyword arguments are interpreted as changes from the default
         initial object input tags.
         '''
         self.name = name
+        self.suffix = suffix
 
         self.inputs = self.getInitialInputs(**initialInputs)
         self.outputs = []
@@ -82,7 +83,7 @@ class AnalysisFlowBase(object):
         '''
         self.inheritGuard('makeAnalysisStep')
 
-        return AnalysisStep(self.name + step, **inputs)
+        return AnalysisStep(self.name + step, self.suffix, **inputs)
 
     
     def setupPath(self):

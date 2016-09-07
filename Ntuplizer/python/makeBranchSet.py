@@ -1,6 +1,6 @@
 import FWCore.ParameterSet.Config as cms
 
-from UWVV.Ntuplizer.templates.eventBranches import eventBranches
+from UWVV.Ntuplizer.templates.eventBranches import eventBranches, genNtupleEventBranches
 from UWVV.Ntuplizer.templates.zBranches import zBranches
 from UWVV.Ntuplizer.templates.objectBranches import objectBranches
 from UWVV.Ntuplizer.templates.leptonBranches import leptonBranches
@@ -87,7 +87,10 @@ def makeBranchSet(channel, extraInitialStateBranches=[],
 
     finalObjects = mapObjects(channel)
 
-    if len(channel) == 2: # single Z
+    if len(channel) == 1: # single object
+        branches.append(makeLepBranchSet(channel, 
+                                         extraInitialStateBranches+extraFinalObjectBranches[channel]))
+    elif len(channel) == 2: # single Z
         assert channel[0] == channel[1], '{} does not make a valid Z'.format(channel)
         branches.append(makeZBranchSet(channel[0], 1, extraIntermediateStateBranches,
                                        extraFinalObjectBranches.get(channel[0], [])))
@@ -147,4 +150,31 @@ def makeBranchSet(channel, extraInitialStateBranches=[],
     return branchSet
 
 
+def makeGenBranchSet(channel, extraInitialStateBranches=[], 
+                     extraIntermediateStateBranches=[], 
+                     **extraFinalObjectBranches):
+    if len(channel) != 4:
+        raise RuntimeError("makeGenBranchSet is only implemented for 4l final "
+                           "states. Please add it for {}".format(channel))
 
+    branches = [genNtupleEventBranches, objectBranches]
+    branchSet = combinePSets(*branches)
+
+    finalObjects = mapObjects(channel)
+    
+    daughterNames = [
+        '_'.join(finalObjects[:2]+['']),
+        '_'.join(finalObjects[2:]+['']),
+        ]
+    branchSet.daughterNames = cms.vstring(*daughterNames)
+
+    z1BranchSet = objectBranches.clone(
+        daughterNames = cms.vstring(*finalObjects[:2]),
+        daughterParams = cms.VPSet(objectBranches.clone(), 
+                                   objectBranches.clone()),
+        )
+    z2BranchSet = z1BranchSet.clone(daughterNames=cms.vstring(*finalObjects[2:]))
+
+    branchSet.daughterParams = cms.VPSet(z1BranchSet,z2BranchSet)
+
+    return branchSet

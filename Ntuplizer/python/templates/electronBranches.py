@@ -32,6 +32,7 @@ electronBranches = cms.PSet(
                                          'userFloat("effScaleFactorError") : 0.)'),
         TrkRecoEffScaleFactor = cms.string('? hasUserFloat("trkRecoEffScaleFactor") ? '
                                            'userFloat("trkRecoEffScaleFactor") : 1.'),
+        MtToMET = cms.string('mtToMET'),
         ),
 
     uints = cms.PSet(

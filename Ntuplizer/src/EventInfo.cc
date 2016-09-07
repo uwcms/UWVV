@@ -14,7 +14,9 @@ EventInfo::EventInfo(edm::ConsumesCollector cc,
   pfCands_(cc, config.getParameter<edm::InputTag>("pfCandSrc")),
   mets_(cc, config.getParameter<edm::InputTag>("metSrc")),
   puInfo_(cc, config.getParameter<edm::InputTag>("puSrc")),
-  genEventInfo_(cc, config.getParameter<edm::InputTag>("genEventInfoSrc"))
+  genEventInfo_(cc, config.getParameter<edm::InputTag>("genEventInfoSrc")),
+  genJets_(cc, config.getParameter<edm::InputTag>("genJetSrc")),
+  genParticles_(cc, config.getParameter<edm::InputTag>("genParticleSrc"))
 {
 }
 
@@ -31,6 +33,8 @@ void EventInfo::setEvent(const edm::Event& event)
   mets_.setEvent(event);
   puInfo_.setEvent(event);
   genEventInfo_.setEvent(event);
+  genJets_.setEvent(event);
+  genParticles_.setEvent(event);
 
   currentEvent_ = &event;
 }

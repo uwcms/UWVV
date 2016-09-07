@@ -69,6 +69,8 @@ def parseChannels(channels):
             return ['eee', 'eem', 'emm', 'mmm']
         elif channels in ['z', '2l', 'll']:
             return ['ee', 'mm']
+        elif channels in ['l', '1l']:
+            return ['e', 'm']
         else:
             chanList = channels.split(',')
             assert all(all(letter in ['e','m','t','g','j'] for letter in ch) and len(ch) <= 4 for ch in chanList),\

@@ -26,9 +26,30 @@ eventBranches = cms.PSet(
         ),
     )
 
+# gen information branches for regular ntuple
 eventGenBranches = cms.PSet(
     floats = cms.PSet(
         genWeight = cms.string('genWeight'),
         nTruePU = cms.string('nTruePU'),
+        ),
+    )
+
+# event branches for gen ntuple
+genNtupleEventBranches = cms.PSet(
+    floats = cms.PSet(
+        genWeight = cms.string('genWeight'),
+        jet1Pt = cms.string('genJet1Pt'),
+        jet1Eta = cms.string('genJet1Eta'),
+        jet2Pt = cms.string('genJet2Pt'),
+        jet2Eta = cms.string('genJet2Eta'),
+        mjj = cms.string('mjjGen'),
+        ),
+    uints = cms.PSet(
+        lumi = cms.string('lumi'),
+        run = cms.string('run'),
+        nJets = cms.string('nGenJets'),
+        ),
+    ulls = cms.PSet(
+        evt = cms.string('evt'),
         ),
     )

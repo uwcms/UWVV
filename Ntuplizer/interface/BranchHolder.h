@@ -28,10 +28,10 @@ namespace uwvv
   template<typename B, class T> class BranchHolder
   {
    public:
-    
+
     // Declare FType to be the type of the function pointer used here
     typedef B (FType)(const edm::Ptr<T>&, EventInfo&);
-  
+
     // Default constuctor (null)
     BranchHolder() {;}
     // Construct with function passed as argument
@@ -40,24 +40,24 @@ namespace uwvv
     BranchHolder(const std::string& name, TTree* const tree, 
                  FType func);
     virtual ~BranchHolder() {;}
-  
+
     // Compute value for this and set so that the next tree->Fill() will take it
     void fill(const edm::Ptr<T>& obj, EventInfo& evt);
-  
+
     const std::string& getName() const {return name;}
-  
+
     const B& getValue() const {return value;}
-  
+
    private:
     const std::string name;
     const std::function<FType> f;
-  
+
     B value;
   };
-  
-  
-  
-  
+
+
+
+
   template<typename B, class T>
   BranchHolder<B,T>::BranchHolder(const std::string& name, TTree* const tree, 
                                   BranchHolder<B, T>::FType func) :
@@ -66,8 +66,8 @@ namespace uwvv
   {
     tree->Branch(name.c_str(), &value);
   }
-  
-  
+
+
   template<typename B, class T>
   BranchHolder<B,T>::BranchHolder(const std::string& name, TTree* const tree, 
                                   const std::function<BranchHolder<B, T>::FType> func) :
@@ -76,8 +76,8 @@ namespace uwvv
   {
     tree->Branch(name.c_str(), &value);
   }
-  
-  
+
+
   template<typename B, class T> 
   void
   BranchHolder<B,T>::fill(const edm::Ptr<T>& obj, EventInfo& evt)
