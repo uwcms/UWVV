@@ -13,6 +13,8 @@ _defaultEventParams = {
     'metSrc'          : 'slimmedMETs',
     'puSrc'           : 'slimmedAddPileupInfo',
     'genEventInfoSrc' : 'generator',
+    'genParticleSrc'  : 'prunedGenParticles',
+    'genJetSrc'       : 'slimmedGenJets',
     }
 
 
@@ -40,3 +42,17 @@ def makeEventParams(flowOutputs, **newParams):
 
     return cms.PSet(**params)
     
+
+def makeGenEventParams(flowOutputs, **newParams):
+    params = _defaultEventParams.copy()
+
+    params['genJetSrc'] = flowOutputs['j']
+    params['genParticleSrc'] = flowOutputs['pfCands']
+
+    params.update(newParams)
+
+    for p in params:
+        if not isinstance(params[p], _ParameterTypeBase):
+            params[p] = cms.InputTag(params[p])
+
+    return cms.PSet(**params)

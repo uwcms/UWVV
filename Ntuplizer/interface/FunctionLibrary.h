@@ -116,6 +116,46 @@ namespace
                                          evt.jets()->at(1).userFloat("qgLikelihood") :
                                          -1.);
                                });
+
+        addTo["genJet1Pt"] = 
+          std::function<FType>([](const edm::Ptr<T>& obj, uwvv::EventInfo& evt)
+                               {
+                                 return (evt.genJets()->size() >= 1 ? 
+                                         evt.genJets()->at(0).pt() :
+                                         -1.);
+                               });
+
+        addTo["genJet2Pt"] = 
+          std::function<FType>([](const edm::Ptr<T>& obj, uwvv::EventInfo& evt)
+                               {
+                                 return (evt.genJets()->size() >= 2 ? 
+                                         evt.genJets()->at(1).pt() :
+                                         -1.);
+                               });
+
+        addTo["genJet1Eta"] = 
+          std::function<FType>([](const edm::Ptr<T>& obj, uwvv::EventInfo& evt)
+                               {
+                                 return (evt.genJets()->size() >= 1 ? 
+                                         evt.genJets()->at(0).eta() :
+                                         -999.);
+                               });
+
+        addTo["genJet2Eta"] = 
+          std::function<FType>([](const edm::Ptr<T>& obj, uwvv::EventInfo& evt)
+                               {
+                                 return (evt.genJets()->size() >= 2 ? 
+                                         evt.genJets()->at(1).eta() :
+                                         -999.);
+                               });
+
+        addTo["mjjGen"] = 
+          std::function<FType>([](const edm::Ptr<T>& obj, uwvv::EventInfo& evt)
+                               {
+                                 return (evt.genJets()->size() >= 2 ? 
+                                         (evt.genJets()->at(0).p4()+evt.genJets()->at(1).p4()).mass() :
+                                         -999.);
+                               });
       }
     };
         
@@ -180,6 +220,10 @@ namespace
         addTo["nJets"] = 
           std::function<FType>([](const edm::Ptr<T>& obj, uwvv::EventInfo& evt)
                                {return evt.jets()->size();});
+
+        addTo["nGenJets"] = 
+          std::function<FType>([](const edm::Ptr<T>& obj, uwvv::EventInfo& evt)
+                               {return evt.genJets()->size();});
       }
     };
 

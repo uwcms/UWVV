@@ -6,8 +6,8 @@ import FWCore.ParameterSet.Types as CfgTypes
 from UWVV.AnalysisTools.analysisFlowMaker import createFlow
 
 from UWVV.Utilities.helpers import parseChannels, expandChannelName
-from UWVV.Ntuplizer.makeBranchSet import makeBranchSet
-from UWVV.Ntuplizer.eventParams import makeEventParams
+from UWVV.Ntuplizer.makeBranchSet import makeBranchSet, makeGenBranchSet
+from UWVV.Ntuplizer.eventParams import makeEventParams, makeGenEventParams
 from UWVV.Ntuplizer.templates.triggerBranches import triggerBranches    
 
 import os
@@ -61,6 +61,10 @@ options.register('hzzExtra', 0,
                  VarParsing.VarParsing.varType.int,
                  "1 if extra HZZ quantities like matrix element "
                  "discriminators and Z kinematic refit are desired.")
+options.register('genInfo', 0, 
+                 VarParsing.VarParsing.multiplicity.singleton,
+                 VarParsing.VarParsing.varType.int,
+                 "1 if gen-level ntuples are desired.")
 
 
 options.parseArguments()
@@ -229,23 +233,30 @@ elif zl or z:
 
     from UWVV.AnalysisTools.templates.ZZCrossCleaning import ZZCrossCleaning
     FlowSteps.append(ZZCrossCleaning)
-        
+elif l:
+    from UWVV.AnalysisTools.templates.ZZFlow import ZZFlow
+    FlowSteps.append(ZZFlow)
 
-for f in FlowSteps:
-    if f.__name__ in ['ZZFSR', 'ZZFlow']:
-        from UWVV.Ntuplizer.templates.fsrBranches import compositeObjectFSRBranches, leptonFSRBranches
-        extraInitialStateBranches.append(compositeObjectFSRBranches)
-        extraIntermediateStateBranches.append(compositeObjectFSRBranches)
-        extraFinalObjectBranches['e'].append(leptonFSRBranches)
-        extraFinalObjectBranches['m'].append(leptonFSRBranches)
-        break
-for f in FlowSteps:
-    if f.__name__ in ['ZZID', 'ZZIso', 'ZZFlow']:
-        from UWVV.AnalysisTools.templates.ZZLeptonCounters import ZZLeptonCounters
-        FlowSteps.append(ZZLeptonCounters)
-        from UWVV.Ntuplizer.templates.countBranches import zzCountBranches
-        extraInitialStateBranches.append(zzCountBranches)
-        break
+    from UWVV.AnalysisTools.templates.ZZSkim import ZZSkim
+    FlowSteps.append(ZZSkim)
+    
+        
+if zz or zl or z:
+    for f in FlowSteps:
+        if f.__name__ in ['ZZFSR', 'ZZFlow']:
+            from UWVV.Ntuplizer.templates.fsrBranches import compositeObjectFSRBranches, leptonFSRBranches
+            extraInitialStateBranches.append(compositeObjectFSRBranches)
+            extraIntermediateStateBranches.append(compositeObjectFSRBranches)
+            extraFinalObjectBranches['e'].append(leptonFSRBranches)
+            extraFinalObjectBranches['m'].append(leptonFSRBranches)
+            break
+    for f in FlowSteps:
+        if f.__name__ in ['ZZID', 'ZZIso', 'ZZFlow']:
+            from UWVV.AnalysisTools.templates.ZZLeptonCounters import ZZLeptonCounters
+            FlowSteps.append(ZZLeptonCounters)
+            from UWVV.Ntuplizer.templates.countBranches import zzCountBranches
+            extraInitialStateBranches.append(zzCountBranches)
+            break
     
 # Lepton calibrations
 if options.eCalib:
@@ -264,6 +275,8 @@ if options.muCalib:
 FlowClass = createFlow(*FlowSteps)
 flow = FlowClass('flow', process, 
                  isMC=bool(options.isMC), isSync=bool(options.isSync))
+
+
 
 ### Set up tree makers
 
@@ -302,6 +315,37 @@ for chan in channels:
 
     setattr(process, chan, mod)
     process.treeSequence += mod
+
+
+# Gen ntuples if desired
+if zz and options.isMC and options.genInfo:
+    process.genTreeSequence = cms.Sequence()
+
+    from UWVV.AnalysisTools.templates.GenZZBase import GenZZBase
+    from UWVV.AnalysisTools.templates.GenLeptonBase import GenLeptonBase
+    GenFlow = createFlow(GenLeptonBase, GenZZBase)
+    genFlow = GenFlow('genFlow', process, suffix='Gen', e='prunedGenParticles',
+                      m='prunedGenParticles', j='slimmedGenJets',
+                      pfCands='packedGenParticles')
+    
+    genTrg = trgBranches.clone(trigNames=cms.vstring())
+
+    for chan in channels:
+        genMod = cms.EDAnalyzer(
+        'GenTreeGeneratorZZ',
+        src = genFlow.finalObjTag(chan),
+        branches = makeGenBranchSet(chan),
+        eventParams = makeGenEventParams(genFlow.finalTags()),
+        triggers = genTrg,
+        )
+
+        setattr(process, chan+'Gen', genMod)
+        process.genTreeSequence += genMod
+
+    pGen = genFlow.getPath()
+    pGen += process.genTreeSequence
+    process.schedule.append(pGen)
+
 
 p = flow.getPath()
 p += process.treeSequence

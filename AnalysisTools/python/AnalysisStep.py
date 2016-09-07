@@ -14,8 +14,9 @@ class AnalysisStep(object):
     '''
     A class to make a Sequence to run all modules in one step of an analysis
     '''
-    def __init__(self, name, *args, **initialInputTags):
+    def __init__(self, name, suffix='', *args, **initialInputTags):
         self.name = name
+        self.suffix = suffix
         self.inputs = initialInputTags
         self.outputs = initialInputTags.copy()
 
@@ -52,7 +53,7 @@ class AnalysisStep(object):
         if isinstance(module, _ModuleSequenceType):
             newTag = module._seq._collection[-1].__str__()
         else:
-            newTag = name
+            newTag = name + self.suffix
 
         for obj in objectsOutput:
             self.outputs[obj] = newTag
@@ -69,8 +70,8 @@ class AnalysisStep(object):
         setattr(process, self.name+"Sequence", seq)
 
         for name, mod in self.modules.iteritems():
-            if not hasattr(process, name):
-                setattr(process, name, mod)
+            if not hasattr(process, name+self.suffix):
+                setattr(process, name+self.suffix, mod)
             if not isinstance(mod, cms.ESSource):
                 seq *= mod
 

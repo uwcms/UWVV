@@ -11,6 +11,7 @@
 
 //STL
 #include <memory>
+#include <type_traits>
 
 // CMSSW
 #include "FWCore/Framework/interface/Frameworkfwd.h"
@@ -21,6 +22,8 @@
 
 #include "FWCore/ServiceRegistry/interface/Service.h"
 #include "CommonTools/UtilAlgos/interface/TFileService.h"
+
+#include "DataFormats/Candidate/interface/Candidate.h"
 
 // ROOT
 #include "TTree.h"
@@ -33,9 +36,14 @@
 
 using namespace uwvv;
 
-template<class... Ts> 
+template<class T> 
 class TreeGenerator : public edm::one::EDAnalyzer<edm::one::SharedResources>
 {
+  // If this is a particle candidate, we can make branches directly from it
+  // Otherwise, assume it specifies and composite candidate
+  typedef typename std::conditional<std::is_base_of<reco::Candidate, T>::value,
+                                    T, pat::CompositeCandidate>::type Cand;
+
  public:
   explicit TreeGenerator(const edm::ParameterSet&);
   virtual ~TreeGenerator() {;}
@@ -45,19 +53,23 @@ class TreeGenerator : public edm::one::EDAnalyzer<edm::one::SharedResources>
 
   TTree* const makeTree() const;
 
-  const edm::EDGetTokenT<edm::View<pat::CompositeCandidate> > candToken;
+  const edm::EDGetTokenT<edm::View<Cand> > candToken;
+
+  const std::string ntupleName;
 
   TTree* const tree;
   EventInfo evtInfo;
 
-  std::unique_ptr<BranchManager<Ts...> > branches;
+  std::unique_ptr<BranchManager<T> > branches;
   std::unique_ptr<TriggerBranches> triggerBranches;
 };
 
 
-template<class... FSParticles>
-TreeGenerator<FSParticles...>::TreeGenerator(const edm::ParameterSet& config) :
-  candToken(consumes<edm::View<pat::CompositeCandidate> >(config.getParameter<edm::InputTag>("src"))),
+template<class T>
+TreeGenerator<T>::TreeGenerator(const edm::ParameterSet& config) :
+  candToken(consumes<edm::View<Cand> >(config.getParameter<edm::InputTag>("src"))),
+  ntupleName(config.exists("ntupleName") ? 
+             config.getParameter<std::string>("ntupleName") : "ntuple"),
   tree(makeTree()),
   evtInfo(consumesCollector(), config.getParameter<edm::ParameterSet>("eventParams"))
 {
@@ -65,7 +77,7 @@ TreeGenerator<FSParticles...>::TreeGenerator(const edm::ParameterSet& config) :
 
   const edm::ParameterSet& branchParams = config.getParameter<edm::ParameterSet>("branches");
   branches = 
-    std::unique_ptr<BranchManager<FSParticles...> >(new BranchManager<FSParticles...>("", tree, branchParams));
+    std::unique_ptr<BranchManager<T> >(new BranchManager<T>("", tree, branchParams));
 
   const edm::ParameterSet& triggers = config.getParameter<edm::ParameterSet>("triggers");  
   triggerBranches = std::unique_ptr<TriggerBranches>(new TriggerBranches(consumesCollector(),
@@ -73,20 +85,20 @@ TreeGenerator<FSParticles...>::TreeGenerator(const edm::ParameterSet& config) :
 }
 
 
-template<class... FSParticles>
-TTree* const TreeGenerator<FSParticles...>::makeTree() const
+template<class T>
+TTree* const TreeGenerator<T>::makeTree() const
 {
   edm::Service<TFileService> FS;
 
-  return FS->make<TTree>("ntuple", "ntuple");
+  return FS->make<TTree>(ntupleName.c_str(), ntupleName.c_str());
 }
 
 
-template<class... FSParticles> void
-TreeGenerator<FSParticles...>::analyze(const edm::Event &event,
-                                       const edm::EventSetup &setup)
+template<class T> void
+TreeGenerator<T>::analyze(const edm::Event &event,
+                          const edm::EventSetup &setup)
 {
-  edm::Handle<edm::View<pat::CompositeCandidate> > cands;
+  edm::Handle<edm::View<Cand> > cands;
   event.getByToken(candToken, cands);
 
   evtInfo.setEvent(event);
@@ -132,6 +144,17 @@ typedef TreeGenerator<CompositeDaughter<CompositeDaughter<pat::Muon, pat::Muon>,
                       > TreeGeneratorEMuMu;
 typedef TreeGenerator<CompositeDaughter<pat::Electron, pat::Electron> > TreeGeneratorEE;
 typedef TreeGenerator<CompositeDaughter<pat::Muon, pat::Muon> > TreeGeneratorMuMu;
+typedef TreeGenerator<pat::Electron> TreeGeneratorE;
+typedef TreeGenerator<pat::Muon> TreeGeneratorMu;
+
+typedef TreeGenerator<CompositeDaughter<CompositeDaughter<reco::GenParticle, reco::GenParticle>, 
+                                        CompositeDaughter<reco::GenParticle, reco::GenParticle> 
+                                        > 
+                      > GenTreeGeneratorZZ;
+typedef TreeGenerator<CompositeDaughter<CompositeDaughter<reco::GenParticle, reco::GenParticle>,
+                                        reco::GenParticle
+                                        > 
+                      > GenTreeGeneratorWZ;
 
 
 #include "FWCore/Framework/interface/MakerMacros.h"
@@ -145,5 +168,8 @@ DEFINE_FWK_MODULE(TreeGeneratorEEMu);
 DEFINE_FWK_MODULE(TreeGeneratorEMuMu);
 DEFINE_FWK_MODULE(TreeGeneratorEE);
 DEFINE_FWK_MODULE(TreeGeneratorMuMu);
+DEFINE_FWK_MODULE(TreeGeneratorE);
+DEFINE_FWK_MODULE(TreeGeneratorMu);
 
-
+DEFINE_FWK_MODULE(GenTreeGeneratorZZ);
+DEFINE_FWK_MODULE(GenTreeGeneratorWZ);
