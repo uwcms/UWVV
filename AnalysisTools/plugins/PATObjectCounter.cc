@@ -43,18 +43,27 @@ private:
   virtual void produce(edm::Event& iEvent, const edm::EventSetup& iSetup);
 
   const edm::EDGetTokenT<edm::View<T> > srcToken_;
-  StringCutObjectSelector<T> cut_;
-  const std::string label_;
+  const std::vector<std::string> labels_;
+  const std::vector<std::string> cuts_;
 };
 
 
 template<typename T>
 PATObjectCounter<T>::PATObjectCounter(const edm::ParameterSet& iConfig) :
   srcToken_(consumes<edm::View<T> >(iConfig.getParameter<edm::InputTag>("src"))),
-  cut_(iConfig.getUntrackedParameter<std::string>("cut", "")),
-  label_(iConfig.getParameter<std::string>("label"))
+  cuts_(iConfig.exists("cuts") ?
+             iConfig.getParameter<std::vector<std::string> >("cuts") :
+             std::vector<std::string>()),
+  labels_(iConfig.exists("intLabels") ?
+             iConfig.getParameter<std::vector<std::string> >("labels") :
+             std::vector<std::string>()),
 {
   produces<int>(label_);
+  
+  if(cuts_.size() != labels_.size())
+    throw cms::Exception("InvalidParams")
+      << "You must supply an equal number of labels and cuts" 
+      << std::endl;
 }
 
 
@@ -64,12 +73,21 @@ void PATObjectCounter<T>::produce(edm::Event& iEvent,
 {
   edm::Handle<edm::View<T> > in;
   iEvent.getByToken(srcToken_, in);
-  
   std::unique_ptr<int> num(new int(0));
-  for(size_t i = 0; i < in->size(); ++i)
+  
+  for (const auto& cut : cuts_) 
     {
-      if (cut_(in->at(i)))
-        *num += 1;
+      if (cut != "")
+        {
+          StringCutObjectSelector<T> cut_(cut);
+          for(size_t i = 0; i < in->size(); ++i)
+            {
+              if (cut_(in->at(i)))
+                  *num += 1;
+            }
+        }
+      else
+          *num = in->size();
     }
   iEvent.put(std::move(num), label_);
 }
