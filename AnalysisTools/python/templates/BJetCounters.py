@@ -28,7 +28,7 @@ class BJetCounters(AnalysisFlowBase):
                 "PATJetCounter",
                 src = step.getObjTag('j'),
                 labels = cms.vstring(*['nJet'+label for label in jetCounters.keys()]),
-                cuts = cms.vstring(*[x for x in jetCounters.values()])#*list(jetCounters.values())),
+                cuts = cms.vstring(*[jetCounters[key] for key in jetCounters.keys()])
                 )
             step.addModule("jetCounter", mod)
 

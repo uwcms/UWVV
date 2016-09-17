@@ -24,18 +24,18 @@ class ZZLeptonCounters(AnalysisFlowBase):
             countTags = []
             countLabels = []
             for lep in 'e','m':
-                for name, cut in counters.iteritems():
-                    label = 'nZZ'+name+getObjName(lep, True)+'s'
-                    countLabels.append(label)
-                    mod = cms.EDProducer(
-                        "PAT{}Counter".format(getObjName(lep, True)),
-                        src = step.getObjTag(lep),
-                        labels = cms.vstring(label),
-                        cuts = cms.vstring(cut),
-                        )
-                    step.addModule(label, mod)
+                labels = ['nZZ'+name+getObjName(lep, True)+'s' for name in counters.keys()]
+                countLabels += labels
+                mod = cms.EDProducer(
+                    "PAT{}Counter".format(getObjName(lep, True)),
+                    src = step.getObjTag(lep),
+                    labels = cms.vstring(*labels),
+                    cuts = cms.vstring(*[counters[label] for label in counters.keys()]),
+                    )
+                moduleName = 'zz{0}Counter'.format('Elec' if lep == 'e' else 'Mu')
+                step.addModule(moduleName, mod)
 
-                    countTags.append(cms.InputTag('{0}:{0}'.format(label)))
+                countTags += [cms.InputTag('{name}:{label}'.format(name=moduleName,label=l)) for l in labels]
 
             for chan in parseChannels('zz')+parseChannels('zl')+parseChannels('z'):
                 if chan not in step.outputs:
