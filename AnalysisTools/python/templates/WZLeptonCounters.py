@@ -21,8 +21,8 @@ class WZLeptonCounters(AnalysisFlowBase):
                 mod = cms.EDProducer(
                     "PATMuonCounter",
                     src = step.getObjTag('m'),
-                    label = cms.string(cut),
-                    cut = cms.untracked.string('userInt("is%s")' % cut),
+                    labels = cms.vstring(cut),
+                    cuts = cms.vstring('userInt("is%s")' % cut),
                     )
                 step.addModule(moduleName, mod)
 
@@ -34,8 +34,8 @@ class WZLeptonCounters(AnalysisFlowBase):
                 mod = cms.EDProducer(
                     "PATElectronCounter",
                     src = step.getObjTag('e'),
-                    label = cms.string(cut),
-                    cut = cms.untracked.string('userFloat("is%s") > 0.5' % cut),
+                    labels = cms.vstring(cut),
+                    cuts = cms.vstring('userFloat("is%s") > 0.5' % cut),
                     )
                 step.addModule(moduleName, mod)
 

@@ -30,8 +30,8 @@ class ZZLeptonCounters(AnalysisFlowBase):
                     mod = cms.EDProducer(
                         "PAT{}Counter".format(getObjName(lep, True)),
                         src = step.getObjTag(lep),
-                        label = cms.string(label),
-                        cut = cms.untracked.string(cut),
+                        labels = cms.vstring(label),
+                        cuts = cms.vstring(cut),
                         )
                     step.addModule(label, mod)
 
