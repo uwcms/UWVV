@@ -43,32 +43,36 @@ private:
   virtual void produce(edm::Event& iEvent, const edm::EventSetup& iSetup);
 
   const edm::EDGetTokenT<edm::View<T> > srcToken_;
-  const std::vector<std::string> cuts_;
+  const std::vector<std::string> cut_strings_;
   const std::vector<std::string> labels_;
+  std::vector<StringCutObjectSelector<T>> cuts_;
 };
 
 
 template<typename T>
 PATObjectCounter<T>::PATObjectCounter(const edm::ParameterSet& iConfig) :
   srcToken_(consumes<edm::View<T> >(iConfig.getParameter<edm::InputTag>("src"))),
-  cuts_(iConfig.exists("cuts") ?
+  cut_strings_(iConfig.exists("cuts") ?
              iConfig.getParameter<std::vector<std::string> >("cuts") :
              std::vector<std::string>()),
   labels_(iConfig.exists("labels") ?
              iConfig.getParameter<std::vector<std::string> >("labels") :
              std::vector<std::string>())
 {
-  for (const auto& label : labels_) 
-    { 
-      produces<int>(label);
-    }
-  
-  if(cuts_.size() != labels_.size())
+  if(cut_strings_.size() != labels_.size())
       throw cms::Exception("InvalidParams")
           << "You must supply an equal number of labels and cuts" << std::endl
           << "Given: labels_->size() == " << labels_.size()
-          << "; cuts_->size() == " << cuts_.size()
+          << "; cut_strings_->size() == " << cut_strings_.size()
           << std::endl;
+  size_t i = 0;
+  for (const auto& label : labels_) 
+    { 
+      produces<int>(label);
+      cuts_.push_back(cut_strings_[i]);
+      i++;
+    }
+  
 }
 
 
@@ -79,16 +83,15 @@ void PATObjectCounter<T>::produce(edm::Event& iEvent,
   edm::Handle<edm::View<T> > in;
   iEvent.getByToken(srcToken_, in);
   
-  for (size_t i = 0; i < cuts_.size(); i++) 
+  for (size_t i = 0; i < cut_strings_.size(); i++) 
     {
       std::unique_ptr<int> num(new int(0));
-      if (cuts_[i] != "")
+      if (cut_strings_[i] != "")
         {
-          StringCutObjectSelector<T> cut(cuts_[i]);
           for(size_t j = 0; j < in->size(); j++)
             {
-              if (cut(in->at(j)))
-                  *num += j;
+              if (cuts_[i](in->at(j)))
+                  (*num)++;
             }
         }
       else
