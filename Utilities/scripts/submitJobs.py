@@ -86,10 +86,12 @@ def writeFarmoutCommand(cfg, jobid, dataset, fullDataset,
     cmds.append("'outputFile=$outputFileName'")
 
     if args.get('applyLumiMask', False):
-        lumiMask = 'Cert_271036-276811_13TeV_PromptReco_Collisions16_JSON.txt' # 12.9/fb
-        if args.get('lumiMaskJSON', ''):
-            lumiMask = args.get('lumiMaskJSON')
-        lumiMask = os.path.join('/afs/cern.ch/cms/CAF/CMSCOMM/COMM_DQM/certification/Collisions16/13TeV', 
+        lumiMask = args.get('lumiMaskJSON')
+
+        # Prepend with the standard JSON repository. If lumiMask is a full path
+        # (starting with '/'), path.join will ignore the first argument.
+        defaultJSONPath = '/afs/cern.ch/cms/CAF/CMSCOMM/COMM_DQM/certification/Collisions16/13TeV'
+        lumiMask = os.path.join(defaultJSONPath,
                                 lumiMask)
         cmds.append('lumiMask={}'.format(lumiMask))
 
@@ -165,8 +167,10 @@ if __name__ == '__main__':
                         help='CMS config file to run.')
     parser.add_argument('--applyLumiMask', action='store_true',
                         help='Pass the appropriate lumi-mask JSON (data only).')
-    parser.add_argument('--lumiMaskJSON', type=str, default='',
-                        help='Custom lumi mask JSON.')
+    parser.add_argument('--lumiMaskJSON', type=str, 
+                        default='Cert_271036-277148_13TeV_PromptReco_Collisions16_JSON.txt', # 15.9/fb
+                        help=('Lumi mask JSON. Assumed to be in the standard '
+                              'certification area unless a full path is given.'))
     parser.add_argument('--campaign', type=str, default='',
                         help='MC generation campaign for samples (MC only).')
     parser.add_argument('--dataEra', type=str, default='',
