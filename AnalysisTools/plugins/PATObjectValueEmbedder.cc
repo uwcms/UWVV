@@ -103,21 +103,29 @@ PATObjectValueEmbedder<T>::PATObjectValueEmbedder(const edm::ParameterSet& iConf
   if(intTokens_.size() != intLabels_.size())
     throw cms::Exception("InvalidParams")
       << "You must supply exactly one label for each int you want to embed" 
+      << "Given: intLabels_.size() == " << intLabels_.size()
+      << "; intTokens_.size() == " << intTokens_.size()
       << std::endl;
 
   if(boolTokens_.size() != boolLabels_.size())
     throw cms::Exception("InvalidParams")
       << "You must supply exactly one label for each bool you want to embed" 
+      << "Given: boolLabels_.size() == " << boolLabels_.size()
+      << "; boolTokens_.size() == " << boolTokens_.size()
       << std::endl;
 
   if(doubleTokens_.size() != doubleLabels_.size())
     throw cms::Exception("InvalidParams")
       << "You must supply exactly one label for each double you want to embed" 
+      << "Given: doubleLabels_.size() == " << doubleLabels_.size()
+      << "; doubleTokens_.size() == " << doubleTokens_.size()
       << std::endl;
 
   if(floatTokens_.size() != floatLabels_.size())
     throw cms::Exception("InvalidParams")
       << "You must supply exactly one label for each float you want to embed" 
+      << "Given: floatLabels_.size() == " << floatLabels_.size()
+      << "; floatTokens_.size() == " << floatTokens_.size()
       << std::endl;
 }
 

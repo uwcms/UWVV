@@ -219,6 +219,9 @@ elif zl or z:
 
         from UWVV.AnalysisTools.templates.WZLeptonCounters import WZLeptonCounters
         FlowSteps.append(WZLeptonCounters)
+        
+        from UWVV.AnalysisTools.templates.BJetCounters import BJetCounters
+        FlowSteps.append(BJetCounters)
 
         from UWVV.Ntuplizer.templates.countBranches import wzCountBranches
         extraInitialStateBranches.append(wzCountBranches)

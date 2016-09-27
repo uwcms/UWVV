@@ -13,6 +13,24 @@ wzCountBranches = cms.PSet(
                                 'userInt("nTightMuon") : 999'),
         nMediumMuonICHEP = cms.string('? hasUserInt("nMediumMuonICHEP") ? '
                                       'userInt("nMediumMuonICHEP") : 999'),
+        nJetJPL = cms.string('? hasUserInt("nJetJPL") ? '
+                              'userInt("nJetJPL") : 999'),
+        nJetJPM = cms.string('? hasUserInt("nJetJPM") ? ' 
+                              'userInt("nJetJPM") : -999'),
+        nJetJPT = cms.string('? hasUserInt("nJetJPT") ? '
+                              'userInt("nJetJPT") : -999'),
+        nJetCSVv2L = cms.string('? hasUserInt("nJetCSVv2L") ? '
+                              'userInt("nJetCSVv2L") : -999'),
+        nJetCSVv2M = cms.string('? hasUserInt("nJetCSVv2M") ? '
+                                 'userInt("nJetCSVv2M") : -999'),
+        nJetCSVv2T = cms.string('? hasUserInt("nJetCSVv2T") ? '
+                                 'userInt("nJetCSVv2T") : -999'),
+        nJetCMVAv2L = cms.string('? hasUserInt("nJetCMVAv2L") ? '
+                                  'userInt("nJetCMVAv2L") : -999'),
+        nJetCMVAv2M = cms.string('? hasUserInt("nJetCMVAv2M") ? '
+                                  'userInt("nJetCMVAv2M") : -999'),
+        nJetCMVAv2T = cms.string('? hasUserInt("nJetCMVAv2T") ? '
+                                  'userInt("nJetCMVAv2T") : -999'),
         ),
     )
 

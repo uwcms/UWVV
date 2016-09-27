@@ -43,18 +43,36 @@ private:
   virtual void produce(edm::Event& iEvent, const edm::EventSetup& iSetup);
 
   const edm::EDGetTokenT<edm::View<T> > srcToken_;
-  StringCutObjectSelector<T> cut_;
-  const std::string label_;
+  const std::vector<std::string> cut_strings_;
+  const std::vector<std::string> labels_;
+  std::vector<StringCutObjectSelector<T>> cuts_;
 };
 
 
 template<typename T>
 PATObjectCounter<T>::PATObjectCounter(const edm::ParameterSet& iConfig) :
   srcToken_(consumes<edm::View<T> >(iConfig.getParameter<edm::InputTag>("src"))),
-  cut_(iConfig.getUntrackedParameter<std::string>("cut", "")),
-  label_(iConfig.getParameter<std::string>("label"))
+  cut_strings_(iConfig.exists("cuts") ?
+             iConfig.getParameter<std::vector<std::string> >("cuts") :
+             std::vector<std::string>()),
+  labels_(iConfig.exists("labels") ?
+             iConfig.getParameter<std::vector<std::string> >("labels") :
+             std::vector<std::string>())
 {
-  produces<int>(label_);
+  if(cut_strings_.size() != labels_.size())
+      throw cms::Exception("InvalidParams")
+          << "You must supply an equal number of labels and cuts" << std::endl
+          << "Given: labels_->size() == " << labels_.size()
+          << "; cut_strings_->size() == " << cut_strings_.size()
+          << std::endl;
+  size_t i = 0;
+  for (const auto& label : labels_) 
+    { 
+      produces<int>(label);
+      cuts_.push_back(cut_strings_[i]);
+      i++;
+    }
+  
 }
 
 
@@ -65,13 +83,21 @@ void PATObjectCounter<T>::produce(edm::Event& iEvent,
   edm::Handle<edm::View<T> > in;
   iEvent.getByToken(srcToken_, in);
   
-  std::unique_ptr<int> num(new int(0));
-  for(size_t i = 0; i < in->size(); ++i)
+  for (size_t i = 0; i < cut_strings_.size(); i++) 
     {
-      if (cut_(in->at(i)))
-        *num += 1;
+      std::unique_ptr<int> num(new int(0));
+      if (cut_strings_[i] != "")
+        {
+          for(size_t j = 0; j < in->size(); j++)
+            {
+              if (cuts_[i](in->at(j)))
+                  (*num)++;
+            }
+        }
+      else
+          *num = in->size();
+      iEvent.put(std::move(num), labels_[i]);
     }
-  iEvent.put(std::move(num), label_);
 }
 
 typedef PATObjectCounter<pat::Electron> PATElectronCounter;
