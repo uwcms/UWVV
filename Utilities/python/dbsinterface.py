@@ -52,7 +52,7 @@ def get_das_info(query):
     
     if das_exitcode <> 0:
         raise RuntimeError(
-            'das.py crashed with error:\n%s' % \
+            'das_client crashed with error:\n%s' % \
                 err+out ) #sometimes das sends the crash message to stdout
     return [i.strip() for i in out.split('\n') if i.strip()]
 
