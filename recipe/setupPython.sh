@@ -7,6 +7,7 @@
 ####    Rootpy: Pythonic wrappers for PyROOT
 ####    IPython: Nicer interactive Python (already in CMS software but broken)
 ####    Jupyter: IPython notebooks
+####    BRIL Work Suite: tools for luminosity (etc.)
 ####    
 ####    Author: Nate Woods, U. Wisconsin
 ####    
@@ -33,6 +34,7 @@ if [ ! -d "$vpython" ]; then
     pip install -U rootpy
     pip install -U ipython
     pip install -U jupyter
+    pip install brilws
 else
     source "$vpython"/bin/activate
 fi
