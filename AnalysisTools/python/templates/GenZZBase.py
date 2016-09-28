@@ -42,13 +42,26 @@ class GenZZBase(ZPlusXBaseFlow):
                         )
                     step.addModule(chan+'GenZZCleaner', cleaner, chan)
 
-            if stepName == 'selection':
-                mod = cms.EDFilter(
-                    'GenJetSelector',
-                    src = step.getObjTag('j'),
-                    cut = cms.string('pt > 30. && abs(eta) < 4.7'),
-                    filter = cms.bool(False),
-                    )
-                step.addModule('genJetCleaner', mod, 'j')
+        if stepName == 'selection':
+            # select and cross clean gen jets
+            mod = cms.EDProducer(
+                "GenJetCleaner",
+                src=step.getObjTag('j'),
+                preselection=cms.string('pt > 30. && abs(eta) < 4.7'),
+                checkOverlaps = cms.PSet(
+                    electrons = cms.PSet(
+                        src=step.getObjTag('e'),
+                        preselection=cms.string(''),
+                        deltaR=cms.double(0.4),
+                        ),
+                    muons = cms.PSet(
+                        src=step.getObjTag('m'),
+                        preselection=cms.string(''),
+                        deltaR=cms.double(0.4),
+                        ),
+                    ),
+                finalCut = cms.string(''),
+                )
+            step.addModule('genJetCleaner', mod, 'j')
 
         return step
