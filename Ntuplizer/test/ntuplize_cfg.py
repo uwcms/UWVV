@@ -173,14 +173,18 @@ FlowSteps.append(ElectronScaleFactors)
 from UWVV.AnalysisTools.templates.JetBaseFlow import JetBaseFlow
 FlowSteps.append(JetBaseFlow)
 if options.isMC:
-    from UWVV.AnalysisTools.templates.JetEnergySmearing import JetEnergySmearing
-    FlowSteps.append(JetEnergySmearing)
+    from UWVV.Ntuplizer.templates.eventBranches import jesSystematicBranches
+    extraInitialStateBranches.append(jesSystematicBranches)
 
     from UWVV.Ntuplizer.templates.eventBranches import eventGenBranches
     extraInitialStateBranches.append(eventGenBranches)
     from UWVV.Ntuplizer.templates.leptonBranches import leptonGenBranches
     extraFinalObjectBranches['e'].append(leptonGenBranches)
     extraFinalObjectBranches['m'].append(leptonGenBranches)
+
+if any(len(c) == 4 for c in channels):
+    from UWVV.Ntuplizer.templates.eventBranches import centralJetBranches
+    extraInitialStateBranches.append(centralJetBranches)
 
 # make final states
 if zz:

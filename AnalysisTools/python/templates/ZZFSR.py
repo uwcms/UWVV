@@ -7,6 +7,8 @@ import FWCore.ParameterSet.Config as cms
 
 class ZZFSR(AnalysisFlowBase):
     def __init__(self, *args, **kwargs):
+        if not hasattr(self, 'isMC'):
+            self.isMC = kwargs.pop('isMC', True)
         super(ZZFSR, self).__init__(*args, **kwargs)
 
     def makeAnalysisStep(self, stepName, **inputs):
@@ -45,6 +47,19 @@ class ZZFSR(AnalysisFlowBase):
                 fsrMuonSelection = cms.string('userFloat("%sTight") > 0.5 && userFloat("%s") > 0.5'%(self.getZZIDLabel(), self.getZZIsoLabel())),
                 )
             step.addModule('jetFSRCleaner', jetFSRCleaner, 'j')
+            
+            if self.isMC:
+                jetFSRCleaner_jesUp = jetFSRCleaner.clone(src = step.getObjTag('j_jesUp'))
+                step.addModule('jetFSRCleanerJESUp', jetFSRCleaner_jesUp, 'j_jesUp')
+                jetFSRCleaner_jesDown = jetFSRCleaner.clone(src = step.getObjTag('j_jesDown'))
+                step.addModule('jetFSRCleanerJESDown', jetFSRCleaner_jesDown, 'j_jesDown')
+                jetFSRCleaner_jerUp = jetFSRCleaner.clone(src = step.getObjTag('j_jerUp'))
+                step.addModule('jetFSRCleanerJERUp', jetFSRCleaner_jerUp, 'j_jerUp')
+                jetFSRCleaner_jerDown = jetFSRCleaner.clone(src = step.getObjTag('j_jerDown'))
+                step.addModule('jetFSRCleanerJERDown', jetFSRCleaner_jerDown, 'j_jerDown')
+
+            jetFSRCleaner_eta2p4 = jetFSRCleaner.clone(src = step.getObjTag('j_eta2p4'))
+            step.addModule('jetFSRCleanerEta2p4', jetFSRCleaner_eta2p4, 'j_eta2p4')
 
         if stepName == 'intermediateStateEmbedding':
             if isinstance(self, ZPlusXBaseFlow):
