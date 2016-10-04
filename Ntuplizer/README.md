@@ -35,8 +35,7 @@ GenPt = cms.string('? genParticleRef.isNull ? -999. : genParticleRef.pt')
 ```
 CMS StringObjectFunctions always return doubles, which are automatically converted to the correct type for the branch.
 
-For quantities that require a more involved calculation or other information about the event, functions are defined in `Ntuplizer/interface/FunctionLibrary.h`. These functions are stored in maps specific to the object type and branch type. These functions take as arguments an `edm::Ptr` to the object and a reference to a `uwvv::EventInfo` object, which has access to a number of useful collections and quantities in the event. If the string defining the branch is a key in the approriate map, the library function is used. Otherwise, it is interpreted as a CMS StringObjectFunction.
-
+Quantities that are more complicated to calculate, or which require information from other objects in the event, are defined in the function library (see below). If the branch string is the name of a function in the library, that function is used instead of a StringObjectFunction. Functions in the library take an extra string argument specified in the branch definition delimited from the function name by `::`. This most often used to specify an alternate collection to be used for a branch holding event info. For example, a branch of the dijet invariant mass with the jet energy scale shifted up would be give by `cms.string('mjj::jesUp')`.
 
 ### Specifying all branches
 
@@ -74,6 +73,13 @@ branches = cms.PSet(
 
 Some useful functions for copying and combining cms.PSets can be found in `Utilities/python/helpers.py`.
 
+
+### Function library
+
+For quantities that require a more involved calculation or other information about the event, functions are defined in `Ntuplizer/interface/FunctionLibrary.h`. These functions are stored as `std::function`s of the right signature, in maps specific to the object type and branch type. These functions take as arguments an `edm::Ptr` to the object, a reference to a `uwvv::EventInfo` object, which has access to a number of useful collections and quantities in the event, and an optional string defined in the branch string. I'd try to give more details about how to write the functions, but if you need to do anything with them, it's probably easier to just look at the code.
+
+
+
 ### Trigger branches
 
 Trigger branches are defined separately, by the `triggers` parameter, which should be a cms.PSet containing
@@ -110,6 +116,11 @@ Branches with information about the initial state or the event are simply named 
 Branches with information about intermediate state particles or final state daughters are called `[object][Quantity]`, e.g. `e1Pt` for the pt of the first electron. Naming intermediate states `[daughter1]_[daughter2]_`, so that their branches are named things like `e1_e2_Mass` (for the mass of an intermediate Z->ee candidate), is recommended but not required. 
 
 
+### Gen ntuples
+
+Composite candidates may be built from `reco::GenParticle`s the same as PAT particles, and generator level ntuples can be made from these with the `GenTreeGeneratorZZ` (4l final state) and `GenTreeGeneratorWZ` (3l final state) modules. In `ntuplize_cfg.py`, the option `genInfo=1` will make a second set of ntuples called `[channel]Gen` alongside the regular ntuples. 
+
+
 ## Metadata
 
 Useful meta info about the ntuples in the file, like which runs and lumi sections were processed and the sum of the generator weights of the sample, can be produced alongside the analysis ntuples. 
@@ -122,3 +133,42 @@ process.metaInfo = cms.EDAnalyzer(
 ```
 
 The tree will be stored in the file as `metaInfo/metaInfo`. Each row is one luminosity block.
+
+
+## Event info
+
+The event info for library functions is held in a `uwvv::EventInfo` object. For each type of object, there is one primary collection and any number of secondary collections keyed to strings. The event info is set up from a `PSet` passed to the `TreeGenerator` as `eventParams`. For each primary collection, `eventParams` contains an `InputTag` called `[object]Src`. The secondary collections come from a `PSet` of `InputTag`s called `[object]Extra`, the keys of which are the strings used to get the collection from the `EventInfo` object. The collections are obtained with functions that return their `edm::Handle`s. With no argument or `""`, they return the primary collection, with a `string` argument they return the collection of the appropriate key. The collections available are as follows:
+
+| Collection       |  Type (`View` or       |  `PSet` name (`[this]Src` and       |  Retrieval function   |
+|                  |  vector of these)      | `[this]Extra` give the input tags)  |                       |
+|------------------|------------------------|-------------------------------------|-----------------------|
+| Vertices         | `reco::Vertex`         | `vtx`                               | `vertices()`          |
+|                  |                        |                                     | `pv()` (first)        |
+|------------------|------------------------|-------------------------------------|-----------------------|
+| Electrons        | `pat::Electron`        | `e`                                 | `electrons()`         |
+|------------------|------------------------|-------------------------------------|-----------------------|
+| Muons            | `pat::Muon`            | `m`                                 | `muons()`             |
+|------------------|------------------------|-------------------------------------|-----------------------|
+| Taus             | `pat::Tau`             | `t`                                 | `taus()`              |
+|------------------|------------------------|-------------------------------------|-----------------------|
+| Photons          | `pat::Photon`          | `g`                                 | `photons()`           |
+|------------------|------------------------|-------------------------------------|-----------------------|
+| Jets             | `pat::Jet`             | `j`                                 | `jets()`              |
+|------------------|------------------------|-------------------------------------|-----------------------|
+| Packed particle  | `pat::PackedCandidate` | `pfCand`                            | `pfCands()`           |
+| flow candidates  |                        |                                     |                       |
+|------------------|------------------------|-------------------------------------|-----------------------|
+| Missing energy   | `pat::METCollection`   | `met`                               | `mets()` (collection) |
+|                  | `pat::MET`             |                                     | `met()` (first)       |
+|------------------|------------------------|-------------------------------------|-----------------------|
+| Pileup           | `PileupSummaryInfo`    | `pu`                                | `puInfo()`            |
+|------------------|------------------------|-------------------------------------|-----------------------|
+| Generator        | `GenEventInfoProduct`  | `genEventInfo`                      | `genEventInfo()`      |
+| information      |                        |                                     |                       |
+|------------------|------------------------|-------------------------------------|-----------------------|
+| Generator-level  | `reco::GenJet`         | `genJet`                            | `genJets()`           |
+| jets             |                        |                                     |                       |
+|------------------|------------------------|-------------------------------------|-----------------------|
+| Pruned gen       | `reco::GenParticle`    | `genParticle`                       | `genParticles()       |
+| particles        |                        |                                     |                       |
+
