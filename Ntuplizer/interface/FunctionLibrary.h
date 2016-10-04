@@ -26,57 +26,57 @@ namespace
     {
       // Null version for types we don't specify anything
       template<class T> static void
-      addFunctions(std::unordered_map<std::string, std::function<B(const edm::Ptr<T>&,uwvv::EventInfo&)> >& addTo) {;}
+      addFunctions(std::unordered_map<std::string, std::function<B(const edm::Ptr<T>&,uwvv::EventInfo&,const std::string&)> >& addTo) {;}
     };
 
   template<>
     struct GeneralFunctionList<float>
     {
       template<class T> static void
-      addFunctions(std::unordered_map<std::string, std::function<float(const edm::Ptr<T>&, uwvv::EventInfo&)> >& addTo)
+      addFunctions(std::unordered_map<std::string, std::function<float(const edm::Ptr<T>&, uwvv::EventInfo&, const std::string&)> >& addTo)
       {
-        typedef float (FType) (const edm::Ptr<T>&, uwvv::EventInfo&);
+        typedef float (FType) (const edm::Ptr<T>&, uwvv::EventInfo&, const std::string&);
 
         addTo["pvZ"] = 
-          std::function<FType>([](const edm::Ptr<T>& obj, uwvv::EventInfo& evt) 
+          std::function<FType>([](const edm::Ptr<T>& obj, uwvv::EventInfo& evt, const std::string& option) 
                                {
                                  return (evt.pv().isNonnull() ? evt.pv()->z() : -999.);
                                });
 
         addTo["pvndof"] = 
-          std::function<FType>([](const edm::Ptr<T>& obj, uwvv::EventInfo& evt) 
+          std::function<FType>([](const edm::Ptr<T>& obj, uwvv::EventInfo& evt, const std::string& option) 
                                {
                                  return (evt.pv().isNonnull() ? evt.pv()->ndof() : -999.);
                                });
 
         addTo["pvRho"] = 
-          std::function<FType>([](const edm::Ptr<T>& obj, uwvv::EventInfo& evt) 
+          std::function<FType>([](const edm::Ptr<T>& obj, uwvv::EventInfo& evt, const std::string& option) 
                                {
                                  return (evt.pv().isNonnull() ? evt.pv()->position().Rho() : -999.);
                                });
 
         addTo["nTruePU"] = 
-          std::function<FType>([](const edm::Ptr<T>& obj, uwvv::EventInfo& evt)
+          std::function<FType>([](const edm::Ptr<T>& obj, uwvv::EventInfo& evt, const std::string& option)
                                {return (evt.puInfo().isValid() && evt.puInfo()->size() > 0 ?
                                         evt.puInfo()->at(1).getTrueNumInteractions() :
                                         -1.);});
 
         addTo["type1_pfMETEt"] = 
-          std::function<FType>([](const edm::Ptr<T>& obj, uwvv::EventInfo& evt)
+          std::function<FType>([](const edm::Ptr<T>& obj, uwvv::EventInfo& evt, const std::string& option)
                                {return evt.met().pt();});
 
         addTo["type1_pfMETPhi"] = 
-          std::function<FType>([](const edm::Ptr<T>& obj, uwvv::EventInfo& evt)
+          std::function<FType>([](const edm::Ptr<T>& obj, uwvv::EventInfo& evt, const std::string& option)
                                {return evt.met().phi();});
 
         addTo["genWeight"] = 
-          std::function<FType>([](const edm::Ptr<T>& obj, uwvv::EventInfo& evt)
+          std::function<FType>([](const edm::Ptr<T>& obj, uwvv::EventInfo& evt, const std::string& option)
                                {
                                  return (evt.genEventInfo().isValid() ? evt.genEventInfo()->weight() : 0.);
                                });
 
         addTo["mtToMET"] = 
-          std::function<FType>([](const edm::Ptr<T>& obj, uwvv::EventInfo& evt)
+          std::function<FType>([](const edm::Ptr<T>& obj, uwvv::EventInfo& evt, const std::string& option)
                                {
                                  float totalEt = obj->et() + evt.met().et();
                                  float totalPt = obj->pt() + evt.met().pt();
@@ -86,76 +86,101 @@ namespace
                                });
 
         addTo["jet1Pt"] = 
-          std::function<FType>([](const edm::Ptr<T>& obj, uwvv::EventInfo& evt)
+          std::function<FType>([](const edm::Ptr<T>& obj, uwvv::EventInfo& evt, const std::string& option)
                                {
-                                 return (evt.jets()->size() >= 1 ? 
-                                         evt.jets()->at(0).pt() :
+                                 return (evt.jets(option)->size() >= 1 ? 
+                                         evt.jets(option)->at(0).pt() :
                                          -1.);
                                });
 
         addTo["jet2Pt"] = 
-          std::function<FType>([](const edm::Ptr<T>& obj, uwvv::EventInfo& evt)
+          std::function<FType>([](const edm::Ptr<T>& obj, uwvv::EventInfo& evt, const std::string& option)
                                {
-                                 return (evt.jets()->size() >= 2 ? 
-                                         evt.jets()->at(1).pt() :
+                                 return (evt.jets(option)->size() >= 2 ? 
+                                         evt.jets(option)->at(1).pt() :
                                          -1.);
                                });
 
-        addTo["jet1QGLikelihood"] = 
-          std::function<FType>([](const edm::Ptr<T>& obj, uwvv::EventInfo& evt)
+        addTo["mjj"] = 
+          std::function<FType>([](const edm::Ptr<T>& obj, uwvv::EventInfo& evt, const std::string& option)
                                {
-                                 return (evt.jets()->size() >= 1 && evt.jets()->at(0).hasUserFloat("qgLikelihood") ?
-                                         evt.jets()->at(0).userFloat("qgLikelihood") :
+                                 return (evt.jets(option)->size() >= 2 ? 
+                                         (evt.jets(option)->at(0).p4()+evt.jets(option)->at(1).p4()).mass() :
+                                         -999.);
+                               });
+
+        addTo["deltaEtajj"] = 
+          std::function<FType>([](const edm::Ptr<T>& obj, uwvv::EventInfo& evt, const std::string& option)
+                               {
+                                 return (evt.jets(option)->size() >= 2 ? 
+                                         fabs(evt.jets(option)->at(0).eta()-evt.jets(option)->at(1).eta()) :
+                                         -999.);
+                               });
+
+        addTo["jet1QGLikelihood"] = 
+          std::function<FType>([](const edm::Ptr<T>& obj, uwvv::EventInfo& evt, const std::string& option)
+                               {
+                                 return (evt.jets(option)->size() >= 1 && evt.jets(option)->at(0).hasUserFloat("qgLikelihood") ?
+                                         evt.jets(option)->at(0).userFloat("qgLikelihood") :
                                          -1.);
                                });
 
         addTo["jet2QGLikelihood"] = 
-          std::function<FType>([](const edm::Ptr<T>& obj, uwvv::EventInfo& evt)
+          std::function<FType>([](const edm::Ptr<T>& obj, uwvv::EventInfo& evt, const std::string& option)
                                {
-                                 return (evt.jets()->size() >= 2 && evt.jets()->at(1).hasUserFloat("qgLikelihood") ?
-                                         evt.jets()->at(1).userFloat("qgLikelihood") :
+                                 return (evt.jets(option)->size() >= 2 && evt.jets(option)->at(1).hasUserFloat("qgLikelihood") ?
+                                         evt.jets(option)->at(1).userFloat("qgLikelihood") :
                                          -1.);
                                });
 
         addTo["genJet1Pt"] = 
-          std::function<FType>([](const edm::Ptr<T>& obj, uwvv::EventInfo& evt)
+          std::function<FType>([](const edm::Ptr<T>& obj, uwvv::EventInfo& evt, const std::string& option)
                                {
-                                 return (evt.genJets()->size() >= 1 ? 
-                                         evt.genJets()->at(0).pt() :
+                                 return (evt.genJets(option)->size() >= 1 ? 
+                                         evt.genJets(option)->at(0).pt() :
                                          -1.);
                                });
 
         addTo["genJet2Pt"] = 
-          std::function<FType>([](const edm::Ptr<T>& obj, uwvv::EventInfo& evt)
+          std::function<FType>([](const edm::Ptr<T>& obj, uwvv::EventInfo& evt, const std::string& option)
                                {
-                                 return (evt.genJets()->size() >= 2 ? 
-                                         evt.genJets()->at(1).pt() :
+                                 return (evt.genJets(option)->size() >= 2 ? 
+                                         evt.genJets(option)->at(1).pt() :
                                          -1.);
                                });
 
         addTo["genJet1Eta"] = 
-          std::function<FType>([](const edm::Ptr<T>& obj, uwvv::EventInfo& evt)
+          std::function<FType>([](const edm::Ptr<T>& obj, uwvv::EventInfo& evt, const std::string& option)
                                {
-                                 return (evt.genJets()->size() >= 1 ? 
-                                         evt.genJets()->at(0).eta() :
+                                 return (evt.genJets(option)->size() >= 1 ? 
+                                         evt.genJets(option)->at(0).eta() :
                                          -999.);
                                });
 
         addTo["genJet2Eta"] = 
-          std::function<FType>([](const edm::Ptr<T>& obj, uwvv::EventInfo& evt)
+          std::function<FType>([](const edm::Ptr<T>& obj, uwvv::EventInfo& evt, const std::string& option)
                                {
-                                 return (evt.genJets()->size() >= 2 ? 
-                                         evt.genJets()->at(1).eta() :
+                                 return (evt.genJets(option)->size() >= 2 ? 
+                                         evt.genJets(option)->at(1).eta() :
                                          -999.);
                                });
 
         addTo["mjjGen"] = 
-          std::function<FType>([](const edm::Ptr<T>& obj, uwvv::EventInfo& evt)
+          std::function<FType>([](const edm::Ptr<T>& obj, uwvv::EventInfo& evt, const std::string& option)
                                {
-                                 return (evt.genJets()->size() >= 2 ? 
-                                         (evt.genJets()->at(0).p4()+evt.genJets()->at(1).p4()).mass() :
+                                 return (evt.genJets(option)->size() >= 2 ? 
+                                         (evt.genJets(option)->at(0).p4()+evt.genJets(option)->at(1).p4()).mass() :
                                          -999.);
                                });
+
+        addTo["deltaEtajjGen"] = 
+          std::function<FType>([](const edm::Ptr<T>& obj, uwvv::EventInfo& evt, const std::string& option)
+                               {
+                                 return (evt.genJets(option)->size() >= 2 ? 
+                                         fabs(evt.genJets(option)->at(0).eta()-evt.genJets(option)->at(1).eta()) :
+                                         -999.);
+                               });
+
       }
     };
         
@@ -163,18 +188,18 @@ namespace
     struct GeneralFunctionList<bool>
     {
       template<class T> static void
-      addFunctions(std::unordered_map<std::string, std::function<bool(const edm::Ptr<T>&, uwvv::EventInfo&)> >& addTo)
+      addFunctions(std::unordered_map<std::string, std::function<bool(const edm::Ptr<T>&, uwvv::EventInfo&, const std::string&)> >& addTo)
       {
-        typedef bool (FType) (const edm::Ptr<T>&, uwvv::EventInfo&);
+        typedef bool (FType) (const edm::Ptr<T>&, uwvv::EventInfo&, const std::string&);
 
         addTo["pvIsValid"] = 
-          std::function<FType>([](const edm::Ptr<T>& obj, uwvv::EventInfo& evt) 
+          std::function<FType>([](const edm::Ptr<T>& obj, uwvv::EventInfo& evt, const std::string& option) 
                                {
                                  return evt.pv().isNonnull() && evt.pv()->isValid();
                                });
 
         addTo["pvIsFake"] = 
-          std::function<FType>([](const edm::Ptr<T>& obj, uwvv::EventInfo& evt) 
+          std::function<FType>([](const edm::Ptr<T>& obj, uwvv::EventInfo& evt, const std::string& option) 
                                {
                                  return evt.pv().isNull() || evt.pv()->isFake();
                                });
@@ -185,45 +210,45 @@ namespace
     struct GeneralFunctionList<int>
     {
       template<class T> static void
-      addFunctions(std::unordered_map<std::string, std::function<int(const edm::Ptr<T>&, uwvv::EventInfo&)> >& addTo)
+      addFunctions(std::unordered_map<std::string, std::function<int(const edm::Ptr<T>&, uwvv::EventInfo&, const std::string&)> >& addTo)
       {
-        typedef int (FType) (const edm::Ptr<T>&, uwvv::EventInfo&);
+        typedef int (FType) (const edm::Ptr<T>&, uwvv::EventInfo&, const std::string&);
 
         addTo["Charge"] = 
-          std::function<FType>([](const edm::Ptr<T>& obj, uwvv::EventInfo& evt) {return obj->charge();});
+          std::function<FType>([](const edm::Ptr<T>& obj, uwvv::EventInfo& evt, const std::string& option) {return obj->charge();});
         
         addTo["PdgId"] = 
-          std::function<FType>([](const edm::Ptr<T>& obj, uwvv::EventInfo& evt) {return obj->pdgId();});  
-      }      
+          std::function<FType>([](const edm::Ptr<T>& obj, uwvv::EventInfo& evt, const std::string& option) {return obj->pdgId();});  
+      }
     };
 
   template<>
     struct GeneralFunctionList<unsigned>
     {
       template<class T> static void
-      addFunctions(std::unordered_map<std::string, std::function<unsigned(const edm::Ptr<T>&, uwvv::EventInfo&)> >& addTo)
+      addFunctions(std::unordered_map<std::string, std::function<unsigned(const edm::Ptr<T>&, uwvv::EventInfo&, const std::string&)> >& addTo)
       {
-        typedef unsigned (FType) (const edm::Ptr<T>&, uwvv::EventInfo&);
+        typedef unsigned (FType) (const edm::Ptr<T>&, uwvv::EventInfo&, const std::string&);
 
         addTo["lumi"] = 
-          std::function<FType>([](const edm::Ptr<T>& obj, uwvv::EventInfo& evt)
+          std::function<FType>([](const edm::Ptr<T>& obj, uwvv::EventInfo& evt, const std::string& option)
                                {return evt.id().luminosityBlock();});
 
         addTo["run"] = 
-          std::function<FType>([](const edm::Ptr<T>& obj, uwvv::EventInfo& evt)
+          std::function<FType>([](const edm::Ptr<T>& obj, uwvv::EventInfo& evt, const std::string& option)
                                {return evt.id().run();});
   
         addTo["nvtx"] = 
-          std::function<FType>([](const edm::Ptr<T>& obj, uwvv::EventInfo& evt)
+          std::function<FType>([](const edm::Ptr<T>& obj, uwvv::EventInfo& evt, const std::string& option)
                                {return evt.nVertices();});
 
         addTo["nJets"] = 
-          std::function<FType>([](const edm::Ptr<T>& obj, uwvv::EventInfo& evt)
-                               {return evt.jets()->size();});
+          std::function<FType>([](const edm::Ptr<T>& obj, uwvv::EventInfo& evt, const std::string& option)
+                               {return evt.jets(option)->size();});
 
         addTo["nGenJets"] = 
-          std::function<FType>([](const edm::Ptr<T>& obj, uwvv::EventInfo& evt)
-                               {return evt.genJets()->size();});
+          std::function<FType>([](const edm::Ptr<T>& obj, uwvv::EventInfo& evt, const std::string& option)
+                               {return evt.genJets(option)->size();});
       }
     };
 
@@ -231,12 +256,12 @@ namespace
     struct GeneralFunctionList<unsigned long long>
     {
       template<class T> static void
-      addFunctions(std::unordered_map<std::string, std::function<unsigned long long(const edm::Ptr<T>&, uwvv::EventInfo&)> >& addTo)
+      addFunctions(std::unordered_map<std::string, std::function<unsigned long long(const edm::Ptr<T>&, uwvv::EventInfo&, const std::string&)> >& addTo)
       {
-        typedef unsigned long long (FType) (const edm::Ptr<T>&, uwvv::EventInfo&);
+        typedef unsigned long long (FType) (const edm::Ptr<T>&, uwvv::EventInfo&, const std::string&);
 
         addTo["evt"] = 
-          std::function<FType>([](const edm::Ptr<T>& obj, uwvv::EventInfo& evt)
+          std::function<FType>([](const edm::Ptr<T>& obj, uwvv::EventInfo& evt, const std::string& option)
                                {return evt.id().event();});
       }
     };
@@ -249,7 +274,7 @@ namespace
   template<typename B, class T> 
     struct ObjectFunctionList
     {
-      typedef B (FType) (const edm::Ptr<T>&, uwvv::EventInfo&);
+      typedef B (FType) (const edm::Ptr<T>&, uwvv::EventInfo&, const std::string&);
       static void addFunctions(std::unordered_map<std::string, std::function<FType> >& addTo) {;}
     }; 
 
@@ -259,13 +284,13 @@ namespace
       // cheating with typedefs for standardization
       typedef pat::Electron T;
       typedef unsigned B;
-      typedef B (FType) (const edm::Ptr<T>&, uwvv::EventInfo&);
+      typedef B (FType) (const edm::Ptr<T>&, uwvv::EventInfo&, const std::string&);
 
       static void 
         addFunctions(std::unordered_map<std::string, std::function<FType> >& addTo)
       {
         addTo["MissingHits"] = 
-          std::function<FType>([](const edm::Ptr<T>& obj, uwvv::EventInfo& evt)
+          std::function<FType>([](const edm::Ptr<T>& obj, uwvv::EventInfo& evt, const std::string& option)
                                {
                                  return obj->gsfTrack()->hitPattern().numberOfHits(reco::HitPattern::MISSING_INNER_HITS);
                                });
@@ -278,25 +303,25 @@ namespace
       // cheating with typedefs for standardization
       typedef pat::Electron T;
       typedef float B;
-      typedef B (FType) (const edm::Ptr<T>&, uwvv::EventInfo&);
+      typedef B (FType) (const edm::Ptr<T>&, uwvv::EventInfo&, const std::string&);
 
       static void 
         addFunctions(std::unordered_map<std::string, std::function<FType> >& addTo)
       {
         addTo["SIP3D"] = 
-          std::function<FType>([](const edm::Ptr<T>& obj, uwvv::EventInfo& evt)
+          std::function<FType>([](const edm::Ptr<T>& obj, uwvv::EventInfo& evt, const std::string& option)
                                {
                                  return fabs(obj->dB(T::PV3D)) / obj->edB(T::PV3D);
                                });
   
         addTo["PVDZ"] = 
-          std::function<FType>([](const edm::Ptr<T>& obj, uwvv::EventInfo& evt)
+          std::function<FType>([](const edm::Ptr<T>& obj, uwvv::EventInfo& evt, const std::string& option)
                                {
                                  return obj->gsfTrack()->dz(evt.pv()->position());
                                });
   
         addTo["PVDXY"] = 
-          std::function<FType>([](const edm::Ptr<T>& obj, uwvv::EventInfo& evt)
+          std::function<FType>([](const edm::Ptr<T>& obj, uwvv::EventInfo& evt, const std::string& option)
                                {
                                  return obj->gsfTrack()->dxy(evt.pv()->position());
                                });
@@ -309,25 +334,25 @@ namespace
       // cheating with typedefs for standardization
       typedef pat::Muon T;
       typedef float B;
-      typedef B (FType) (const edm::Ptr<T>&, uwvv::EventInfo&);
+      typedef B (FType) (const edm::Ptr<T>&, uwvv::EventInfo&, const std::string&);
 
       static void 
         addFunctions(std::unordered_map<std::string, std::function<FType> >& addTo)
       {
         addTo["SIP3D"] = 
-          std::function<FType>([](const edm::Ptr<T>& obj, uwvv::EventInfo& evt)
+          std::function<FType>([](const edm::Ptr<T>& obj, uwvv::EventInfo& evt, const std::string& option)
                                {
                                  return fabs(obj->dB(T::PV3D)) / obj->edB(T::PV3D);
                                });
   
         addTo["PVDZ"] = 
-          std::function<FType>([](const edm::Ptr<T>& obj, uwvv::EventInfo& evt)
+          std::function<FType>([](const edm::Ptr<T>& obj, uwvv::EventInfo& evt, const std::string& option)
                                {
                                  return obj->muonBestTrack()->dz(evt.pv()->position());
                                });
   
         addTo["PVDXY"] = 
-          std::function<FType>([](const edm::Ptr<T>& obj, uwvv::EventInfo& evt)
+          std::function<FType>([](const edm::Ptr<T>& obj, uwvv::EventInfo& evt, const std::string& option)
                                {
                                  return obj->muonBestTrack()->dxy(evt.pv()->position());
                                });
@@ -340,19 +365,19 @@ namespace
       // cheating with typedefs for standardization
       typedef pat::Muon T;
       typedef bool B;
-      typedef B (FType) (const edm::Ptr<T>&, uwvv::EventInfo&);
+      typedef B (FType) (const edm::Ptr<T>&, uwvv::EventInfo&, const std::string&);
 
       static void 
         addFunctions(std::unordered_map<std::string, std::function<FType> >& addTo)
       {
         addTo["IsPFMuon"] = 
-          std::function<FType>([](const edm::Ptr<T>& obj, uwvv::EventInfo& evt){return obj->isPFMuon();});
+          std::function<FType>([](const edm::Ptr<T>& obj, uwvv::EventInfo& evt, const std::string& option){return obj->isPFMuon();});
   
         addTo["IsGlobal"] = 
-          std::function<FType>([](const edm::Ptr<T>& obj, uwvv::EventInfo& evt){return obj->isGlobalMuon();});
+          std::function<FType>([](const edm::Ptr<T>& obj, uwvv::EventInfo& evt, const std::string& option){return obj->isGlobalMuon();});
   
         addTo["IsTracker"] = 
-          std::function<FType>([](const edm::Ptr<T>& obj, uwvv::EventInfo& evt){return obj->isTrackerMuon();});
+          std::function<FType>([](const edm::Ptr<T>& obj, uwvv::EventInfo& evt, const std::string& option){return obj->isTrackerMuon();});
       }
     };
   
@@ -362,16 +387,16 @@ namespace
       // cheating with typedefs for standardization
       typedef pat::Muon T;
       typedef unsigned B;
-      typedef B (FType) (const edm::Ptr<T>&, uwvv::EventInfo&);
+      typedef B (FType) (const edm::Ptr<T>&, uwvv::EventInfo&, const std::string&);
 
       static void 
         addFunctions(std::unordered_map<std::string, std::function<FType> >& addTo)
       {
         addTo["BestTrackType"] = 
-          std::function<FType>([](const edm::Ptr<T>& obj, uwvv::EventInfo& evt){return obj->muonBestTrackType();});
+          std::function<FType>([](const edm::Ptr<T>& obj, uwvv::EventInfo& evt, const std::string& option){return obj->muonBestTrackType();});
   
         addTo["MatchedStations"] = 
-          std::function<FType>([](const edm::Ptr<T>& obj, uwvv::EventInfo& evt){return obj->numberOfMatchedStations();});
+          std::function<FType>([](const edm::Ptr<T>& obj, uwvv::EventInfo& evt, const std::string& option){return obj->numberOfMatchedStations();});
       }
     };
   
@@ -381,44 +406,44 @@ namespace
       // cheating with typedefs for standardization
       typedef pat::CompositeCandidate T;
       typedef float B;
-      typedef B (FType) (const edm::Ptr<T>&, uwvv::EventInfo&);
+      typedef B (FType) (const edm::Ptr<T>&, uwvv::EventInfo&, const std::string&);
 
       static void 
         addFunctions(std::unordered_map<std::string, std::function<FType> >& addTo)
       {
         addTo["DR"] = 
-          std::function<FType>([](const edm::Ptr<T>& obj, uwvv::EventInfo& evt)
+          std::function<FType>([](const edm::Ptr<T>& obj, uwvv::EventInfo& evt, const std::string& option)
                                {
                                  return reco::deltaR(obj->daughter(0)->p4(),
                                                      obj->daughter(1)->p4());
                                });
 
         addTo["massNoFSR"] = 
-          std::function<FType>([](const edm::Ptr<T>& obj, uwvv::EventInfo& evt)
+          std::function<FType>([](const edm::Ptr<T>& obj, uwvv::EventInfo& evt, const std::string& option)
                                {
                                  return uwvv::helpers::p4WithoutFSR(obj).mass();
                                });
 
         addTo["ptNoFSR"] = 
-          std::function<FType>([](const edm::Ptr<T>& obj, uwvv::EventInfo& evt)
+          std::function<FType>([](const edm::Ptr<T>& obj, uwvv::EventInfo& evt, const std::string& option)
                                {
                                  return uwvv::helpers::p4WithoutFSR(obj).pt();
                                });
 
         addTo["etaNoFSR"] = 
-          std::function<FType>([](const edm::Ptr<T>& obj, uwvv::EventInfo& evt)
+          std::function<FType>([](const edm::Ptr<T>& obj, uwvv::EventInfo& evt, const std::string& option)
                                {
                                  return uwvv::helpers::p4WithoutFSR(obj).eta();
                                });
 
         addTo["phiNoFSR"] = 
-          std::function<FType>([](const edm::Ptr<T>& obj, uwvv::EventInfo& evt)
+          std::function<FType>([](const edm::Ptr<T>& obj, uwvv::EventInfo& evt, const std::string& option)
                                {
                                  return uwvv::helpers::p4WithoutFSR(obj).phi();
                                });
 
         addTo["energyNoFSR"] = 
-          std::function<FType>([](const edm::Ptr<T>& obj, uwvv::EventInfo& evt)
+          std::function<FType>([](const edm::Ptr<T>& obj, uwvv::EventInfo& evt, const std::string& option)
                                {
                                  return uwvv::helpers::p4WithoutFSR(obj).energy();
                                });
@@ -431,20 +456,20 @@ namespace
       // cheating with typedefs for standardization
       typedef pat::CompositeCandidate T;
       typedef bool B;
-      typedef B (FType) (const edm::Ptr<T>&, uwvv::EventInfo&);
+      typedef B (FType) (const edm::Ptr<T>&, uwvv::EventInfo&, const std::string&);
 
       static void 
         addFunctions(std::unordered_map<std::string, std::function<FType> >& addTo)
       {
         addTo["SS"] = 
-          std::function<FType>([](const edm::Ptr<T>& obj, uwvv::EventInfo& evt)
+          std::function<FType>([](const edm::Ptr<T>& obj, uwvv::EventInfo& evt, const std::string& option)
                                {
                                  return obj->daughter(0)->charge() == obj->daughter(1)->charge();
                                });
       }
     };
   
-}
+} // anonymous namespace
 
 
 namespace uwvv
@@ -456,7 +481,9 @@ namespace uwvv
    public:
 
     // Declare signature of these functions as FType
-    typedef B (FType) (const edm::Ptr<T>&, EventInfo&);
+    typedef B (FType) (const edm::Ptr<T>&, EventInfo&, const std::string&);
+    // Outward-facing signature doesn't include option argument
+    typedef B (FSig) (const edm::Ptr<T>&, EventInfo&);
     
     FunctionLibrary()
       {
@@ -465,12 +492,25 @@ namespace uwvv
       }
     ~FunctionLibrary() {;}
   
-    std::function<FType>
+    std::function<FSig>
     getFunction(const std::string& f)
       {
-        if(functions.find(f) != functions.end())
-          return functions.at(f);
-        return StringFunctionMaker::makeStringFunction<B, T, uwvv::EventInfo&>(f);
+        // option indicated by '::', i.e. f="functionName::option"
+        size_t sepStart = f.find("::");
+        std::string fname = f.substr(0, sepStart);
+
+        // if there's an option but the function is not in the library, 
+        // something is probably wrong, but we'll just let the 
+        // StringObjectFunction fail to compile
+        if(functions.find(fname) == functions.end())
+          return StringFunctionMaker::makeStringFunction<B, T, uwvv::EventInfo&>(f);
+
+        std::string option = "";
+        if(sepStart != std::string::npos && sepStart+2 < f.size())
+          option = f.substr(sepStart+2);
+
+        return std::bind(functions.at(fname), std::placeholders::_1,
+                         std::placeholders::_2, option);
       }
 
     // for testing purposes
@@ -483,7 +523,7 @@ namespace uwvv
   };
   
 
-} // namespace
+} // namespace uwvv
 
 
 #endif // header guard
