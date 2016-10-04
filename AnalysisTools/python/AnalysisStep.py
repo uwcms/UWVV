@@ -78,17 +78,31 @@ class AnalysisStep(object):
         return seq
 
 
-    def addBasicSelector(self, obj, selection, name=''):
+    def addBasicSelector(self, obj, selection, name='', objectType='', 
+                         newCollection=''):
         '''
         Add a basic, no-frills string cut selector module for objects
-        of type obj ('e', 'm' etc.). If obj is more than one letter, the
-        type is assumed to be pat::CompositeCandidate.
+        of collection obj ('e', 'm' etc.). 
+        objectType should be 'e' or "Electron" or whatever. If it is not 
+        specified, the name is inferred from the name up to the first '_', e.g.
+        'j_jesUp' is interpreted as a jet collection. If this is more than one 
+        letter, the type is assumed to be pat::CompositeCandidate.
         If 'name' is empty, the module is called <obj>cleaning<stepName>.
+        If newCollection is non-empty, a new collection called 
+        [obj]_[newCollection] is made instead of replacing the collection
+        that's already there.
         '''
-        if len(obj) > 1:
-            modName = 'PATCompositeCandidateRefSelector'
+        inferTypeFrom = objectType
+        if not inferTypeFrom:
+            inferTypeFrom = obj.split('_')[0]
+            if len(inferTypeFrom) > 1:
+                inferTypeFrom = 'CompositeCandidate'
+        if len(inferTypeFrom) == 1:
+            typeName = getObjName(inferTypeFrom, True)
         else:
-            modName = 'PAT{}RefSelector'.format(getObjName(obj, True))
+            typeName = inferTypeFrom
+        modName = 'PAT{}RefSelector'.format(typeName)
+            
         mod = cms.EDFilter(
             modName,
             src = self.getObjTag(obj),
@@ -96,8 +110,13 @@ class AnalysisStep(object):
             filter = cms.bool(False),
             )
 
-        self.addModule(''.join([obj, name if name else 'cleaning', self.name]), mod,
-                       obj)
+        collection = obj
+        if newCollection:
+            collection += '_'+newCollection
+
+        self.addModule(''.join([obj, newCollection, name if name else 'cleaning', 
+                                self.name]).replace('_',''),
+                       mod, collection)
 
     
     def addCrossSelector(self, obj, selection, name='', **otherObjects):
@@ -125,7 +144,7 @@ class AnalysisStep(object):
             setattr(overlapParams, getObjName(obj2), objParams)
 
         mod = cms.EDProducer(
-            "PAT{}Cleaner".format(getObjName(obj, True)),
+            "PAT{}Cleaner".format(getObjName(obj.split('_')[0], True)),
             src=self.getObjTag(obj),
             preselection=cms.string(selection),
             checkOverlaps = overlapParams,
@@ -133,4 +152,4 @@ class AnalysisStep(object):
             )
 
         self.addModule(''.join([obj, name if name else 'crossCleaning', 
-                                self.name]), mod, obj)
+                                self.name]).replace('_',''), mod, obj)
