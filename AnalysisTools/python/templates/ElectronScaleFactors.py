@@ -58,7 +58,7 @@ class ElectronScaleFactors(AnalysisFlowBase):
                 src = step.getObjTag('e'),
                 fileName = cms.string(sfFile),
                 histName = cms.string('ele_scale_factors_gap_uncertainties'),
-                label = cms.string("effScaleFactorErrorGap"),
+                label = cms.string("effScaleFactorGapError"),
                 xValue = cms.string('abs(eta)'),
                 yValue = cms.string('pt'),
                 )
@@ -76,6 +76,7 @@ class ElectronScaleFactors(AnalysisFlowBase):
                 label = cms.string("trkRecoEffScaleFactor"),
                 xValue = cms.string('superCluster.eta'),
                 yValue = cms.string('pt'),
+                useError = cms.bool(True),
                 )
             step.addModule('gsfTrackRecoScaleFactorEmbedder', gsfTrackRecoScaleFactorEmbedder, 'e')
 
