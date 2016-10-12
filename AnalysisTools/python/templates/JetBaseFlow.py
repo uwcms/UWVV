@@ -13,6 +13,20 @@ class JetBaseFlow(AnalysisFlowBase):
         step = super(JetBaseFlow, self).makeAnalysisStep(stepName, **inputs)
 
         if stepName == 'preliminary':
+            # Pileup veto
+            # This puts the IDs in the event stream, not an updated 
+            # jet collection
+            self.process.load("RecoJets.JetProducers.PileupJetID_cfi")
+            self.process.pileupJetIdUpdated = self.process.pileupJetId.clone(
+                jets = step.getObjTag('j'),
+                inputIsCorrected = True,
+                applyJec = True,
+                vertexes = step.getObjTag('v'),
+                )
+            step.addModule('pileupJetIdUpdated', 
+                           self.process.pileupJetIdUpdated,
+                           'puID', puID='fullId')
+
             # Jet energy corrections
             corrections = ['L1FastJet', 'L2Relative', 'L3Absolute',]
             if not self.isMC:
@@ -23,6 +37,10 @@ class JetBaseFlow(AnalysisFlowBase):
                 labelName = 'UpdatedJEC',
                 jetCorrections = ('AK4PFchs', cms.vstring(corrections), 'None'),
                 )
+
+            # Store PU ID in jet collection as a userInt
+            self.process.updatedPatJetsUpdatedJEC.userData.userInts.src += [step.getObjTagString('puID')]
+
             self.process.jecSequence = cms.Sequence(
                 self.process.patJetCorrFactorsUpdatedJEC
                 * self.process.updatedPatJetsUpdatedJEC
@@ -76,15 +94,22 @@ class JetBaseFlow(AnalysisFlowBase):
                 step.addModule("jetSmearingJESDown", jetSmearing_jesDown, 'j_jesDown')
 
         if stepName == 'preselection':
-            step.addBasicSelector('j', 'pt>30. && abs(eta) < 4.7 && userFloat("idLoose") > 0.5')
+            # use medium PU ID
+            # PU IDs are stored as a userInt where the first three digits are
+            # tight, medium, and loose PUID decisions (going right to left)
+            selectionString = ('pt>30. && abs(eta) < 4.7 && '
+                               'userFloat("idLoose") > 0.5 && '
+                               'userInt("{}") >= 6').format(step.getObjTagString('puID'))
+
+            step.addBasicSelector('j', selectionString)
             if self.isMC:
-                step.addBasicSelector('j_jesUp', 'pt>30. && abs(eta) < 4.7 && userFloat("idLoose") > 0.5')
-                step.addBasicSelector('j_jesDown', 'pt>30. && abs(eta) < 4.7 && userFloat("idLoose") > 0.5')
-                step.addBasicSelector('j_jerUp', 'pt>30. && abs(eta) < 4.7 && userFloat("idLoose") > 0.5')
-                step.addBasicSelector('j_jerDown', 'pt>30. && abs(eta) < 4.7 && userFloat("idLoose") > 0.5')
+                step.addBasicSelector('j_jesUp', selectionString)
+                step.addBasicSelector('j_jesDown', selectionString)
+                step.addBasicSelector('j_jerUp', selectionString)
+                step.addBasicSelector('j_jerDown', selectionString)
 
         return step
-    
+
 
 
 
