@@ -65,7 +65,18 @@ options.register('genInfo', 0,
                  VarParsing.VarParsing.multiplicity.singleton,
                  VarParsing.VarParsing.varType.int,
                  "1 if gen-level ntuples are desired.")
-
+options.register('eScaleShift', 0,
+                 VarParsing.VarParsing.multiplicity.singleton,
+                 VarParsing.VarParsing.varType.int,
+                 'Electron energy scale shift, in units of sigma.')
+options.register('eRhoResShift', 0,
+                 VarParsing.VarParsing.multiplicity.singleton,
+                 VarParsing.VarParsing.varType.int,
+                 'Electron energy smearing rho shift, in units of sigma.')
+options.register('ePhiResShift', 0,
+                 VarParsing.VarParsing.multiplicity.singleton,
+                 VarParsing.VarParsing.varType.int,
+                 'Electron energy smearing phi shift, in units of sigma.')
 
 options.parseArguments()
 
@@ -277,11 +288,18 @@ if options.muCalib:
     from UWVV.Ntuplizer.templates.muonBranches import muonCalibrationBranches
     extraFinalObjectBranches['m'].append(muonCalibrationBranches)
 
+flowOpts = {
+    'isMC' : bool(options.isMC),
+    'isSync' : bool(options.isMC) and bool(options.isSync),
+
+    'electronScaleShift' : options.eScaleShift,
+    'electronRhoResShift' : options.eRhoResShift,
+    'electronPhiResShift' : options.ePhiResShift,
+    }
 
 # Turn all these into a single flow class
 FlowClass = createFlow(*FlowSteps)
-flow = FlowClass('flow', process,
-                 isMC=bool(options.isMC), isSync=bool(options.isSync))
+flow = FlowClass('flow', process, **flowOpts)
 
 
 
