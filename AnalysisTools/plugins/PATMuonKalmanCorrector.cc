@@ -44,6 +44,8 @@ private:
   const bool isSync;
 
   const float maxPt;
+
+  const int closureShift;
 };
 
 
@@ -53,9 +55,16 @@ PATMuonKalmanCorrector::PATMuonKalmanCorrector(const edm::ParameterSet& params) 
   isMC(corType.find("MC") != std::string::npos),
   calib(new KalmanMuonCalibrator(corType)),
   isSync(params.exists("isSync") && isMC && params.getParameter<bool>("isSync")),
-  maxPt(params.exists("maxPt") ? params.getParameter<double>("maxPt") : 200.)
+  maxPt(params.exists("maxPt") ? params.getParameter<double>("maxPt") : 200.),
+  closureShift(params.exists("closureShift") ?
+               params.getParameter<int>("closureShift") : 0)
 {
   produces<pat::MuonCollection>();
+
+  if(closureShift)
+    calib->varyClosure(closureShift);
+
+  std::cout << "Shift: " << closureShift << std::endl;
 }
 
 
@@ -72,7 +81,7 @@ PATMuonKalmanCorrector::produce(edm::Event& event, const edm::EventSetup& setup)
       edm::Ptr<pat::Muon> muIn = in->ptrAt(i);
 
       float pt = muIn->pt();
-      
+
       out->push_back(*muIn);
 
       if(muIn->muonBestTrackType() == 1 && pt < maxPt)
@@ -83,9 +92,17 @@ PATMuonKalmanCorrector::produce(edm::Event& event, const edm::EventSetup& setup)
 
           if(isMC || (pt > 2. && fabs(eta) < 2.4))
             {
+              float ptOld = pt;
+              std::cout << "Raw: " << pt << " ";
               pt = calib->getCorrectedPt(pt, eta, phi, muIn->charge());
+              calib->varyClosure(0);
+              std::cout << "unshifted: " << calib->getCorrectedPt(ptOld, eta, phi, muIn->charge()) << " ";
+              calib->varyClosure(1);
+              std::cout << "+1: " << calib->getCorrectedPt(ptOld,eta,phi,muIn->charge()) << " ";
+              calib->varyClosure(closureShift);
+              std::cout << "shifted: " << pt << std::endl;
             }
-      
+
           if(isMC)
             {
               if(isSync)
@@ -101,6 +118,8 @@ PATMuonKalmanCorrector::produce(edm::Event& event, const edm::EventSetup& setup)
           out->back().addUserCand("uncorrected", muIn);
         }
     }
+
+  std::cout << std::endl;
 
   event.put(std::move(out));
 }
