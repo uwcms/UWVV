@@ -27,8 +27,8 @@ namespace uwvv
 {
 
   template<class Obj1, class Obj2> struct CompositeDaughter {};
-  
-  
+
+
   template<class T> class BranchManager
   {
    public:
@@ -36,34 +36,39 @@ namespace uwvv
     BranchManager(const std::string& name, TTree* const tree,
                   const edm::ParameterSet& config);
     virtual ~BranchManager(){;}
-    
+
     void fill(const reco::Candidate* const obj, EventInfo& evt);
     void fill(const edm::Ptr<T>& obj, EventInfo& evt);
-  
+
     const std::string& getName() const {return name;}
-  
+
    protected:
     edm::Ptr<T> extractMasterPtr(const reco::Candidate* const);
-  
+
    private:
     template<typename B> void
       addBranchesFromPSet(std::vector<std::unique_ptr<BranchHolder<B, T> > >& addTo,
-                          const edm::ParameterSet& toAdd, 
+                          const edm::ParameterSet& toAdd,
                           TTree* const tree);
+    template<typename B> void
+      addVectorBranchesFromPSet(std::vector<std::unique_ptr<BranchHolder<std::vector<B>, T> > >& addTo,
+                                const edm::ParameterSet& toAdd,
+                                TTree* const tree);
 
     const std::string name;
-  
+
     std::vector<std::unique_ptr<BranchHolder<float, T> > >              floatBranches;
     std::vector<std::unique_ptr<BranchHolder<bool, T> > >               boolBranches;
     std::vector<std::unique_ptr<BranchHolder<int, T> > >                intBranches;
     std::vector<std::unique_ptr<BranchHolder<unsigned, T> > >           uintBranches;
     std::vector<std::unique_ptr<BranchHolder<unsigned long long, T> > > ullBranches;
+    std::vector<std::unique_ptr<BranchHolder<std::vector<float>, T> > > vFloatBranches;
   };
 
 
   template<>
-  template<class T1, class T2> 
-  class BranchManager<CompositeDaughter<T1, T2> > : 
+  template<class T1, class T2>
+  class BranchManager<CompositeDaughter<T1, T2> > :
     public BranchManager<pat::CompositeCandidate>
   {
    public:
@@ -76,11 +81,11 @@ namespace uwvv
     void fill(const edm::Ptr<pat::CompositeCandidate> & obj, EventInfo& evt);
 
    private:
-    const std::string& extractDaughterName(const size_t i, 
+    const std::string& extractDaughterName(const size_t i,
                                            const std::vector<std::string>& names) const;
 
     bool daughtersNeedReorder(const edm::Ptr<pat::CompositeCandidate>& cand) const;
-    
+
     std::unique_ptr<BranchManager<T1> > daughterBranches1;
     std::unique_ptr<BranchManager<T2> > daughterBranches2;
 
@@ -119,26 +124,46 @@ namespace uwvv
       addBranchesFromPSet(ullBranches,
                           config.getParameter<edm::ParameterSet>("ulls"),
                           tree);
+
+    if(config.exists("vFloats"))
+      addVectorBranchesFromPSet(vFloatBranches,
+                                config.getParameter<edm::ParameterSet>("vFloats"),
+                                tree);
   }
 
 
   template<class T>
   template<typename B> void
   BranchManager<T>::addBranchesFromPSet(std::vector<std::unique_ptr<BranchHolder<B, T> > >& addTo,
-                                        const edm::ParameterSet& toAdd, 
+                                        const edm::ParameterSet& toAdd,
                                         TTree* const tree)
   {
     FunctionLibrary<B,T> fLib = FunctionLibrary<B,T>();
 
-    for(auto&& b : toAdd.getParameterNames())
-      addTo.push_back(std::unique_ptr<BranchHolder<B, T> >(new BranchHolder<B, T>(getName()+b, 
-                                                                                  tree, 
+    for(const auto& b : toAdd.getParameterNames())
+      addTo.push_back(std::unique_ptr<BranchHolder<B, T> >(new BranchHolder<B, T>(getName()+b,
+                                                                                  tree,
                                                                                   fLib.getFunction(toAdd.getParameter<std::string>(b)))));
   }
 
 
+  template<class T>
+  template<typename B> void
+  BranchManager<T>::addVectorBranchesFromPSet(std::vector<std::unique_ptr<BranchHolder<std::vector<B>, T> > >& addTo,
+                                        const edm::ParameterSet& toAdd,
+                                        TTree* const tree)
+  {
+    FunctionLibrary<std::vector<B>,T> fLib = FunctionLibrary<std::vector<B>,T>();
+
+    for(const auto& b : toAdd.getParameterNames())
+      addTo.push_back(std::unique_ptr<BranchHolder<std::vector<B>, T> >(new BranchHolder<std::vector<B>, T>(getName()+b,
+                                                                                                            tree,
+                                                                                                            fLib.getFunction(toAdd.getParameter<std::vector<std::string> >(b)))));
+  }
+
+
   template<class T> void
-  BranchManager<T>::fill(const reco::Candidate* const abstractObject, 
+  BranchManager<T>::fill(const reco::Candidate* const abstractObject,
                          EventInfo& evt)
   {
     edm::Ptr<T> obj = extractMasterPtr(abstractObject);
@@ -164,6 +189,9 @@ namespace uwvv
 
     for(auto&& b : ullBranches)
       b->fill(obj, evt);
+
+    for(auto&& b : vFloatBranches)
+      b->fill(obj, evt);
   }
 
 
@@ -180,7 +208,7 @@ namespace uwvv
 
   template<>
   template<class T1, class T2>
-  BranchManager<CompositeDaughter<T1, T2> >::BranchManager(const std::string& name, 
+  BranchManager<CompositeDaughter<T1, T2> >::BranchManager(const std::string& name,
                                                            TTree* const tree,
                                                            const edm::ParameterSet& config) :
     BranchManager<pat::CompositeCandidate>(name, tree, config),
@@ -189,7 +217,7 @@ namespace uwvv
     daughterName2(extractDaughterName(1,
                                       config.getParameter<std::vector<std::string> >("daughterNames")))
   {
-    std::vector<edm::ParameterSet> daughterParams = 
+    std::vector<edm::ParameterSet> daughterParams =
       config.getParameter<std::vector<edm::ParameterSet> >("daughterParams");
 
     if(daughterParams.size() < 2)
@@ -197,11 +225,11 @@ namespace uwvv
         << "You must provide two sets of daughter parameters for a composite "
         << "candidate with two daughters." << std::endl;
 
-    daughterBranches1 = 
+    daughterBranches1 =
       std::unique_ptr<BranchManager<T1> >(new BranchManager<T1>(daughterName1,
-                                                                tree, 
+                                                                tree,
                                                                 daughterParams.at(0)));
-    daughterBranches2 = 
+    daughterBranches2 =
       std::unique_ptr<BranchManager<T2> >(new BranchManager<T2>(daughterName2,
                                                                 tree,
                                                                 daughterParams.at(1)));
@@ -220,13 +248,13 @@ namespace uwvv
           << " names for a composite candidate with "
           << i+1 << " daughters." << std::endl;
 
-      return names.at(i);      
+      return names.at(i);
     }
 
 
   template<>
   template<class T1, class T2> void
-  BranchManager<CompositeDaughter<T1, T2> >::fill(const reco::Candidate* const abstractObject, 
+  BranchManager<CompositeDaughter<T1, T2> >::fill(const reco::Candidate* const abstractObject,
                                                   EventInfo& evt)
   {
     edm::Ptr<pat::CompositeCandidate> obj = extractMasterPtr(abstractObject);
@@ -237,12 +265,12 @@ namespace uwvv
 
   template<>
   template<class T1, class T2> void
-  BranchManager<CompositeDaughter<T1, T2> >::fill(const edm::Ptr<pat::CompositeCandidate>& obj, 
+  BranchManager<CompositeDaughter<T1, T2> >::fill(const edm::Ptr<pat::CompositeCandidate>& obj,
                                                   EventInfo& evt)
   {
     if(obj.isNull() || obj->numberOfDaughters() < 2)
       throw cms::Exception("InvalidObject")
-        << "Invalid " << this->getName() 
+        << "Invalid " << this->getName()
         <<" CompositeCandidate object passed to Ntuplizer";
 
     BranchManager<pat::CompositeCandidate>::fill(obj, evt);
@@ -283,13 +311,13 @@ namespace uwvv
 
   // 4e and 4mu candidates should be ordered by Z compatibility
   template<> bool
-    BranchManager<CompositeDaughter<CompositeDaughter<pat::Electron, pat::Electron>, 
+    BranchManager<CompositeDaughter<CompositeDaughter<pat::Electron, pat::Electron>,
     CompositeDaughter<pat::Electron, pat::Electron> > >::daughtersNeedReorder(const edm::Ptr<pat::CompositeCandidate>& cand) const
     {
       return helpers::zsNeedReorder<pat::Electron, pat::Electron>(cand);
     }
   template<> bool
-    BranchManager<CompositeDaughter<CompositeDaughter<pat::Muon, pat::Muon>, 
+    BranchManager<CompositeDaughter<CompositeDaughter<pat::Muon, pat::Muon>,
     CompositeDaughter<pat::Muon, pat::Muon> > >::daughtersNeedReorder(const edm::Ptr<pat::CompositeCandidate>& cand) const
     {
       return helpers::zsNeedReorder<pat::Muon, pat::Muon>(cand);
