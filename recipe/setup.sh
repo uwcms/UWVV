@@ -10,9 +10,7 @@ fi
 
 if [ ! -d ./EgammaAnalysis ]; then
     echo "Setting up electron energy scale corrections"
-    git remote add -f -t ecal_smear_fix_80X emanueledimarco https://github.com/emanueledimarco/cmssw.git
-    git cms-addpkg EgammaAnalysis/ElectronTools
-    git checkout -b from-52f192a 52f192a
+    git cms-merge-topic emanueledimarco:ecal_smear_fix_80X
 
     pushd EgammaAnalysis/ElectronTools/data
     git clone -b ICHEP2016_v2 https://github.com/ECALELFS/ScalesSmearings.git

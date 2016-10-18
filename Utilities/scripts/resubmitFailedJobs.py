@@ -1,155 +1,70 @@
 #!/usr/bin/env python
 """
+
 Allows the resubmission of failed Condor jobs provided they have a rescue dag
 file.
 
-Author: D. Austin Belknap, UW-Madison
+Author: Nate Woods, U. Wisconsin, loosely based on the version by D. Austin
+Belknap and Devin Taylor
+
 """
 
-import os
-import re
-import sys
-import glob
-import argparse
-from socket import gethostname
+from os import system as _bash
+from os import environ as _env
+from os.path import join as _join
+from re import compile as _reCompile
+from glob import glob as _glob
+from argparse import ArgumentParser as _ArgParser
+from socket import gethostname as _hostname
 
 
-def submit_jobid(sample, dryrun=False, verboseInfo={}):
+def resubmit(sample, dryrun=False):
     """
     Check the dag status file of the sample for failed jobs. If any, submit 
     the rescue dag files to farmoutAnalysisJobs. 
     Sample should be a path to the submit directory.
     """
-    verbose = bool(verboseInfo)
+    statusDag = '%s/dags/dag.status' % sample
 
-    # FSA ntuples and PAT tuples use a different naming convention for the
-    # status dag files. Try both.
-    status_dag1 = '%s/dags/dag.status' % sample
-    status_dag2 = '%s/dags/dag.dag.status' % sample
+    pattern = _reCompile(r'Nodes(?P<status>[A-Za-z]+) = (?P<nNodes>\d+)')
 
-    # look for failed jobs
-    errors = []
+    results = {}
+    with open(statusDag, 'r') as f:
+        for line in f:
+            # we only care about the summary block, which is first
+            if ']' in line:
+                break
+
+            match = pattern.search(line)
+            if match:
+                results[match.group('status')] = int(match.group("nNodes"))
+
     try:
-        if verbose: dagStatus, nodeStatuses, endStatus = parse_dag_state(status_dag1)
-        with open(status_dag1, 'r') as dagfile:
-            errors = [re.search('STATUS_ERROR', line) for line in dagfile]
-        with open(status_dag1, 'r') as dagfile:
-            submitted = [re.search('STATUS_SUBMITTED', line) for line in dagfile]
-    except IOError:
-        try:
-            if verbose: dagStatus, nodeStatuses, endStatus = parse_dag_state(status_dag2)
-            with open(status_dag2, 'r') as dagfile:
-                errors = [re.search('STATUS_ERROR', line) for line in dagfile]
-            with open(status_dag2, 'r') as dagfile:
-                submitted = [re.search('STATUS_SUBMITTED', line) for line in dagfile]
-        except IOError:
-            print "    Skipping: %s" % sample
-            return
+        total = results['Total']
+        succeeded = results['Done']
+        failed = results['Failed']
+        inProgress = results['Pre'] + results['Post'] + results['Queued'] + \
+            results['Ready']
+        ignore = results['Unready'] # email job or something
+    except KeyError:
+        raise IOError("Something is wrong with {}!".format(statusDag))
 
-    # verbose details
-    if verbose:
-        total = dagStatus['NodesTotal']
-        verboseInfo["jobTotal"] += total
-        done = dagStatus['NodesDone']
-        verboseInfo["jobDone"] += done
-        queued = dagStatus['NodesQueued']
-        verboseInfo["jobQueued"] += queued
-        failed = dagStatus['NodesFailed']
-        verboseInfo["jobFailed"] += failed
-        if not queued and failed:
-            verboseInfo["doneTotal"] += total
-            verboseInfo["doneDone"] += done
-            verboseInfo["doneQueued"] += queued
-            verboseInfo["doneFailed"] += failed
-            verboseInfo["doneSamples"] += [sample]
-        statusString = "        Total: {0} Done: {1} Queued: {2} Failed: {3}".format(total,done,queued,failed)
-        errors = []
-        for node in nodeStatuses:
-            if 'status' in node['StatusDetails']:
-                errors.append(int(node['StatusDetails'].split()[-1]))
-        verboseInfo["jobErrors"].extend(errors)
-        counts = [[x,errors.count(x)] for x in set(errors)]
-        counts = sorted(counts, key=lambda error: error[0])
-        #statusString += "\n        Errors:"
-        #for c in counts:
-        #    statusString += "\n            Error {0:d}: {1:d} times".format(c[0],c[1])
+    print '    ' + sample
+    print "        Total: {0} Done: {1} Queued: {2} Failed: {3}".format(total-ignore,succeeded,inProgress,failed)
+    
 
-    # Do not try to resubmit jobs if jobs are still running
-    if any(submitted):
-        print "    %s not done, try again later" % sample
-        if verbose: print statusString
-        return
-
-    # if there are any errors, submit the rescue dag files
-    if any(errors):
-        print "    Resubmit: %s" % sample
-        if verbose: print statusString
-        rescue_dag = max(glob.glob('%s/dags/*dag.rescue[0-9][0-9][0-9]' % sample))
-        if verbose: print '        Rescue file: {0}'.format(rescue_dag)
+    if inProgress:
+        print "        Not done, try again later"
+    elif failed:
+        print "        Resubmitting..."
+        rescue_dag = max(_glob('{}/dags/*dag.rescue[0-9][0-9][0-9]'.format(sample)))
+        print '        Rescue file: {0}'.format(rescue_dag)
         if not dryrun:
-            cmd = 'farmoutAnalysisJobs --rescue-dag-file=%s' % rescue_dag
-            os.system(cmd)
-    else:
-        #print "    %s successful, nothing to do"%sample
-        pass
+            cmd = 'farmoutAnalysisJobs --rescue-dag-file={}'.format(rescue_dag)
+            _bash(cmd)
+        
+    return succeeded, failed, inProgress
 
-
-def parse_dag_state(filename):
-    with open(filename,'r') as dagfile:
-        lines = dagfile.readlines()
-    dagStatus = {}
-    nodeStatuses = []
-    endStatus = {}
-    currentNode = {}
-    keyvalString = ''
-    for line in lines:
-        if '[' in line: # new object
-            currentNode = {}
-        elif ']' in line: # end object
-            if currentNode['Type'] == "DagStatus":
-                dagStatus = currentNode
-            elif currentNode['Type'] == "NodeStatus":
-                nodeStatuses.append(currentNode)
-            elif currentNode['Type'] == "StatusEnd":
-                endStatus = currentNode
-            else:
-                print 'Error: unknown type "%s"' % currentNode['Type']
-        elif ';' in line: # end of key val pair
-            keyvalString += line
-            keyvalString = ' '.join(keyvalString.split())
-            keyval = keyvalString.split(';')[0]
-            strings = [x.strip() for x in keyval.split('=')]
-            key = strings[0]
-            if '{' in strings[1]: # create a python list
-                val = [x.strip('') for x in strings[1].strip('{}').split('"') if x]
-            elif '"' in strings[1]: # its a python string
-                val = strings[1].strip('"')
-            else: # its a number
-                val =  int(strings[1]) 
-            currentNode[key] = val
-            keyvalString = ''
-        else:
-            keyvalString += line
-    return dagStatus, nodeStatuses, endStatus
-
-def parse_command_line(argv):
-    parser = argparse.ArgumentParser(description='Resubmit failed Condor jobs',
-                                     formatter_class=argparse.RawTextHelpFormatter)
-
-    parser.add_argument('jobids', nargs='+', help='Provide the FSA sample(s) in'
-                        ' one of the following formats (UNIX wildcards allowed):\n'
-                        'jobID \n'
-                        'jobID/sample \n'
-                        '/path/to/job/or/submit/directory')
-
-    parser.add_argument('--dry-run', dest='dryrun', action='store_true',
-                        help='Show samples to submit without submitting them')
-    parser.add_argument('--verbose', dest='verbose', action='store_true',
-                        help='Show detailed information about the jobs')
-
-    args = parser.parse_args(argv)
-
-    return args
 
 def generate_submit_dirs(jobids):
     '''
@@ -167,78 +82,71 @@ def generate_submit_dirs(jobids):
     '''
     dirs = []
 
-    if 'uwlogin' in gethostname():
+    if 'uwlogin' in _hostname():
         scratch = '/data'
     else:
         scratch = '/nfs_scratch'
 
-    user = os.environ['USER']
+    user = _env['USER']
 
     for job in jobids:
         if job.count('/') > 1: # full path
             unixPath = job
         else: # jobid or jobid/sample
-            unixPath = os.path.join(scratch, user, job)
+            unixPath = _join(scratch, user, job)
 
-        subdirs = glob.glob('%s/*' % unixPath)
+        subdirs = _glob('%s/*' % unixPath)
         if any('dags' in s for s in subdirs): # this is a sample
-            dirs += glob.glob(unixPath)
+            dirs += _glob(unixPath)
         else:
             dirs += subdirs
 
     return dirs
 
 
-def main(argv=None):
-    if argv is None:
-        argv = sys.argv[1:]
 
-    args = parse_command_line(argv)
+if __name__ == "__main__":
+    parser = _ArgParser(description='Resubmit failed Condor jobs')
+
+    parser.add_argument('jobids', nargs='+', help='Provide the FSA sample(s) in'
+                        ' one of the following formats (UNIX wildcards allowed):\n'
+                        'jobID \n'
+                        'jobID/sample \n'
+                        '/path/to/job/or/submit/directory')
+
+    parser.add_argument('--dry-run', dest='dryrun', action='store_true',
+                        help='Show samples to submit without submitting them')
+
+    args = parser.parse_args()
+
+    if args.dryrun:
+        print "Pretending to resubmit samples from {}".format(', '.join(args.jobids))
+    else:
+        print "Trying to resubmit samples from {}".format(', '.join(args.jobids))
 
     samples = generate_submit_dirs(args.jobids)
 
-    verboseInfo = {}
-    if args.verbose:
-        verboseInfo["jobTotal"] = 0
-        verboseInfo["jobDone"] = 0
-        verboseInfo["jobQueued"] = 0
-        verboseInfo["jobFailed"] = 0
-        verboseInfo["jobErrors"] = []
-        verboseInfo["doneTotal"] = 0
-        verboseInfo["doneDone"] = 0
-        verboseInfo["doneQueued"] = 0
-        verboseInfo["doneFailed"] = 0
-        verboseInfo["doneSamples"] = []
+    succeeded = 0
+    failed = 0
+    inProgress = 0
+    resubmitted = 0
 
     for s in samples:
-        submit_jobid(s, dryrun=args.dryrun, verboseInfo=verboseInfo)
+        succ, fail, prog = resubmit(s, args.dryrun)
+        succeeded += succ
+        failed += fail
+        inProgress += prog
+        if not prog:
+            resubmitted += fail
 
-    if args.verbose:
-        statusString = "    Job Total: {0} Done: {1} Queued: {2} Failed: {3}".format(verboseInfo["jobTotal"],
-                                                                                     verboseInfo["jobDone"],
-                                                                                     verboseInfo["jobQueued"],
-                                                                                     verboseInfo["jobFailed"])
-        counts = [[x,verboseInfo["jobErrors"].count(x)] for x in set(verboseInfo["jobErrors"])]
-        counts = sorted(counts, key=lambda error: error[0])
-        #statusString += "\n    Job Errors:"
-        #for c in counts:
-        #    statusString += "\n        Job Error {0:d}: {1:d} times".format(c[0],c[1])
-        print statusString
-
-        doneStatusString = "    Resubmit Total: {0} Done: {1} Failed: {2}".format(verboseInfo["doneTotal"],
-                                                                                  verboseInfo["doneDone"],
-                                                                                  verboseInfo["doneFailed"])
-        if verboseInfo["doneTotal"] and verboseInfo["doneFailed"]:
-            print doneStatusString
-            print "    Samples to resubmit:"
-            for sample in verboseInfo["doneSamples"]:
-                print "        {0}".format(sample)
-        else:
-            print "    None can be resubmitted at the moment"
-
-    return 0
+    print "Total: {}  Done: {}  In Progress: {}  Failed: {}".format(succeeded+failed+inProgress,
+                                                                    succeeded, inProgress, 
+                                                                    failed)
+    if resubmitted:
+        print "Resubmitted: {}".format(resubmitted)
+    if inProgress:
+        print "Still working -- try again later."
+    if failed + inProgress == 0:
+        print "Done!"
 
 
-if __name__ == "__main__":
-    status = main()
-    sys.exit(status)

@@ -3,7 +3,9 @@
 //    PATObjectScaleFactorEmbedder                                           //
 //                                                                           //
 //    Takes a TH2F and a collection of PAT objects and embeds the            //
-//    content of the bin the object would fill as a userFloat                //
+//    content of the bin the object would fill as a userFloat with a         //
+//    specified label. If the "useError" option is used, the bin error is    //
+//    also stored, with the same label except with "Error" appended.         //
 //                                                                           //
 //    Nate Woods, U. Wisconsin                                               //
 //                                                                           //
@@ -51,6 +53,7 @@ private:
   const std::unique_ptr<TFile> file;
   const std::unique_ptr<TH2F> h;
   const std::string label;
+  const bool useError;
 
   StringObjectFunction<T> xFunction;
   StringObjectFunction<T> yFunction;
@@ -65,6 +68,8 @@ PATObjectScaleFactorEmbedder<T>::PATObjectScaleFactorEmbedder(const edm::Paramet
     (TH2F*)(file->Get(iConfig.getParameter<std::string>("histName").c_str())->Clone()) :
     new TH2F("h","h",1,0.,1.,1,0.,1.)),
   label(iConfig.getParameter<std::string>("label")),
+  useError(iConfig.exists("useError") && 
+           iConfig.getParameter<bool>("useError")),
   xFunction(iConfig.exists("xValue") ?
             iConfig.getParameter<std::string>("xValue") :
             "eta"),
@@ -123,9 +128,12 @@ void PATObjectScaleFactorEmbedder<T>::produce(edm::Event& iEvent,
         }
 
       float value = h->GetBinContent(bin);
+      float error = h->GetBinError(bin);
 
       out->push_back(t); // copies with ownership
       out->back().addUserFloat(label, value);
+      if(useError)
+        out->back().addUserFloat(label+"Error", error);
     }
 
   iEvent.put(std::move(out));

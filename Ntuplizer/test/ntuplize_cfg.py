@@ -8,7 +8,7 @@ from UWVV.AnalysisTools.analysisFlowMaker import createFlow
 from UWVV.Utilities.helpers import parseChannels, expandChannelName
 from UWVV.Ntuplizer.makeBranchSet import makeBranchSet, makeGenBranchSet
 from UWVV.Ntuplizer.eventParams import makeEventParams, makeGenEventParams
-from UWVV.Ntuplizer.templates.triggerBranches import triggerBranches    
+from UWVV.Ntuplizer.templates.triggerBranches import triggerBranches
 
 import os
 
@@ -20,11 +20,11 @@ options.inputFiles = '/store/mc/RunIIFall15MiniAODv2/GluGluHToZZTo4L_M2500_13TeV
 options.outputFile = 'ntuplize.root'
 options.maxEvents = -1
 
-options.register('channels', "zz", 
+options.register('channels', "zz",
                  VarParsing.VarParsing.multiplicity.singleton,
                  VarParsing.VarParsing.varType.string,
                  "Channel to make ntuples for. May be comma-separated list and/or several presets like 'zz'")
-options.register('globalTag', "", 
+options.register('globalTag', "",
                  VarParsing.VarParsing.multiplicity.singleton,
                  VarParsing.VarParsing.varType.string,
                  "Global tag. If empty (default), auto tag is chosen based on isMC")
@@ -56,12 +56,12 @@ options.register('profile', 0,
                  VarParsing.VarParsing.multiplicity.singleton,
                  VarParsing.VarParsing.varType.int,
                  "Set nonzero to run igprof.")
-options.register('hzzExtra', 0, 
+options.register('hzzExtra', 0,
                  VarParsing.VarParsing.multiplicity.singleton,
                  VarParsing.VarParsing.varType.int,
                  "1 if extra HZZ quantities like matrix element "
                  "discriminators and Z kinematic refit are desired.")
-options.register('genInfo', 0, 
+options.register('genInfo', 0,
                  VarParsing.VarParsing.multiplicity.singleton,
                  VarParsing.VarParsing.varType.int,
                  "1 if gen-level ntuples are desired.")
@@ -77,9 +77,9 @@ z  = any(len(c) == 2 for c in channels)
 l  = any(len(c) == 1 for c in channels)
 
 
-### To use IgProf's neat memory profiling tools, run with the profile 
+### To use IgProf's neat memory profiling tools, run with the profile
 ### option and igprof like so:
-###      $ igprof -d -mp -z -o igprof.mp.gz cmsRun profile=1 ... 
+###      $ igprof -d -mp -z -o igprof.mp.gz cmsRun profile=1 ...
 ### this will create a memory profile every 250 events so you can track use
 ### Turn the profile into text with
 ###      $ igprof-analyse -d -v -g -r MEM_LIVE igprof.yourOutputFile.gz > igreport_live.res
@@ -173,14 +173,18 @@ FlowSteps.append(ElectronScaleFactors)
 from UWVV.AnalysisTools.templates.JetBaseFlow import JetBaseFlow
 FlowSteps.append(JetBaseFlow)
 if options.isMC:
-    from UWVV.AnalysisTools.templates.JetEnergySmearing import JetEnergySmearing
-    FlowSteps.append(JetEnergySmearing)
+    from UWVV.Ntuplizer.templates.eventBranches import jesSystematicBranches
+    extraInitialStateBranches.append(jesSystematicBranches)
 
     from UWVV.Ntuplizer.templates.eventBranches import eventGenBranches
     extraInitialStateBranches.append(eventGenBranches)
     from UWVV.Ntuplizer.templates.leptonBranches import leptonGenBranches
     extraFinalObjectBranches['e'].append(leptonGenBranches)
     extraFinalObjectBranches['m'].append(leptonGenBranches)
+
+if any(len(c) == 4 for c in channels):
+    from UWVV.Ntuplizer.templates.eventBranches import centralJetBranches
+    extraInitialStateBranches.append(centralJetBranches)
 
 # make final states
 if zz:
@@ -219,7 +223,7 @@ elif zl or z:
 
         from UWVV.AnalysisTools.templates.WZLeptonCounters import WZLeptonCounters
         FlowSteps.append(WZLeptonCounters)
-        
+
         from UWVV.AnalysisTools.templates.BJetCounters import BJetCounters
         FlowSteps.append(BJetCounters)
 
@@ -242,8 +246,8 @@ elif l:
 
     from UWVV.AnalysisTools.templates.ZZSkim import ZZSkim
     FlowSteps.append(ZZSkim)
-    
-        
+
+
 if zz or zl or z:
     for f in FlowSteps:
         if f.__name__ in ['ZZFSR', 'ZZFlow']:
@@ -260,7 +264,7 @@ if zz or zl or z:
             from UWVV.Ntuplizer.templates.countBranches import zzCountBranches
             extraInitialStateBranches.append(zzCountBranches)
             break
-    
+
 # Lepton calibrations
 if options.eCalib:
     from UWVV.AnalysisTools.templates.ElectronCalibration import ElectronCalibration
@@ -276,7 +280,7 @@ if options.muCalib:
 
 # Turn all these into a single flow class
 FlowClass = createFlow(*FlowSteps)
-flow = FlowClass('flow', process, 
+flow = FlowClass('flow', process,
                  isMC=bool(options.isMC), isSync=bool(options.isSync))
 
 
@@ -291,7 +295,7 @@ process.metaInfo = cms.EDAnalyzer(
 process.treeSequence = cms.Sequence(process.metaInfo)
 
 # Trigger info is only in MC from reHLT campaign
-if options.isMC and 'reHLT' not in options.inputFiles[0]:
+if options.isMC and 'reHLT' not in options.inputFiles[0] and 'withHLT' not in options.inputFiles[0]:
     trgBranches = cms.PSet(
         trigNames=cms.vstring(),
         trigResultsSrc = cms.InputTag("TriggerResults", "", "HLT"),
@@ -309,8 +313,8 @@ for chan in channels:
     mod = cms.EDAnalyzer(
         'TreeGenerator{}'.format(expandChannelName(chan)),
         src = flow.finalObjTag(chan),
-        branches = makeBranchSet(chan, extraInitialStateBranches, 
-                                 extraIntermediateStateBranches, 
+        branches = makeBranchSet(chan, extraInitialStateBranches,
+                                 extraIntermediateStateBranches,
                                  **extraFinalObjectBranches),
         eventParams = makeEventParams(flow.finalTags()),
         triggers = trgBranches,
@@ -330,7 +334,7 @@ if zz and options.isMC and options.genInfo:
     genFlow = GenFlow('genFlow', process, suffix='Gen', e='prunedGenParticles',
                       m='prunedGenParticles', j='slimmedGenJets',
                       pfCands='packedGenParticles')
-    
+
     genTrg = trgBranches.clone(trigNames=cms.vstring())
 
     for chan in channels:

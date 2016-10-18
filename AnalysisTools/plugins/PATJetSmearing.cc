@@ -3,14 +3,15 @@
 //    PATJetSmearing.cc                                                     //
 //                                                                          //
 //    Apply energy smearing to PF jets. Outputs a collection of jets with   //
-//    the smearing applied and with corrections that undo the smearing or   //
-//    apply +/- 1sigma corrections for for systematics.                     //
+//    the smearing applied and with a correction that undoes the smearing   //
+//    stored as a userFloat                                                 //
 //    To get the original 4-momentum back:                                  //
 //        jet.p4() * jet.userFloat("jerCorrInverse")                        //
-//    To get the 4-momentum with JER+1sigma:                                //
-//        jet.p4() * jet.userFloat("jerCorrUp")                             //
-//    To get the 4-momentum with JER-1sigma:                                //
-//        jet.p4() * jet.userFloat("jerCorrDown")                           //
+//                                                                          //
+//    If systematic shifts are also requested (systematics=cms.bool(True),  //
+//    also produces one collection with the smearing shifted up by one      //
+//    sigma, and another with the smearing shifted down by one sigma, for   //
+//    systematics. Labels for these are "jerUp" and "jerDown".              //
 //                                                                          //
 //    Obviously, this only makes sense for MC                               //
 //                                                                          //
@@ -53,14 +54,23 @@ class PATJetSmearing : public edm::stream::EDProducer<>
 
   edm::EDGetTokenT<JetView> srcToken;
   edm::EDGetTokenT<double> rhoToken;
+
+  const bool systematics;
 };
 
 
 PATJetSmearing::PATJetSmearing(const edm::ParameterSet& pset) :
   srcToken(consumes<JetView>(pset.getParameter<edm::InputTag>("src"))),
-  rhoToken(consumes<double>(pset.getParameter<edm::InputTag>("rhoSrc")))
+  rhoToken(consumes<double>(pset.getParameter<edm::InputTag>("rhoSrc"))),
+  systematics(pset.exists("systematics") ? 
+              pset.getParameter<bool>("systematics") : false)
 {
   produces<VJet>();
+  if(systematics)
+    {
+      produces<VJet>("jerUp");
+      produces<VJet>("jerDown");
+    }
 }
 
 
@@ -73,6 +83,8 @@ void PATJetSmearing::produce(edm::Event& iEvent,
   iEvent.getByToken(rhoToken, rho);
 
   std::unique_ptr<VJet> out(new VJet());
+  std::unique_ptr<VJet> outUp(new VJet());
+  std::unique_ptr<VJet> outDn(new VJet());
 
   JME::JetResolutionScaleFactor resSF = 
     JME::JetResolutionScaleFactor::get(iSetup, "AK4PFchs");
@@ -80,10 +92,7 @@ void PATJetSmearing::produce(edm::Event& iEvent,
 
   for(size_t i = 0; i < in->size(); ++i)
     {
-      const edm::Ptr<Jet> jetPtr = in->ptrAt(i);
-      out->push_back(*jetPtr); // copies, transfers ownership
-
-      Jet& jet = out->back(); // for convenience
+      const Jet& jet = in->at(i);
       
       float pt = jet.pt();
       float eta = jet.eta();
@@ -98,8 +107,8 @@ void PATJetSmearing::produce(edm::Event& iEvent,
       paramsSF.setJetEta(eta).setRho(*rho);
       
       float sf = resSF.getScaleFactor(paramsSF);
-      float sfUp = resSF.getScaleFactor(paramsSF, Variation::UP);
-      float sfDn = resSF.getScaleFactor(paramsSF, Variation::DOWN);
+      float sfUp = systematics ? resSF.getScaleFactor(paramsSF, Variation::UP) : 0.;
+      float sfDn = systematics ? resSF.getScaleFactor(paramsSF, Variation::DOWN) : 0.;
 
       double ptJER, ptJERUp, ptJERDn;
       const reco::GenJet* gen = jet.genJet();
@@ -130,13 +139,31 @@ void PATJetSmearing::produce(edm::Event& iEvent,
       float jerCorrDn = ptJERDn / pt;
 
       math::XYZTLorentzVector p4JER = jerCorr * jet.p4();
-      jet.setP4(p4JER);
-      jet.addUserFloat("jerCorrInverse", 1./jerCorr);
-      jet.addUserFloat("jerCorrUp", jerCorrUp/jerCorr);
-      jet.addUserFloat("jerCorrDown", jerCorrDn/jerCorr);
+      math::XYZTLorentzVector p4JERUp = jerCorrUp * jet.p4();
+      math::XYZTLorentzVector p4JERDn = jerCorrDn * jet.p4();
+      
+      out->push_back(jet);
+      out->back().setP4(p4JER);
+      out->back().addUserFloat("jerCorrInverse", 1./jerCorr);
+      
+      if(systematics)
+        {
+          outUp->push_back(jet);
+          outUp->back().setP4(p4JERUp);
+          outUp->back().addUserFloat("jerCorrInverse", 1./jerCorrUp);
+
+          outDn->push_back(jet);
+          outDn->back().setP4(p4JERDn);
+          outDn->back().addUserFloat("jerCorrInverse", 1./jerCorrDn);
+        }
     }
 
   iEvent.put(std::move(out));
+  if(systematics)
+    {
+      iEvent.put(std::move(outUp), "jerUp");
+      iEvent.put(std::move(outDn), "jerDown");
+    }
 }
 
 

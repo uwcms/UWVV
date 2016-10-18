@@ -115,6 +115,8 @@ where each `otherObjects` argument is a dictionary specifying the distance for c
 step.addCrossSelector('j', 'pt>30.', m={'deltaR':0.4,'selection':'pt>10.'})
 ```
 
+If `addBasicSelector()` and `addCrossSelector` receive a collection with a longer name, if an underscore is the second character, it will assume this is a secondary collection of a type given by the first character. For example, `j_jesUp` will be interpreted as a second jet collection used for energy scale systematics estimates. Any other multi-character collection will be assumed to be `CompositeCandidates`. 
+
 ### Order of modules within a step
 
 The order of modules within a step is determined by the order in which the Flow base classes that embed them are passed into `createFlow`. The first Flow class's modules will be first, the last Flow class's modules will be last. In general, this should not matter, but it comes up on occasion, e.g. when an `edm::ValueMap` is keyed to a specific particle collection and not a copy of the collection. 

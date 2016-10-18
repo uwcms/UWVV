@@ -4,6 +4,8 @@ import FWCore.ParameterSet.Config as cms
 
 class ZZCrossCleaning(AnalysisFlowBase):
     def __init__(self, *args, **kwargs):
+        if not hasattr(self, 'isMC'):
+            self.isMC = kwargs.pop('isMC', True)
         super(ZZCrossCleaning, self).__init__(*args, **kwargs)
 
     def makeAnalysisStep(self, stepName, **inputs):
@@ -19,7 +21,7 @@ class ZZCrossCleaning(AnalysisFlowBase):
                     'selection' : 'userFloat("{}Tight") > 0.5'.format(self.getZZIDLabel()),
                     }
                 )
-            
+
             # remove jets close to tight, isolated electrons and muons
             step.addCrossSelector(
                 'j',
@@ -38,10 +40,75 @@ class ZZCrossCleaning(AnalysisFlowBase):
                     },
                 )
 
+            if self.isMC:
+                step.addCrossSelector(
+                    'j_jesUp',
+                    '', # no further basic selection here
+                    e={
+                        'deltaR' : 0.4,
+                        'selection' : ('userFloat("{}Tight") > 0.5 && '
+                                       'userFloat("{}") > 0.5').format(self.getZZIDLabel(),
+                                                                       self.getZZIsoLabel()),
+                        },
+                    m={
+                        'deltaR' : 0.4,
+                        'selection' : ('userFloat("{}Tight") > 0.5 && '
+                                       'userFloat("{}") > 0.5').format(self.getZZIDLabel(),
+                                                                       self.getZZIsoLabel()),
+                        },
+                    )
+                step.addCrossSelector(
+                    'j_jesDown',
+                    '', # no further basic selection here
+                    e={
+                        'deltaR' : 0.4,
+                        'selection' : ('userFloat("{}Tight") > 0.5 && '
+                                       'userFloat("{}") > 0.5').format(self.getZZIDLabel(),
+                                                                       self.getZZIsoLabel()),
+                        },
+                    m={
+                        'deltaR' : 0.4,
+                        'selection' : ('userFloat("{}Tight") > 0.5 && '
+                                       'userFloat("{}") > 0.5').format(self.getZZIDLabel(),
+                                                                       self.getZZIsoLabel()),
+                        },
+                    )
+                step.addCrossSelector(
+                    'j_jerUp',
+                    '', # no further basic selection here
+                    e={
+                        'deltaR' : 0.4,
+                        'selection' : ('userFloat("{}Tight") > 0.5 && '
+                                       'userFloat("{}") > 0.5').format(self.getZZIDLabel(),
+                                                                       self.getZZIsoLabel()),
+                        },
+                    m={
+                        'deltaR' : 0.4,
+                        'selection' : ('userFloat("{}Tight") > 0.5 && '
+                                       'userFloat("{}") > 0.5').format(self.getZZIDLabel(),
+                                                                       self.getZZIsoLabel()),
+                        },
+                    )
+                step.addCrossSelector(
+                    'j_jerDown',
+                    '', # no further basic selection here
+                    e={
+                        'deltaR' : 0.4,
+                        'selection' : ('userFloat("{}Tight") > 0.5 && '
+                                       'userFloat("{}") > 0.5').format(self.getZZIDLabel(),
+                                                                       self.getZZIsoLabel()),
+                        },
+                    m={
+                        'deltaR' : 0.4,
+                        'selection' : ('userFloat("{}Tight") > 0.5 && '
+                                       'userFloat("{}") > 0.5').format(self.getZZIDLabel(),
+                                                                       self.getZZIsoLabel()),
+                        },
+                    )
+
+            step.addBasicSelector('j', 'abs(eta) < 2.4', newCollection="eta2p4")
+
         return step
-    
-
-
 
 
 

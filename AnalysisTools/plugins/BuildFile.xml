@@ -13,6 +13,8 @@
 <use name="JetMETCorrections/Modules"/>
 <use name="CondFormats/JetMETObjects"/>
 <use name="DataFormats/Math"/>
+<use name="PhysicsTools/PatAlgos"/>
+<use name="JetMETCorrections/Objects"/>
 
 <library file="*.cc" name="UWVVAnalysisToolsPlugins">
   <flags EDM_PLUGIN="1"/>

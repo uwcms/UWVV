@@ -3,20 +3,89 @@
 
 using namespace uwvv;
 
+template<class T>
+EventInfoHolder<T>::EventInfoHolder(edm::ConsumesCollector& cc, 
+                                    const edm::InputTag& primaryTag,
+                                    const edm::ParameterSet& moreTags) :
+  primary_(setupData(cc,primaryTag,moreTags))
+{
+}
+
+
+template<class T>
+DatumPtr<T>&
+EventInfoHolder<T>::setupData(edm::ConsumesCollector& cc, 
+                              const edm::InputTag& primaryTag,
+                              const edm::ParameterSet& moreTags)
+{
+  data_ = std::map<std::string, DatumPtr<T> >();
+  data_[""] = std::make_unique<EventDatum<T> >(cc, primaryTag);
+
+  for(auto&& collection : moreTags.getParameterNames())
+    data_[collection] = std::make_unique<EventDatum<T> >(cc, moreTags.getParameter<edm::InputTag>(collection));
+
+  return data_[""];
+}
+
+
+template<class T>
+void EventInfoHolder<T>::setEvent(const edm::Event& event)
+{
+  for(auto&& d : data_)
+    d.second->setEvent(event);
+}
+
+
 EventInfo::EventInfo(edm::ConsumesCollector cc,
                      const edm::ParameterSet& config) :
-  vertices_(cc, config.getParameter<edm::InputTag>("vtxSrc")),
-  electrons_(cc, config.getParameter<edm::InputTag>("eSrc")),
-  muons_(cc, config.getParameter<edm::InputTag>("mSrc")),
-  taus_(cc, config.getParameter<edm::InputTag>("tSrc")),
-  photons_(cc, config.getParameter<edm::InputTag>("gSrc")),
-  jets_(cc, config.getParameter<edm::InputTag>("jSrc")),
-  pfCands_(cc, config.getParameter<edm::InputTag>("pfCandSrc")),
-  mets_(cc, config.getParameter<edm::InputTag>("metSrc")),
-  puInfo_(cc, config.getParameter<edm::InputTag>("puSrc")),
-  genEventInfo_(cc, config.getParameter<edm::InputTag>("genEventInfoSrc")),
-  genJets_(cc, config.getParameter<edm::InputTag>("genJetSrc")),
-  genParticles_(cc, config.getParameter<edm::InputTag>("genParticleSrc"))
+  vertices_(cc, config.getParameter<edm::InputTag>("vtxSrc"),
+            config.exists("vtxExtra") ? 
+            config.getParameter<edm::ParameterSet>("vtxExtra") :
+            edm::ParameterSet()),
+  electrons_(cc, config.getParameter<edm::InputTag>("eSrc"),
+             config.exists("eExtra") ? 
+             config.getParameter<edm::ParameterSet>("eExtra") :
+             edm::ParameterSet()),
+  muons_(cc, config.getParameter<edm::InputTag>("mSrc"),
+         config.exists("mExtra") ? 
+         config.getParameter<edm::ParameterSet>("mExtra") :
+         edm::ParameterSet()),
+  taus_(cc, config.getParameter<edm::InputTag>("tSrc"),
+        config.exists("tExtra") ? 
+        config.getParameter<edm::ParameterSet>("tExtra") :
+        edm::ParameterSet()),
+  photons_(cc, config.getParameter<edm::InputTag>("gSrc"),
+           config.exists("gExtra") ? 
+           config.getParameter<edm::ParameterSet>("gExtra") :
+           edm::ParameterSet()),
+  jets_(cc, config.getParameter<edm::InputTag>("jSrc"),
+        config.exists("jExtra") ? 
+        config.getParameter<edm::ParameterSet>("jExtra") :
+        edm::ParameterSet()),
+  pfCands_(cc, config.getParameter<edm::InputTag>("pfCandSrc"),
+           config.exists("pfCandExtra") ? 
+           config.getParameter<edm::ParameterSet>("pfCandExtra") :
+           edm::ParameterSet()),
+  mets_(cc, config.getParameter<edm::InputTag>("metSrc"),
+        config.exists("metExtra") ? 
+        config.getParameter<edm::ParameterSet>("metExtra") :
+        edm::ParameterSet()),
+  puInfo_(cc, config.getParameter<edm::InputTag>("puSrc"),
+          config.exists("puExtra") ? 
+          config.getParameter<edm::ParameterSet>("puExtra") :
+          edm::ParameterSet()),
+  genEventInfo_(cc, config.getParameter<edm::InputTag>("genEventInfoSrc"),
+                config.exists("genEventInfoExtra") ? 
+                config.getParameter<edm::ParameterSet>("genEventInfoExtra") :
+                edm::ParameterSet()),
+  genJets_(cc, config.getParameter<edm::InputTag>("genJetSrc"),
+           config.exists("genJetExtra") ? 
+           config.getParameter<edm::ParameterSet>("genJetExtra") :
+           edm::ParameterSet()),
+  genParticles_(cc, config.getParameter<edm::InputTag>("genParticleSrc"),
+                config.exists("genParticleExtra") ? 
+                config.getParameter<edm::ParameterSet>("genParticleExtra") :
+                edm::ParameterSet())
 {
 }
 
