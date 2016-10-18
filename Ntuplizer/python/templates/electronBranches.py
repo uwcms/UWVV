@@ -66,6 +66,7 @@ electronBranches = cms.PSet(
     uints = cms.PSet(
         MissingHits = cms.string('MissingHits'),
         ),
+
     bools = cms.PSet(
         IsGap = cms.string('isGap'),
         IsCBVIDtight = cms.string('? hasUserFloat("isCBVIDtight") ? '
@@ -74,5 +75,13 @@ electronBranches = cms.PSet(
                                    'userFloat("isCBVIDmedium") : 0'),
         IsCBVIDloose = cms.string('? hasUserFloat("isCBVIDloose") ? '
                                   'userFloat("isCBVIDloose") : 0'),
-        )
+        ),
+
+    vFloats = cms.PSet(
+        OneTwoPt = cms.vstring('1', '2', 'pt'),
+        FiveSixSeven = cms.vstring('fiveSixSeven'),
+        PtAsVector = cms.vstring('pt'),
+        ThreePVDXYFour = cms.vstring('3', 'PVDXY', '4'),
+        P4 = cms.vstring('pt', 'eta', 'phi', 'mass'),
+        ),
     )
