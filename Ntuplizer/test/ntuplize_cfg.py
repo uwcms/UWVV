@@ -77,6 +77,10 @@ options.register('ePhiResShift', 0,
                  VarParsing.VarParsing.multiplicity.singleton,
                  VarParsing.VarParsing.varType.int,
                  'Electron energy smearing phi shift, in units of sigma.')
+options.register('mClosureShift', 0,
+                 VarParsing.VarParsing.multiplicity.singleton,
+                 VarParsing.VarParsing.varType.int,
+                 'Muon calibration closure shift, in units of sigma.')
 
 options.parseArguments()
 
@@ -295,6 +299,7 @@ flowOpts = {
     'electronScaleShift' : options.eScaleShift,
     'electronRhoResShift' : options.eRhoResShift,
     'electronPhiResShift' : options.ePhiResShift,
+    'muonClosureShift' : options.mClosureShift,
     }
 
 # Turn all these into a single flow class
