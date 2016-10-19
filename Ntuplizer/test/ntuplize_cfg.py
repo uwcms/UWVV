@@ -348,7 +348,8 @@ if zz and options.isMC and options.genInfo:
     from UWVV.AnalysisTools.templates.GenZZBase import GenZZBase
     from UWVV.AnalysisTools.templates.GenLeptonBase import GenLeptonBase
     from UWVV.Ntuplizer.templates.vbsBranches import vbsGenBranches
-
+    from UWVV.AnalysisTools.templates.DressedGenLeptonBase import DressedGenLeptonBase
+    
     GenFlow = createFlow(GenLeptonBase, GenZZBase)
     genFlow = GenFlow('genFlow', process, suffix='Gen', e='prunedGenParticles',
                       m='prunedGenParticles', j='slimmedGenJets',
