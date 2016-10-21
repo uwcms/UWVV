@@ -15,6 +15,7 @@
 #include "DataFormats/PatCandidates/interface/Muon.h"
 #include "DataFormats/PatCandidates/interface/CompositeCandidate.h"
 #include "DataFormats/Common/interface/Ptr.h"
+#include "DataFormats/Math/interface/deltaPhi.h"
 
 
 
@@ -38,13 +39,91 @@ namespace
       {
         typedef std::vector<float> (FType) (const edm::Ptr<T>&, uwvv::EventInfo&, const std::string&);
 
-        addTo["fiveSixSeven"] =
+        addTo["jetPt"] =
           std::function<FType>([](const edm::Ptr<T>& obj, uwvv::EventInfo& evt, const std::string& option)
                                {
                                  std::vector<float> out;
-                                 out.push_back(5.);
-                                 out.push_back(6.);
-                                 out.push_back(7.);
+
+                                 for(size_t i = 0; i < evt.jets(option)->size(); ++i)
+                                   out.push_back(evt.jets(option)->at(i).pt());
+
+                                 return out;
+                               });
+
+        addTo["jetEta"] =
+          std::function<FType>([](const edm::Ptr<T>& obj, uwvv::EventInfo& evt, const std::string& option)
+                               {
+                                 std::vector<float> out;
+
+                                 for(size_t i = 0; i < evt.jets(option)->size(); ++i)
+                                   out.push_back(evt.jets(option)->at(i).eta());
+
+                                 return out;
+                               });
+
+        addTo["jetPhi"] =
+          std::function<FType>([](const edm::Ptr<T>& obj, uwvv::EventInfo& evt, const std::string& option)
+                               {
+                                 std::vector<float> out;
+
+                                 for(size_t i = 0; i < evt.jets(option)->size(); ++i)
+                                   out.push_back(evt.jets(option)->at(i).phi());
+
+                                 return out;
+                               });
+
+        addTo["jetRapidity"] =
+          std::function<FType>([](const edm::Ptr<T>& obj, uwvv::EventInfo& evt, const std::string& option)
+                               {
+                                 std::vector<float> out;
+
+                                 for(size_t i = 0; i < evt.jets(option)->size(); ++i)
+                                   out.push_back(evt.jets(option)->at(i).rapidity());
+
+                                 return out;
+                               });
+
+        addTo["genJetPt"] =
+          std::function<FType>([](const edm::Ptr<T>& obj, uwvv::EventInfo& evt, const std::string& option)
+                               {
+                                 std::vector<float> out;
+
+                                 for(size_t i = 0; i < evt.genJets(option)->size(); ++i)
+                                   out.push_back(evt.genJets(option)->at(i).pt());
+
+                                 return out;
+                               });
+
+        addTo["genJetEta"] =
+          std::function<FType>([](const edm::Ptr<T>& obj, uwvv::EventInfo& evt, const std::string& option)
+                               {
+                                 std::vector<float> out;
+
+                                 for(size_t i = 0; i < evt.genJets(option)->size(); ++i)
+                                   out.push_back(evt.genJets(option)->at(i).eta());
+
+                                 return out;
+                               });
+
+        addTo["genJetPhi"] =
+          std::function<FType>([](const edm::Ptr<T>& obj, uwvv::EventInfo& evt, const std::string& option)
+                               {
+                                 std::vector<float> out;
+
+                                 for(size_t i = 0; i < evt.genJets(option)->size(); ++i)
+                                   out.push_back(evt.genJets(option)->at(i).phi());
+
+                                 return out;
+                               });
+
+        addTo["genJetRapidity"] =
+          std::function<FType>([](const edm::Ptr<T>& obj, uwvv::EventInfo& evt, const std::string& option)
+                               {
+                                 std::vector<float> out;
+
+                                 for(size_t i = 0; i < evt.genJets(option)->size(); ++i)
+                                   out.push_back(evt.genJets(option)->at(i).rapidity());
+
                                  return out;
                                });
       }
@@ -106,27 +185,35 @@ namespace
                                  return std::sqrt(std::abs(mtSqr));
                                });
 
-        addTo["jet1Pt"] =
-          std::function<FType>([](const edm::Ptr<T>& obj, uwvv::EventInfo& evt, const std::string& option)
-                               {
-                                 return (evt.jets(option)->size() >= 1 ?
-                                         evt.jets(option)->at(0).pt() :
-                                         -1.);
-                               });
-
-        addTo["jet2Pt"] =
-          std::function<FType>([](const edm::Ptr<T>& obj, uwvv::EventInfo& evt, const std::string& option)
-                               {
-                                 return (evt.jets(option)->size() >= 2 ?
-                                         evt.jets(option)->at(1).pt() :
-                                         -1.);
-                               });
-
         addTo["mjj"] =
           std::function<FType>([](const edm::Ptr<T>& obj, uwvv::EventInfo& evt, const std::string& option)
                                {
                                  return (evt.jets(option)->size() >= 2 ?
                                          (evt.jets(option)->at(0).p4()+evt.jets(option)->at(1).p4()).mass() :
+                                         -999.);
+                               });
+
+        addTo["ptjj"] =
+          std::function<FType>([](const edm::Ptr<T>& obj, uwvv::EventInfo& evt, const std::string& option)
+                               {
+                                 return (evt.jets(option)->size() >= 2 ?
+                                         (evt.jets(option)->at(0).p4()+evt.jets(option)->at(1).p4()).pt() :
+                                         -999.);
+                               });
+
+        addTo["etajj"] =
+          std::function<FType>([](const edm::Ptr<T>& obj, uwvv::EventInfo& evt, const std::string& option)
+                               {
+                                 return (evt.jets(option)->size() >= 2 ?
+                                         (evt.jets(option)->at(0).p4()+evt.jets(option)->at(1).p4()).eta() :
+                                         -999.);
+                               });
+
+        addTo["phijj"] =
+          std::function<FType>([](const edm::Ptr<T>& obj, uwvv::EventInfo& evt, const std::string& option)
+                               {
+                                 return (evt.jets(option)->size() >= 2 ?
+                                         (evt.jets(option)->at(0).p4()+evt.jets(option)->at(1).p4()).phi() :
                                          -999.);
                                });
 
@@ -154,43 +241,35 @@ namespace
                                          -1.);
                                });
 
-        addTo["genJet1Pt"] =
-          std::function<FType>([](const edm::Ptr<T>& obj, uwvv::EventInfo& evt, const std::string& option)
-                               {
-                                 return (evt.genJets(option)->size() >= 1 ?
-                                         evt.genJets(option)->at(0).pt() :
-                                         -1.);
-                               });
-
-        addTo["genJet2Pt"] =
-          std::function<FType>([](const edm::Ptr<T>& obj, uwvv::EventInfo& evt, const std::string& option)
-                               {
-                                 return (evt.genJets(option)->size() >= 2 ?
-                                         evt.genJets(option)->at(1).pt() :
-                                         -1.);
-                               });
-
-        addTo["genJet1Eta"] =
-          std::function<FType>([](const edm::Ptr<T>& obj, uwvv::EventInfo& evt, const std::string& option)
-                               {
-                                 return (evt.genJets(option)->size() >= 1 ?
-                                         evt.genJets(option)->at(0).eta() :
-                                         -999.);
-                               });
-
-        addTo["genJet2Eta"] =
-          std::function<FType>([](const edm::Ptr<T>& obj, uwvv::EventInfo& evt, const std::string& option)
-                               {
-                                 return (evt.genJets(option)->size() >= 2 ?
-                                         evt.genJets(option)->at(1).eta() :
-                                         -999.);
-                               });
-
         addTo["mjjGen"] =
           std::function<FType>([](const edm::Ptr<T>& obj, uwvv::EventInfo& evt, const std::string& option)
                                {
                                  return (evt.genJets(option)->size() >= 2 ?
                                          (evt.genJets(option)->at(0).p4()+evt.genJets(option)->at(1).p4()).mass() :
+                                         -999.);
+                               });
+
+        addTo["ptjjGen"] =
+          std::function<FType>([](const edm::Ptr<T>& obj, uwvv::EventInfo& evt, const std::string& option)
+                               {
+                                 return (evt.genJets(option)->size() >= 2 ?
+                                         (evt.genJets(option)->at(0).p4()+evt.genJets(option)->at(1).p4()).pt() :
+                                         -999.);
+                               });
+
+        addTo["etajjGen"] =
+          std::function<FType>([](const edm::Ptr<T>& obj, uwvv::EventInfo& evt, const std::string& option)
+                               {
+                                 return (evt.genJets(option)->size() >= 2 ?
+                                         (evt.genJets(option)->at(0).p4()+evt.genJets(option)->at(1).p4()).eta() :
+                                         -999.);
+                               });
+
+        addTo["phijjGen"] =
+          std::function<FType>([](const edm::Ptr<T>& obj, uwvv::EventInfo& evt, const std::string& option)
+                               {
+                                 return (evt.genJets(option)->size() >= 2 ?
+                                         (evt.genJets(option)->at(0).p4()+evt.genJets(option)->at(1).p4()).phi() :
                                          -999.);
                                });
 
@@ -202,6 +281,28 @@ namespace
                                          -999.);
                                });
 
+
+        addTo["zeppenfeld"] =
+          std::function<FType>([](const edm::Ptr<T>& obj, uwvv::EventInfo& evt, const std::string& option)
+                               {
+                                 if(evt.jets(option)->size() < 2)
+                                   return -999.;
+
+                                 return std::abs(obj->rapidity() -
+                                                 (evt.jets(option)->at(0).rapidity() +
+                                                  evt.jets(option)->at(0).rapidity()) / 2.);
+                               });
+
+        addTo["deltaPhiToJJ"] =
+          std::function<FType>([](const edm::Ptr<T>& obj, uwvv::EventInfo& evt, const std::string& option)
+                               {
+                                 if(evt.jets(option)->size() < 2)
+                                   return -999.;
+
+                                 float phiJJ = (evt.jets(option)->at(0).p4() + evt.jets(option)->at(1).p4()).phi();
+
+                                 return std::abs(deltaPhi(obj->phi(), phiJJ));
+                               });
       }
     };
 

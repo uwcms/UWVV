@@ -292,6 +292,13 @@ if options.muCalib:
     from UWVV.Ntuplizer.templates.muonBranches import muonCalibrationBranches
     extraFinalObjectBranches['m'].append(muonCalibrationBranches)
 
+
+# VBS variables for ZZ
+if zz:
+    from UWVV.Ntuplizer.templates.vbsBranches import vbsBranches
+    extraInitialStateBranches.append(vbsBranches)
+
+
 flowOpts = {
     'isMC' : bool(options.isMC),
     'isSync' : bool(options.isMC) and bool(options.isSync),
@@ -353,6 +360,8 @@ if zz and options.isMC and options.genInfo:
 
     from UWVV.AnalysisTools.templates.GenZZBase import GenZZBase
     from UWVV.AnalysisTools.templates.GenLeptonBase import GenLeptonBase
+    from UWVV.Ntuplizer.templates.vbsBranches import vbsGenBranches
+
     GenFlow = createFlow(GenLeptonBase, GenZZBase)
     genFlow = GenFlow('genFlow', process, suffix='Gen', e='prunedGenParticles',
                       m='prunedGenParticles', j='slimmedGenJets',
@@ -364,7 +373,7 @@ if zz and options.isMC and options.genInfo:
         genMod = cms.EDAnalyzer(
         'GenTreeGeneratorZZ',
         src = genFlow.finalObjTag(chan),
-        branches = makeGenBranchSet(chan),
+        branches = makeGenBranchSet(chan, extraInitialStateBranches=[vbsGenBranches]),
         eventParams = makeGenEventParams(genFlow.finalTags()),
         triggers = genTrg,
         )
