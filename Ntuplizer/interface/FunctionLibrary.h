@@ -131,12 +131,12 @@ namespace
                                {
                                  std::vector<float> out;
                                  
-                                 if (!evt.lheEventInfo().isValid()) {
-                                    std::cout << "NOT VALID!";
-                                    return out;
-                                    }
+                                 if (!evt.lheEventInfo().isValid()) 
+                                   {
+                                     out.push_back(-1);
+                                     return out;
+                                   }
                                  for(const auto& weight : evt.lheEventInfo()->weights())
-                                    //std::cout << weight << std::endl;
                                     out.push_back(weight.wgt);
 
                                  return out;
