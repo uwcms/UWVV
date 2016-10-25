@@ -272,7 +272,7 @@ elif l:
     FlowSteps.append(ZZSkim)
 
 
-if zz or zl or z:
+if (zz or zl or z) and not "wz" in options.channels:
     for f in FlowSteps:
         if f.__name__ in ['ZZFSR', 'ZZFlow']:
             from UWVV.Ntuplizer.templates.fsrBranches import compositeObjectFSRBranches, leptonFSRBranches

@@ -126,6 +126,21 @@ namespace
 
                                  return out;
                                });
+        addTo["lheWeights"] =
+          std::function<FType>([](const edm::Ptr<T>& obj, uwvv::EventInfo& evt, const std::string& option)
+                               {
+                                 std::vector<float> out;
+                                 
+                                 if (!evt.lheEventInfo().isValid()) {
+                                    std::cout << "NOT VALID!";
+                                    return out;
+                                    }
+                                 for(const auto& weight : evt.lheEventInfo()->weights())
+                                    //std::cout << weight << std::endl;
+                                    out.push_back(weight.wgt);
+
+                                 return out;
+                               });
       }
     };
 
