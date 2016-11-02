@@ -16,7 +16,7 @@ from UWVV.Utilities.helpers import pset2Dict, dict2PSet, \
 
 def makeLepBranchSet(lep, extraBranches=[]):
     branches = [objectBranches, leptonBranches]
-    
+
     if lep[0] == 'e':
         branches.append(electronBranches)
     if lep[0] == 'm':
@@ -26,7 +26,7 @@ def makeLepBranchSet(lep, extraBranches=[]):
         for b in extraBranches:
             branches.append(b)
     elif isinstance(extraBranches, cms.PSet):
-        branches.append(extraBranches)    
+        branches.append(extraBranches)
 
     return combinePSets(*branches)
 
@@ -34,7 +34,7 @@ def makeZBranchSet(lep, n, extraBranches=[], extraLepBranches=[], addName=False)
     '''
     lep: 'e' or 'm'
     n: 1 or 2 (so we know whether to make, e.g., e1 and e2 or e3 and e4)
-    addNameToZBranches: workaround for 2l final states: put 'e1_e2' 
+    addNameToZBranches: workaround for 2l final states: put 'e1_e2'
     (or whatever) at the start of the branch names so these branches can have
     the necessary names while the object stays nameless for event variables.
     extraBranches: see makeBranchSet extraIntermediateBranches
@@ -46,7 +46,7 @@ def makeZBranchSet(lep, n, extraBranches=[], extraLepBranches=[], addName=False)
             branches.append(b)
     elif isinstance(extraBranches, cms.PSet):
         branches.append(extraBranches)
-                             
+
     branchSet = combinePSets(*branches)
 
     daughterNames = [lep[0]+str(i) for i in [n*2-1,n*2]]
@@ -66,16 +66,16 @@ def makeZBranchSet(lep, n, extraBranches=[], extraLepBranches=[], addName=False)
 
     return branchSet
 
-def makeBranchSet(channel, extraInitialStateBranches=[], 
-                  extraIntermediateStateBranches=[], 
+def makeBranchSet(channel, extraInitialStateBranches=[],
+                  extraIntermediateStateBranches=[],
                   **extraFinalObjectBranches):
     '''
-    extraInitialStateBranches (PSet or list of PSets): branches for the whole 
+    extraInitialStateBranches (PSet or list of PSets): branches for the whole
         event or the whole system
     extraIntermediateStateBranches (PSet or list of PSets): branches for the Zs
         or other intermediate composite objects
-    extraFinalObjectBranches (PSet or list of PSets keyed to object type, 
-        e.g. 'e'): branches for individual leptons, jets, etc. 
+    extraFinalObjectBranches (PSet or list of PSets keyed to object type,
+        e.g. 'e'): branches for individual leptons, jets, etc.
     '''
     branches = [eventBranches]
 
@@ -88,7 +88,7 @@ def makeBranchSet(channel, extraInitialStateBranches=[],
     finalObjects = mapObjects(channel)
 
     if len(channel) == 1: # single object
-        branches.append(makeLepBranchSet(channel, 
+        branches.append(makeLepBranchSet(channel,
                                          extraInitialStateBranches+extraFinalObjectBranches[channel]))
     elif len(channel) == 2: # single Z
         assert channel[0] == channel[1], '{} does not make a valid Z'.format(channel)
@@ -96,7 +96,7 @@ def makeBranchSet(channel, extraInitialStateBranches=[],
                                        extraFinalObjectBranches.get(channel[0], [])))
     else:
         branches.append(objectBranches)
-        
+
     if len(channel) == 3: # Z+l
         if channel[0] != channel[1]: # emm -> mme
             assert channel[1] == channel[2], "Invalid channel {}".format(channel)
@@ -109,8 +109,8 @@ def makeBranchSet(channel, extraInitialStateBranches=[],
 
         daughterSets = [
             makeZBranchSet(channel[0], 1, extraIntermediateStateBranches,
-                           extraFinalObjectBranches.get(channel[0], [])), 
-            makeLepBranchSet(channel[2], 
+                           extraFinalObjectBranches.get(channel[0], [])),
+            makeLepBranchSet(channel[2],
                              extraFinalObjectBranches.get(channel[2], []))
             ]
         daughterNames = [
@@ -139,7 +139,7 @@ def makeBranchSet(channel, extraInitialStateBranches=[],
     else:
         daughterSets = []
         daughterNames = []
-        
+
     branchSet = combinePSets(*branches)
 
     if daughterSets:
@@ -150,18 +150,22 @@ def makeBranchSet(channel, extraInitialStateBranches=[],
     return branchSet
 
 
-def makeGenBranchSet(channel, extraInitialStateBranches=[], 
-                     extraIntermediateStateBranches=[], 
+def makeGenBranchSet(channel, extraInitialStateBranches=[],
+                     extraIntermediateStateBranches=[],
                      **extraFinalObjectBranches):
     if len(channel) != 4:
         raise RuntimeError("makeGenBranchSet is only implemented for 4l final "
                            "states. Please add it for {}".format(channel))
 
-    branches = [genNtupleEventBranches, objectBranches]
+    if extraFinalObjectBranches:
+        raise NotImplementedError("You never implemented extra gen lepton "
+                                  "branches, dummy")
+
+    branches = [genNtupleEventBranches, objectBranches] + extraInitialStateBranches
     branchSet = combinePSets(*branches)
 
     finalObjects = mapObjects(channel)
-    
+
     daughterNames = [
         '_'.join(finalObjects[:2]+['']),
         '_'.join(finalObjects[2:]+['']),
@@ -170,9 +174,11 @@ def makeGenBranchSet(channel, extraInitialStateBranches=[],
 
     z1BranchSet = objectBranches.clone(
         daughterNames = cms.vstring(*finalObjects[:2]),
-        daughterParams = cms.VPSet(objectBranches.clone(), 
+        daughterParams = cms.VPSet(objectBranches.clone(),
                                    objectBranches.clone()),
         )
+    z1BranchSet = combinePSets(z1BranchSet, *extraIntermediateStateBranches)
+
     z2BranchSet = z1BranchSet.clone(daughterNames=cms.vstring(*finalObjects[2:]))
 
     branchSet.daughterParams = cms.VPSet(z1BranchSet,z2BranchSet)

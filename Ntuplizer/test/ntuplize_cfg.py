@@ -65,7 +65,22 @@ options.register('genInfo', 0,
                  VarParsing.VarParsing.multiplicity.singleton,
                  VarParsing.VarParsing.varType.int,
                  "1 if gen-level ntuples are desired.")
-
+options.register('eScaleShift', 0,
+                 VarParsing.VarParsing.multiplicity.singleton,
+                 VarParsing.VarParsing.varType.int,
+                 'Electron energy scale shift, in units of sigma.')
+options.register('eRhoResShift', 0,
+                 VarParsing.VarParsing.multiplicity.singleton,
+                 VarParsing.VarParsing.varType.int,
+                 'Electron energy smearing rho shift, in units of sigma.')
+options.register('ePhiResShift', 0,
+                 VarParsing.VarParsing.multiplicity.singleton,
+                 VarParsing.VarParsing.varType.int,
+                 'Electron energy smearing phi shift, in units of sigma.')
+options.register('mClosureShift', 0,
+                 VarParsing.VarParsing.multiplicity.singleton,
+                 VarParsing.VarParsing.varType.int,
+                 'Muon calibration closure shift, in units of sigma.')
 
 options.parseArguments()
 
@@ -278,10 +293,25 @@ if options.muCalib:
     extraFinalObjectBranches['m'].append(muonCalibrationBranches)
 
 
+# VBS variables for ZZ
+if zz:
+    from UWVV.Ntuplizer.templates.vbsBranches import vbsBranches
+    extraInitialStateBranches.append(vbsBranches)
+
+
+flowOpts = {
+    'isMC' : bool(options.isMC),
+    'isSync' : bool(options.isMC) and bool(options.isSync),
+
+    'electronScaleShift' : options.eScaleShift,
+    'electronRhoResShift' : options.eRhoResShift,
+    'electronPhiResShift' : options.ePhiResShift,
+    'muonClosureShift' : options.mClosureShift,
+    }
+
 # Turn all these into a single flow class
 FlowClass = createFlow(*FlowSteps)
-flow = FlowClass('flow', process,
-                 isMC=bool(options.isMC), isSync=bool(options.isSync))
+flow = FlowClass('flow', process, **flowOpts)
 
 
 
@@ -330,6 +360,8 @@ if zz and options.isMC and options.genInfo:
 
     from UWVV.AnalysisTools.templates.GenZZBase import GenZZBase
     from UWVV.AnalysisTools.templates.GenLeptonBase import GenLeptonBase
+    from UWVV.Ntuplizer.templates.vbsBranches import vbsGenBranches
+
     GenFlow = createFlow(GenLeptonBase, GenZZBase)
     genFlow = GenFlow('genFlow', process, suffix='Gen', e='prunedGenParticles',
                       m='prunedGenParticles', j='slimmedGenJets',
@@ -341,7 +373,7 @@ if zz and options.isMC and options.genInfo:
         genMod = cms.EDAnalyzer(
         'GenTreeGeneratorZZ',
         src = genFlow.finalObjTag(chan),
-        branches = makeGenBranchSet(chan),
+        branches = makeGenBranchSet(chan, extraInitialStateBranches=[vbsGenBranches]),
         eventParams = makeGenEventParams(genFlow.finalTags()),
         triggers = genTrg,
         )

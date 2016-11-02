@@ -49,6 +49,10 @@ private:
   const double l4PtCut;
   const double etaCut;
   const double ossfMassCut;
+  const double z1MassMin;
+  const double z1MassMax;
+  const double z2MassMin;
+  const double z2MassMax;
 };
 
 
@@ -65,7 +69,15 @@ GenZZCleaner::GenZZCleaner(const edm::ParameterSet& iConfig) :
   etaCut(iConfig.exists("etaCut") ?
          iConfig.getParameter<double>("etaCut") : 2.5),
   ossfMassCut(iConfig.exists("ossfMassCut") ?
-              iConfig.getParameter<double>("ossfMassCut") : 4.)
+              iConfig.getParameter<double>("ossfMassCut") : 4.),
+  z1MassMin(iConfig.exists("z1MassMin") ?
+            iConfig.getParameter<double>("z1MassMin") : 40.),
+  z1MassMax(iConfig.exists("z1MassMax") ?
+            iConfig.getParameter<double>("z1MassMax") : 120.),
+  z2MassMin(iConfig.exists("z2MassMin") ?
+            iConfig.getParameter<double>("z2MassMin") : 4.),
+  z2MassMax(iConfig.exists("z2MassMax") ?
+            iConfig.getParameter<double>("z2MassMax") : 120.)
 {
   produces<std::vector<CCand> >();
 }
@@ -86,8 +98,15 @@ void GenZZCleaner::produce(edm::Event& iEvent,
     {
       CCandPtr c = in->ptrAt(i);
 
-      float dz1 = std::abs(c->daughter(0)->mass() - 91.1876);
-      float dz2 = std::abs(c->daughter(0)->mass() - 91.1876);
+      float mZ1 = c->daughter(0)->mass();
+      if(mZ1 < z1MassMin || mZ1 > z1MassMax)
+        continue;
+      float mZ2 = c->daughter(1)->mass();
+      if(mZ2 < z2MassMin || mZ2 > z2MassMax)
+        continue;
+
+      float dz1 = std::abs(mZ1 - 91.1876);
+      float dz2 = std::abs(mZ2 - 91.1876);
 
       float betterDZ = (dz1 < dz2 ? dz1 : dz2);
 
@@ -123,15 +142,15 @@ void GenZZCleaner::produce(edm::Event& iEvent,
           passl4Pt &= pt > l4PtCut;
         }
 
-      best &= (passl1Pt && passl4Pt && passEta && 
+      best &= (passl1Pt && passl4Pt && passEta &&
                nPassl2Pt >= 2 && nPassl3Pt >= 3);
 
       if(!best)
         continue;
 
-      best &= (passOSSFCuts(daughters.at(0), daughters.at(2)) && 
-               passOSSFCuts(daughters.at(0), daughters.at(3)) && 
-               passOSSFCuts(daughters.at(1), daughters.at(2)) && 
+      best &= (passOSSFCuts(daughters.at(0), daughters.at(2)) &&
+               passOSSFCuts(daughters.at(0), daughters.at(3)) &&
+               passOSSFCuts(daughters.at(1), daughters.at(2)) &&
                passOSSFCuts(daughters.at(1), daughters.at(3)));
 
       if(!best)
@@ -146,10 +165,10 @@ void GenZZCleaner::produce(edm::Event& iEvent,
 
   iEvent.put(std::move(out));
 }
-         
+
 bool GenZZCleaner::passOSSFCuts(const Cand* p1, const Cand* p2) const
 {
-  return p1->pdgId() != -1 * p2->pdgId() || 
+  return p1->pdgId() != -1 * p2->pdgId() ||
     (p1->p4() + p2->p4()).mass() > ossfMassCut;
 }
 

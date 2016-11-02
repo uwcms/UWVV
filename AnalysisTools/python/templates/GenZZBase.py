@@ -26,21 +26,24 @@ class GenZZBase(ZPlusXBaseFlow):
                     checkCharge = cms.bool(False),
                     setPdgId = cms.int32(25),
                     )
-                
+
                 step.addModule(chan+'GenProducer', mod, chan)
-            
-                if chan[1] == chan[2]: # not needed for 2e2mu
-                    cleaner = cms.EDProducer(
-                        "GenZZCleaner",
-                        src = step.getObjTag(chan),
-                        l1PtCut = cms.double(20.),
-                        l2PtCut = cms.double(10.),
-                        l3PtCut = cms.double(5.),
-                        l4PtCut = cms.double(5.),
-                        etaCut = cms.double(2.5),
-                        ossfMassCut = cms.double(4.),
-                        )
-                    step.addModule(chan+'GenZZCleaner', cleaner, chan)
+
+                cleaner = cms.EDProducer(
+                    "GenZZCleaner",
+                    src = step.getObjTag(chan),
+                    l1PtCut = cms.double(20.),
+                    l2PtCut = cms.double(10.),
+                    l3PtCut = cms.double(5.),
+                    l4PtCut = cms.double(5.),
+                    etaCut = cms.double(2.5),
+                    ossfMassCut = cms.double(4.),
+                    z1MassMin = cms.double(60.),
+                    z1MassMax = cms.double(120.),
+                    z2MassMin = cms.double(60.),
+                    z2MassMax = cms.double(120.),
+                    )
+                step.addModule(chan+'GenZZCleaner', cleaner, chan)
 
         if stepName == 'selection':
             # select and cross clean gen jets
