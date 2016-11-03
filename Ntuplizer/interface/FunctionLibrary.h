@@ -179,10 +179,10 @@ namespace
           std::function<FType>([](const edm::Ptr<T>& obj, uwvv::EventInfo& evt, const std::string& option)
                                {
                                  float totalEt = obj->et() + evt.met().et();
-                                 float totalPt = obj->pt() + evt.met().pt();
+                                 float totalPt = (obj->p4() + evt.met().p4()).pt();
                                  float mtSqr = totalEt * totalEt - totalPt * totalPt;
 
-                                 return std::sqrt(std::abs(mtSqr));
+                                 return std::sqrt(mtSqr);
                                });
 
         addTo["mjj"] =
