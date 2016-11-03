@@ -201,6 +201,10 @@ if any(len(c) == 4 for c in channels):
     from UWVV.Ntuplizer.templates.eventBranches import centralJetBranches
     extraInitialStateBranches.append(centralJetBranches)
 
+# FSR and ZZ/HZZ stuff
+from UWVV.AnalysisTools.templates.ZZFlow import ZZFlow
+FlowSteps.append(ZZFlow)
+
 # make final states
 if zz:
     from UWVV.AnalysisTools.templates.ZZInitialStateBaseFlow import ZZInitialStateBaseFlow
@@ -222,10 +226,6 @@ if zz:
         from UWVV.Ntuplizer.templates.zzDiscriminantBranches import zzDiscriminantBranches, kinFitBranches
         extraInitialStateBranches += [zzDiscriminantBranches, kinFitBranches]
 
-    # FSR and other ZZ/HZZ stuff
-    from UWVV.AnalysisTools.templates.ZZFlow import ZZFlow
-    FlowSteps.append(ZZFlow)
-
     from UWVV.AnalysisTools.templates.ZZSkim import ZZSkim
     FlowSteps.append(ZZSkim)
 
@@ -245,20 +245,7 @@ elif zl or z:
         from UWVV.Ntuplizer.templates.countBranches import wzCountBranches
         extraInitialStateBranches.append(wzCountBranches)
 
-    # FSR and other ZZ/HZZ stuff
-    from UWVV.AnalysisTools.templates.ZZID import ZZID
-    from UWVV.AnalysisTools.templates.ZZIso import ZZIso
-    from UWVV.AnalysisTools.templates.ZZFSR import ZZFSR
-    FlowSteps.append(ZZID)
-    FlowSteps.append(ZZFSR)
-    FlowSteps.append(ZZIso)
-
-    from UWVV.AnalysisTools.templates.ZZCrossCleaning import ZZCrossCleaning
-    FlowSteps.append(ZZCrossCleaning)
 elif l:
-    from UWVV.AnalysisTools.templates.ZZFlow import ZZFlow
-    FlowSteps.append(ZZFlow)
-
     from UWVV.AnalysisTools.templates.ZZSkim import ZZSkim
     FlowSteps.append(ZZSkim)
 
