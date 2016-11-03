@@ -17,7 +17,7 @@ class MuonScaleFactors(AnalysisFlowBase):
         if stepName == 'embedding' and self.isMC:
 
             sfFile = path.join(UWVV_BASE_PATH, 'data', 'LeptonScaleFactors',
-                               'muEfficiencySF_all_HZZ_ICHEP16_final.root')
+                               'muEfficiencySF_all_HZZ_ICHEP16_final_withErrors.root')
             sfName = 'FINAL'
 
             scaleFactorEmbedder = cms.EDProducer(
@@ -42,13 +42,13 @@ class MuonScaleFactors(AnalysisFlowBase):
                 xValue = cms.string('eta'),
                 yValue = cms.string('pt'),
                 )
-            step.addModule('scaleFactorErrorEmbedderM', 
+            step.addModule('scaleFactorErrorEmbedderM',
                            scaleFactorErrorEmbedder, 'm')
 
         return step
 
 
-    
+
 
 
 
