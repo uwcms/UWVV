@@ -18,7 +18,8 @@ muonBranches = cms.PSet(
         PFPhotonIso = cms.string('pfIsolationR03.sumPhotonEt'),
         PFNeutralIso = cms.string('pfIsolationR03.sumNeutralHadronEt'),
         PFPUIso = cms.string('pfIsolationR03.sumPUPt'),
-
+        TrackIso = cms.string('trackIso()'), 
+        
         PtErr = cms.string('? hasUserFloat("kalmanPtError") ? '
                            'userFloat("kalmanPtError") : '
                            'bestTrack.ptError'),

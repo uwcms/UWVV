@@ -332,6 +332,32 @@ if zz:
         extraInitialStateBranches.append(vbsSystematicBranches)
 
 
+flowOpts = {
+    'isMC' : bool(options.isMC),
+    'isSync' : bool(options.isMC) and bool(options.isSync),
+
+    'electronScaleShift' : options.eScaleShift,
+    'electronRhoResShift' : options.eRhoResShift,
+    'electronPhiResShift' : options.ePhiResShift,
+    'muonClosureShift' : options.mClosureShift,
+    }
+
+# Turn all these into a single flow class
+FlowClass = createFlow(*FlowSteps)
+flow = FlowClass('flow', process, **flowOpts)
+
+
+
+### Set up tree makers
+
+# meta info tree first
+process.metaInfo = cms.EDAnalyzer(
+    'MetaTreeGenerator',
+    eventParams = makeEventParams(flow.finalTags()),
+    )
+process.metaTreePath = cms.Path(process.metaInfo)
+process.schedule.append(process.metaTreePath)
+
 # Trigger info is only in MC from reHLT campaign
 if 'RunIISpring16' in options.inputFiles[0] and 'reHLT' not in options.inputFiles[0] and 'withHLT' not in options.inputFiles[0]:
     trgBranches = cms.PSet(
@@ -352,6 +378,21 @@ else:
     if 'reHLT' in options.inputFiles[0]:
         trgBranches = trgBranches.clone(trigResultsSrc=cms.InputTag("TriggerResults", "", "HLT2"))
 
+process.treeSequence = cms.Sequence()
+# then the ntuples
+for chan in channels:
+    mod = cms.EDAnalyzer(
+        'TreeGenerator{}'.format(expandChannelName(chan)),
+        src = flow.finalObjTag(chan),
+        branches = makeBranchSet(chan, extraInitialStateBranches,
+                                 extraIntermediateStateBranches,
+                                 **extraFinalObjectBranches),
+        eventParams = makeEventParams(flow.finalTags()),
+        triggers = trgBranches,
+        )
+
+    setattr(process, chan, mod)
+    process.treeSequence += mod
 
 # Gen ntuples if desired
 if zz and options.isMC and options.genInfo:
@@ -415,57 +456,6 @@ if zz and options.isMC and options.genInfo:
     pGen += process.genTreeSequence
     process.schedule.append(pGen)
 
-
-flowOpts = {
-    'isMC' : bool(options.isMC),
-    'isSync' : bool(options.isMC) and bool(options.isSync),
-
-    'electronScaleShift' : options.eScaleShift,
-    'electronRhoResShift' : options.eRhoResShift,
-    'electronPhiResShift' : options.ePhiResShift,
-    'muonClosureShift' : options.mClosureShift,
-    }
-
-# include gen initial states' input tags if needed
-if zz and options.isMC and options.genInfo:
-    for chan in channels:
-        flowOpts[chan+'Gen'] = genFlow.finalObjTagString(chan)
-    from UWVV.Ntuplizer.templates.eventBranches import genInitialStateBranches
-    extraInitialStateBranches.append(genInitialStateBranches)
-
-# Turn all these into a single flow class
-FlowClass = createFlow(*FlowSteps)
-flow = FlowClass('flow', process, **flowOpts)
-
-
-
-### Set up tree makers
-
-# meta info tree first
-process.metaInfo = cms.EDAnalyzer(
-    'MetaTreeGenerator',
-    eventParams = makeEventParams(flow.finalTags()),
-    )
-process.treeSequence = cms.Sequence(process.metaInfo)
-
-
-# then the ntuples
-for chan in channels:
-    mod = cms.EDAnalyzer(
-        'TreeGenerator{}'.format(expandChannelName(chan)),
-        src = flow.finalObjTag(chan),
-        branches = makeBranchSet(chan, extraInitialStateBranches,
-                                 extraIntermediateStateBranches,
-                                 **extraFinalObjectBranches),
-        eventParams = makeEventParams(flow.finalTags(),chan),
-        triggers = trgBranches,
-        )
-
-    setattr(process, chan, mod)
-    process.treeSequence += mod
-
-
 p = flow.getPath()
 p += process.treeSequence
-
 process.schedule.append(p)

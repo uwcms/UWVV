@@ -87,3 +87,6 @@ AnalysisTools/plugins/ZZDiscriminantEmbedder.cc
 AnalysisTools/plugins/ZKinematicFitEmbedder.cc
 # But don't ignore the .txt files they're now stored in
 !AnalysisTools/plugins/*Code.txt
+
+# Crab submit directories 
+crab_*
