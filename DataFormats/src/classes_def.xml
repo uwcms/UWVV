@@ -1,0 +1,19 @@
+<lcgdict>
+<selection>
+    <class name="DressedGenParticle"/>
+    <class name="DressedGenParticleCollection"/>
+    <class name="std::vector<DressedGenParticle>"/>
+    <class name="std::vector<DressedGenParticle*>"/>
+    <class name="edm::RefProd<DressedGenParticleCollection>"/>
+    <class name="edm::RefVector<DressedGenParticleCollection>"/>
+    <class name="edm::Wrapper<DressedGenParticleCollection>"/>
+    <class name="edm::Wrapper<edm::OwnVector<DressedGenParticle>>"/>
+    <class name="edm::OwnVector<DressedGenParticle, edm::ClonePolicy<DressedGenParticle> >" />
+    <class name="edm::Wrapper<edm::OwnVector<DressedGenParticle, edm::ClonePolicy<DressedGenParticle> > >" />
+</selection>
+<exclusion>
+    <class name="edm::OwnVector<DressedGenParticle, edm::ClonePolicy<DressedGenParticle> >">
+        <method name="sort" />
+    </class>
+</exclusion>
+</lcgdict>
