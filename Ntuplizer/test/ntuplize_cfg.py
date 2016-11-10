@@ -360,7 +360,7 @@ if zz and options.isMC and options.genInfo:
         from UWVV.AnalysisTools.templates.GenLeptonBase import GenLeptonBase
         GenFlow = createFlow(GenLeptonBase, GenZZBase)
     genFlow = GenFlow('genFlow', process, suffix='Gen', e='prunedGenParticles',
-                    m='prunedGenParticles', g='prunedGenParticles', j='slimmedGenJets',
+                    m='prunedGenParticles', a='prunedGenParticles', j='slimmedGenJets',
                     pfCands='packedGenParticles')
 
     genTrg = trgBranches.clone(trigNames=cms.vstring())

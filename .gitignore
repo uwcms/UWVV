@@ -78,3 +78,6 @@ br.sm[12]
 input.DAT
 process.DAT
 ffwarn.dat
+
+# Generated WZ submissions scripts
+scripts/WZSubmission/GeneratedScripts

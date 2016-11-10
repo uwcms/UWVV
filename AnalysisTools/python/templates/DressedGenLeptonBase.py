@@ -30,7 +30,7 @@ class DressedGenLeptonBase(AnalysisFlowBase):
                 associates = step.getObjTag('a'),
                 dRmax = cms.untracked.double(0.1)
             )
-            step.addModule('dressedGenEMod', dressedGenEMod, 'e')
+            step.addModule('dressedElectrons', dressedGenEMod, 'e')
 
             genMuMod = cms.EDFilter(
                 "GenParticleSelector",
@@ -40,11 +40,11 @@ class DressedGenLeptonBase(AnalysisFlowBase):
             step.addModule('genSelectionMu', genMuMod, 'm')
             
             dressedGenMuMod = cms.EDProducer("DressedGenParticlesProducer",
-                baseCollection = step.getObjTag('e'),
+                baseCollection = step.getObjTag('m'),
                 associates = step.getObjTag('a'),
                 dRmax = cms.untracked.double(0.1)
             )
-            step.addModule('dressedGenMuMod', dressedGenMuMod, 'm')
+            step.addModule('dressedMuons', dressedGenMuMod, 'm')
 
         return step
 

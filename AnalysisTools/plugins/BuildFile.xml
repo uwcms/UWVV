@@ -15,6 +15,7 @@
 <use name="DataFormats/Math"/>
 <use name="PhysicsTools/PatAlgos"/>
 <use name="JetMETCorrections/Objects"/>
+<use name="UWVV/DataFormats"/>
 
 <library file="*.cc" name="UWVVAnalysisToolsPlugins">
   <flags EDM_PLUGIN="1"/>

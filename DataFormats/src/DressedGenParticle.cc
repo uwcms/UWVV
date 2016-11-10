@@ -24,7 +24,6 @@ DressedGenParticle::DressedGenParticle(const reco::GenParticle& cand,
     const reco::GenParticleCollection assocCollection, 
     const float dRmax) :
         reco::GenParticle(cand), p4_undressed(cand.p4()) {
-    std::cout << "Number of photons " << assocCollection.size() << std::endl;
     for (const auto& associated : assocCollection) {
         if (reco::deltaR(cand.p4(), associated.p4()) < dRmax) {
             this->setP4(this->p4() + associated.p4());
