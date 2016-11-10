@@ -3,20 +3,20 @@ from UWVV.AnalysisTools.AnalysisFlowBase import AnalysisFlowBase
 import FWCore.ParameterSet.Config as cms
 
 
-class GenLeptonBase(AnalysisFlowBase):
+class DressedGenLeptonBase(AnalysisFlowBase):
     def __init__(self, *args, **kwargs):
         self.flag = kwargs.pop('leptonStatusFlag', 'fromHardProcessFinalState')
-        super(GenLeptonBase, self).__init__(*args, **kwargs)
+        super(DressedGenLeptonBase, self).__init__(*args, **kwargs)
 
     def makeAnalysisStep(self, stepName, **inputs):
-        step = super(GenLeptonBase, self).makeAnalysisStep(stepName, **inputs)
+        step = super(DressedGenLeptonBase, self).makeAnalysisStep(stepName, **inputs)
 
         if stepName == 'selection':
             promptPhotonsMod = cms.EDFilter("GenParticleSelector",
-                src = cms.InputTag(genParticlesLabel),
+                src = step.getObjTag('a'),
                 cut = cms.string("pdgId = 22 && statusFlags().isPrompt() && status() == 1")
             )
-            step.addModule('promptPhotonsMod', genEMod, 'g')
+            step.addModule('promptPhotonsMod', promptPhotonsMod, 'a')
             
             genEMod = cms.EDFilter(
                 "GenParticleSelector",
@@ -27,10 +27,10 @@ class GenLeptonBase(AnalysisFlowBase):
             
             dressedGenEMod = cms.EDProducer("DressedGenParticlesProducer",
                 baseCollection = step.getObjTag('e'),
-                associates = step.getObjTag('g'),
+                associates = step.getObjTag('a'),
                 dRmax = cms.untracked.double(0.1)
             )
-            step.addModule('dressedGenEMod', genEMod, 'e')
+            step.addModule('dressedGenEMod', dressedGenEMod, 'e')
 
             genMuMod = cms.EDFilter(
                 "GenParticleSelector",
@@ -41,11 +41,10 @@ class GenLeptonBase(AnalysisFlowBase):
             
             dressedGenMuMod = cms.EDProducer("DressedGenParticlesProducer",
                 baseCollection = step.getObjTag('e'),
-                associates = step.getObjTag('g'),
+                associates = step.getObjTag('a'),
                 dRmax = cms.untracked.double(0.1)
             )
-            step.addModule('dressedGenMuMod', genEMod, 'm')
+            step.addModule('dressedGenMuMod', dressedGenMuMod, 'm')
 
         return step
-
 

@@ -53,6 +53,7 @@ class AnalysisFlowBase(object):
         out = {
             'e' : 'slimmedElectrons',
             'm' : 'slimmedMuons',
+            'a' : 'slimmedPhotons',
             'j' : 'slimmedJets',
             'v' : 'offlineSlimmedPrimaryVertices',
             'pfCands' : 'packedPFCandidates',

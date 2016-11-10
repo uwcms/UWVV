@@ -65,6 +65,11 @@ options.register('genInfo', 0,
                  VarParsing.VarParsing.multiplicity.singleton,
                  VarParsing.VarParsing.varType.int,
                  "1 if gen-level ntuples are desired.")
+options.register('genLeptonType', 'fromHardProcessFS',
+                 VarParsing.VarParsing.multiplicity.singleton,
+                 VarParsing.VarParsing.varType.string,
+                 "lepton type. Options: dressedHPFS, dressedFS, "
+                 "hardProcesFS, hardProcess")
 options.register('eScaleShift', 0,
                  VarParsing.VarParsing.multiplicity.singleton,
                  VarParsing.VarParsing.varType.int,
@@ -346,14 +351,17 @@ if zz and options.isMC and options.genInfo:
     process.genTreeSequence = cms.Sequence()
 
     from UWVV.AnalysisTools.templates.GenZZBase import GenZZBase
-    from UWVV.AnalysisTools.templates.GenLeptonBase import GenLeptonBase
     from UWVV.Ntuplizer.templates.vbsBranches import vbsGenBranches
-    from UWVV.AnalysisTools.templates.DressedGenLeptonBase import DressedGenLeptonBase
     
-    GenFlow = createFlow(GenLeptonBase, GenZZBase)
+    if "dressed" in options.genLeptonType:
+        from UWVV.AnalysisTools.templates.DressedGenLeptonBase import DressedGenLeptonBase
+        GenFlow = createFlow(DressedGenLeptonBase, GenZZBase)
+    else:
+        from UWVV.AnalysisTools.templates.GenLeptonBase import GenLeptonBase
+        GenFlow = createFlow(GenLeptonBase, GenZZBase)
     genFlow = GenFlow('genFlow', process, suffix='Gen', e='prunedGenParticles',
-                      m='prunedGenParticles', j='slimmedGenJets',
-                      pfCands='packedGenParticles')
+                    m='prunedGenParticles', g='prunedGenParticles', j='slimmedGenJets',
+                    pfCands='packedGenParticles')
 
     genTrg = trgBranches.clone(trigNames=cms.vstring())
 
