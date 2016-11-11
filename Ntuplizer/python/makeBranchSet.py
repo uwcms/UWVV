@@ -157,10 +157,6 @@ def makeGenBranchSet(channel, extraInitialStateBranches=[],
         raise RuntimeError("makeGenBranchSet is only implemented for 4l final "
                            "states. Please add it for {}".format(channel))
 
-    if extraFinalObjectBranches:
-        raise NotImplementedError("You never implemented extra gen lepton "
-                                  "branches, dummy")
-
     branches = [genNtupleEventBranches, objectBranches] + extraInitialStateBranches
     branchSet = combinePSets(*branches)
 
@@ -172,14 +168,25 @@ def makeGenBranchSet(channel, extraInitialStateBranches=[],
         ]
     branchSet.daughterNames = cms.vstring(*daughterNames)
 
+    finalObjBranches = {
+        'e' : combinePSets(objectBranches.clone(), extraFinalObjectBranches.get('e',cms.PSet())),
+        'm' : combinePSets(objectBranches.clone(), extraFinalObjectBranches.get('m',cms.PSet())),
+        }
+
     z1BranchSet = objectBranches.clone(
         daughterNames = cms.vstring(*finalObjects[:2]),
-        daughterParams = cms.VPSet(objectBranches.clone(),
-                                   objectBranches.clone()),
+        daughterParams = cms.VPSet(finalObjBranches[channel[0]],
+                                   finalObjBranches[channel[0]]),
         )
     z1BranchSet = combinePSets(z1BranchSet, *extraIntermediateStateBranches)
 
-    z2BranchSet = z1BranchSet.clone(daughterNames=cms.vstring(*finalObjects[2:]))
+    z2BranchSet = objectBranches.clone(
+        daughterNames = cms.vstring(*finalObjects[2:]),
+        daughterParams = cms.VPSet(finalObjBranches[channel[2]],
+                                   finalObjBranches[channel[2]]),
+        )
+
+    z2BranchSet = combinePSets(z2BranchSet, *extraIntermediateStateBranches)
 
     branchSet.daughterParams = cms.VPSet(z1BranchSet,z2BranchSet)
 
