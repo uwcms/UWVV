@@ -40,6 +40,12 @@ const reco::Candidate::LorentzVector DressedGenParticle::undressedP4() const {
 float DressedGenParticle::undressedPt() const {
     return p4_undressed.pt();
 }
+float DressedGenParticle::undressedEta() const {
+    return p4_undressed.eta();
+}
+float DressedGenParticle::undressedPhi() const {
+    return p4_undressed.phi();
+}
 float DressedGenParticle::numAssociated() const {
     return associates.size();
 }

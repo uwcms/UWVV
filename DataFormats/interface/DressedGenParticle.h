@@ -22,6 +22,8 @@ class DressedGenParticle : public reco::GenParticle {
         DressedGenParticle* clone() const;
         const LorentzVector undressedP4() const;
         float undressedPt() const;
+        float undressedEta() const;
+        float undressedPhi() const;
         float numAssociated() const;
         bool isAssociated(const reco::GenParticle& associated) const;
         reco::GenParticleCollection getAssociated() const;
