@@ -21,7 +21,7 @@ leptonBranches = cms.PSet(
         ),
     )
 
-matchedGenleptonBranches = cms.PSet(
+matchedGenLeptonBranches = cms.PSet(
     floats = cms.PSet(
         GenPt = cms.string('? genParticleRef.isNull ? -999. : genParticleRef.pt'),
         GenEta = cms.string('? genParticleRef.isNull ? -999. : genParticleRef.eta'),
@@ -35,9 +35,9 @@ matchedGenleptonBranches = cms.PSet(
 
 dressedGenLeptonBranches = cms.PSet(
     floats = cms.PSet(
-        GenUndressedPt = cms.string('undressedPt'),
-        GenUndressedEta = cms.string('undressedEta'),
-        GenUndressedPhi = cms.string('undressedPhi'),
+        UndressedPt = cms.string('undressedPt'),
+        UndressedEta = cms.string('undressedEta'),
+        UndressedPhi = cms.string('undressedPhi'),
         ),
     ints = cms.PSet(
         nAssociatedPhotons = cms.string('numAssociated'),
