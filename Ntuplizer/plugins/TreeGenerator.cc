@@ -32,6 +32,7 @@
 #include "UWVV/Ntuplizer/interface/BranchManager.h"
 #include "UWVV/Ntuplizer/interface/EventInfo.h"
 #include "UWVV/Ntuplizer/interface/TriggerBranches.h"
+#include "UWVV/DataFormats/interface/DressedGenParticle.h"
 
 
 using namespace uwvv;
@@ -155,6 +156,14 @@ typedef TreeGenerator<CompositeDaughter<CompositeDaughter<reco::GenParticle, rec
                                         reco::GenParticle
                                         > 
                       > GenTreeGeneratorWZ;
+typedef TreeGenerator<CompositeDaughter<CompositeDaughter<DressedGenParticle, DressedGenParticle>, 
+                                        CompositeDaughter<DressedGenParticle, DressedGenParticle> 
+                                        > 
+                      > GenDressedTreeGeneratorZZ;
+typedef TreeGenerator<CompositeDaughter<CompositeDaughter<DressedGenParticle, DressedGenParticle>,
+                                        DressedGenParticle
+                                        > 
+                      > GenDressedTreeGeneratorWZ;
 
 
 #include "FWCore/Framework/interface/MakerMacros.h"
@@ -172,4 +181,6 @@ DEFINE_FWK_MODULE(TreeGeneratorE);
 DEFINE_FWK_MODULE(TreeGeneratorMu);
 
 DEFINE_FWK_MODULE(GenTreeGeneratorZZ);
+DEFINE_FWK_MODULE(GenDressedTreeGeneratorWZ);
+DEFINE_FWK_MODULE(GenDressedTreeGeneratorZZ);
 DEFINE_FWK_MODULE(GenTreeGeneratorWZ);

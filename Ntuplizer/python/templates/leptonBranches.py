@@ -24,6 +24,7 @@ leptonBranches = cms.PSet(
 leptonGenBranches = cms.PSet(
     floats = cms.PSet(
         GenPt = cms.string('? genParticleRef.isNull ? -999. : genParticleRef.pt'),
+        GenUndressedPt = cms.string('? genParticleRef.isNull ? -999. : genParticleRef.undressedPt'),
         GenEta = cms.string('? genParticleRef.isNull ? -999. : genParticleRef.eta'),
         GenPhi = cms.string('? genParticleRef.isNull ? -999. : genParticleRef.phi'),
         ),
