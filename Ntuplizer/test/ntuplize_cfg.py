@@ -90,7 +90,7 @@ options.register('mClosureShift', 0,
 options.parseArguments()
 
 genLepChoices =  {"hardProcess" : "isHardProcess()", 
-        "fromHardProcessFS" : "fromHardProcessFinalState()",
+        "hardProcessFS" : "fromHardProcessFinalState()",
         "finalstate" : "status() == 1", 
         "promptFS" : "isPromptFinalState()", 
         "dressedHPFS" : "fromHardProcessFinalState()",
