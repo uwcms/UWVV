@@ -132,10 +132,8 @@ namespace
                                  std::vector<float> out;
                                  
                                  if (!evt.lheEventInfo().isValid()) 
-                                   {
-                                     out.push_back(-1);
-                                     return out;
-                                   }
+                                   throw cms::Exception("ProductNotFound")
+                                       << "Unable to open LHE event information";
                                  for(const auto& weight : evt.lheEventInfo()->weights())
                                     out.push_back(weight.wgt);
 

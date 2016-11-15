@@ -10,7 +10,6 @@ eventBranches = cms.PSet(
         type1_pfMETPhi = cms.string('type1_pfMETPhi'),
         ),
     vFloats = cms.PSet(
-        lheWeights = cms.vstring('lheWeights'),
         jetPt = cms.vstring('jetPt'),
         jetEta = cms.vstring('jetEta'),
         jetPhi = cms.vstring('jetPhi'),
@@ -27,6 +26,12 @@ eventBranches = cms.PSet(
         ),
     ulls = cms.PSet(
         evt = cms.string('evt'),
+        ),
+    )
+
+eventWeightBranches = cms.PSet(
+    vFloats = cms.PSet(
+        lheWeights = cms.vstring('lheWeights'),
         ),
     )
 

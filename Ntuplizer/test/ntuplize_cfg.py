@@ -86,6 +86,10 @@ options.register('mClosureShift', 0,
                  VarParsing.VarParsing.multiplicity.singleton,
                  VarParsing.VarParsing.varType.int,
                  'Muon calibration closure shift, in units of sigma.')
+options.register('lheWeights', 1,
+                 VarParsing.VarParsing.multiplicity.singleton,
+                 VarParsing.VarParsing.varType.int,
+                 'Add LHE weights from Monte Carlo (default True)')
 
 options.parseArguments()
 
@@ -212,6 +216,10 @@ FlowSteps.append(JetBaseFlow)
 if options.isMC:
     from UWVV.Ntuplizer.templates.eventBranches import jesSystematicBranches
     extraInitialStateBranches.append(jesSystematicBranches)
+    
+    if options.lheWeights:
+        from UWVV.Ntuplizer.templates.eventBranches import eventWeightBranches
+        extraInitialStateBranches.append(eventWeightBranches)
 
     from UWVV.Ntuplizer.templates.eventBranches import eventGenBranches
     extraInitialStateBranches.append(eventGenBranches)
@@ -266,7 +274,6 @@ elif zl or z:
 
         from UWVV.Ntuplizer.templates.countBranches import wzCountBranches
         extraInitialStateBranches.append(wzCountBranches)
-
 elif l:
     from UWVV.AnalysisTools.templates.ZZSkim import ZZSkim
     FlowSteps.append(ZZSkim)
