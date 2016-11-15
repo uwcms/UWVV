@@ -1,10 +1,10 @@
-from UWVV.AnalysisTools.templates.ZPlusXBaseFlow import ZPlusXBaseFlow
+from UWVV.AnalysisTools.templates.ZPlusXBaseFlow import ZPlusXBaseFlowGen
 from UWVV.Utilities.helpers import mapObjects, parseChannels
 
 import FWCore.ParameterSet.Config as cms
 
 
-class GenZZBase(ZPlusXBaseFlow):
+class GenZZBase(ZPlusXBaseFlowGen):
     def __init__(self, *args, **kwargs):
         super(GenZZBase, self).__init__(*args, **kwargs)
 
