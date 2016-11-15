@@ -16,12 +16,14 @@
 #include "DataFormats/PatCandidates/interface/Muon.h"
 #include "DataFormats/PatCandidates/interface/CompositeCandidate.h"
 #include "DataFormats/Common/interface/Ptr.h"
+#include "DataFormats/HepMCCandidate/interface/GenParticle.h"
 
 // UWVV
 #include "UWVV/Ntuplizer/interface/EventInfo.h"
 #include "UWVV/Ntuplizer/interface/BranchHolder.h"
 #include "UWVV/Ntuplizer/interface/FunctionLibrary.h"
 #include "UWVV/Utilities/interface/helpers.h"
+#include "UWVV/DataFormats/interface/DressedGenParticle.h"
 
 namespace uwvv
 {
@@ -308,19 +310,43 @@ namespace uwvv
     {
       return cand->daughter(1)->pt() > cand->daughter(0)->pt();
     }
+  template<> bool
+    BranchManager<CompositeDaughter<reco::GenParticle, reco::GenParticle> >::daughtersNeedReorder(const edm::Ptr<pat::CompositeCandidate>& cand) const
+    {
+      return cand->daughter(1)->pt() > cand->daughter(0)->pt();
+    }
+  template<> bool
+    BranchManager<CompositeDaughter<DressedGenParticle, DressedGenParticle> >::daughtersNeedReorder(const edm::Ptr<pat::CompositeCandidate>& cand) const
+    {
+      return cand->daughter(1)->pt() > cand->daughter(0)->pt();
+    }
 
   // 4e and 4mu candidates should be ordered by Z compatibility
   template<> bool
     BranchManager<CompositeDaughter<CompositeDaughter<pat::Electron, pat::Electron>,
     CompositeDaughter<pat::Electron, pat::Electron> > >::daughtersNeedReorder(const edm::Ptr<pat::CompositeCandidate>& cand) const
     {
-      return helpers::zsNeedReorder<pat::Electron, pat::Electron>(cand);
+      return helpers::zsNeedReorder(cand);
     }
   template<> bool
     BranchManager<CompositeDaughter<CompositeDaughter<pat::Muon, pat::Muon>,
     CompositeDaughter<pat::Muon, pat::Muon> > >::daughtersNeedReorder(const edm::Ptr<pat::CompositeCandidate>& cand) const
     {
-      return helpers::zsNeedReorder<pat::Muon, pat::Muon>(cand);
+      return helpers::zsNeedReorder(cand);
+    }
+  template<> bool
+    BranchManager<CompositeDaughter<CompositeDaughter<reco::GenParticle, reco::GenParticle>,
+    CompositeDaughter<reco::GenParticle, reco::GenParticle> > >::daughtersNeedReorder(const edm::Ptr<pat::CompositeCandidate>& cand) const
+    {
+      return std::abs(cand->daughter(0)->daughter(0)->pdgId()) == std::abs(cand->daughter(1)->daughter(0)->pdgId()) &&
+        helpers::zsNeedReorder(cand);
+    }
+  template<> bool
+    BranchManager<CompositeDaughter<CompositeDaughter<DressedGenParticle, DressedGenParticle>,
+    CompositeDaughter<DressedGenParticle, DressedGenParticle> > >::daughtersNeedReorder(const edm::Ptr<pat::CompositeCandidate>& cand) const
+    {
+      return std::abs(cand->daughter(0)->daughter(0)->pdgId()) == std::abs(cand->daughter(1)->daughter(0)->pdgId()) &&
+        helpers::zsNeedReorder(cand);
     }
 
 } // namespace
