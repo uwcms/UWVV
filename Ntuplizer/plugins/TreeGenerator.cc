@@ -1,12 +1,12 @@
-/////////////////////////////////////////////////////////////////////////////    
-//                                                                         //    
-//    TreeGenerator                                                        //    
-//                                                                         //    
-//    A builder of ntuples from composite candidates.                      //    
-//                                                                         //    
-//    Nate Woods, U. Wisconsin                                             //    
-//                                                                         //    
-/////////////////////////////////////////////////////////////////////////////    
+/////////////////////////////////////////////////////////////////////////////
+//                                                                         //
+//    TreeGenerator                                                        //
+//                                                                         //
+//    A builder of ntuples from composite candidates.                      //
+//                                                                         //
+//    Nate Woods, U. Wisconsin                                             //
+//                                                                         //
+/////////////////////////////////////////////////////////////////////////////
 
 
 //STL
@@ -24,6 +24,7 @@
 #include "CommonTools/UtilAlgos/interface/TFileService.h"
 
 #include "DataFormats/Candidate/interface/Candidate.h"
+#include "DataFormats/HepMCCandidate/interface/GenParticle.h"
 
 // ROOT
 #include "TTree.h"
@@ -37,7 +38,7 @@
 
 using namespace uwvv;
 
-template<class T> 
+template<class T>
 class TreeGenerator : public edm::one::EDAnalyzer<edm::one::SharedResources>
 {
   // If this is a particle candidate, we can make branches directly from it
@@ -69,7 +70,7 @@ class TreeGenerator : public edm::one::EDAnalyzer<edm::one::SharedResources>
 template<class T>
 TreeGenerator<T>::TreeGenerator(const edm::ParameterSet& config) :
   candToken(consumes<edm::View<Cand> >(config.getParameter<edm::InputTag>("src"))),
-  ntupleName(config.exists("ntupleName") ? 
+  ntupleName(config.exists("ntupleName") ?
              config.getParameter<std::string>("ntupleName") : "ntuple"),
   tree(makeTree()),
   evtInfo(consumesCollector(), config.getParameter<edm::ParameterSet>("eventParams"))
@@ -77,10 +78,10 @@ TreeGenerator<T>::TreeGenerator(const edm::ParameterSet& config) :
   usesResource("TFileService");
 
   const edm::ParameterSet& branchParams = config.getParameter<edm::ParameterSet>("branches");
-  branches = 
+  branches =
     std::unique_ptr<BranchManager<T> >(new BranchManager<T>("", tree, branchParams));
 
-  const edm::ParameterSet& triggers = config.getParameter<edm::ParameterSet>("triggers");  
+  const edm::ParameterSet& triggers = config.getParameter<edm::ParameterSet>("triggers");
   triggerBranches = std::unique_ptr<TriggerBranches>(new TriggerBranches(consumesCollector(),
                                                                          triggers, tree));
 }
@@ -115,54 +116,54 @@ TreeGenerator<T>::analyze(const edm::Event &event,
 }
 
 
-typedef TreeGenerator<CompositeDaughter<CompositeDaughter<pat::Electron, pat::Electron>, 
-                                        CompositeDaughter<pat::Electron, pat::Electron> 
-                                        > 
+typedef TreeGenerator<CompositeDaughter<CompositeDaughter<pat::Electron, pat::Electron>,
+                                        CompositeDaughter<pat::Electron, pat::Electron>
+                                        >
                       > TreeGeneratorEEEE;
-typedef TreeGenerator<CompositeDaughter<CompositeDaughter<pat::Electron, pat::Electron>, 
-                                        CompositeDaughter<pat::Muon, pat::Muon> 
-                                        > 
+typedef TreeGenerator<CompositeDaughter<CompositeDaughter<pat::Electron, pat::Electron>,
+                                        CompositeDaughter<pat::Muon, pat::Muon>
+                                        >
                       > TreeGeneratorEEMuMu;
-typedef TreeGenerator<CompositeDaughter<CompositeDaughter<pat::Muon, pat::Muon>, 
-                                        CompositeDaughter<pat::Muon, pat::Muon> 
-                                        > 
+typedef TreeGenerator<CompositeDaughter<CompositeDaughter<pat::Muon, pat::Muon>,
+                                        CompositeDaughter<pat::Muon, pat::Muon>
+                                        >
                       > TreeGeneratorMuMuMuMu;
 typedef TreeGenerator<CompositeDaughter<CompositeDaughter<pat::Electron, pat::Electron>,
                                         pat::Electron
-                                        > 
+                                        >
                       > TreeGeneratorEEE;
 typedef TreeGenerator<CompositeDaughter<CompositeDaughter<pat::Muon, pat::Muon>,
                                         pat::Muon
-                                        > 
+                                        >
                       > TreeGeneratorMuMuMu;
 typedef TreeGenerator<CompositeDaughter<CompositeDaughter<pat::Electron, pat::Electron>,
                                         pat::Muon
-                                        > 
+                                        >
                       > TreeGeneratorEEMu;
 typedef TreeGenerator<CompositeDaughter<CompositeDaughter<pat::Muon, pat::Muon>,
                                         pat::Electron
-                                        > 
+                                        >
                       > TreeGeneratorEMuMu;
 typedef TreeGenerator<CompositeDaughter<pat::Electron, pat::Electron> > TreeGeneratorEE;
 typedef TreeGenerator<CompositeDaughter<pat::Muon, pat::Muon> > TreeGeneratorMuMu;
 typedef TreeGenerator<pat::Electron> TreeGeneratorE;
 typedef TreeGenerator<pat::Muon> TreeGeneratorMu;
 
-typedef TreeGenerator<CompositeDaughter<CompositeDaughter<reco::GenParticle, reco::GenParticle>, 
-                                        CompositeDaughter<reco::GenParticle, reco::GenParticle> 
-                                        > 
+typedef TreeGenerator<CompositeDaughter<CompositeDaughter<reco::GenParticle, reco::GenParticle>,
+                                        CompositeDaughter<reco::GenParticle, reco::GenParticle>
+                                        >
                       > GenTreeGeneratorZZ;
 typedef TreeGenerator<CompositeDaughter<CompositeDaughter<reco::GenParticle, reco::GenParticle>,
                                         reco::GenParticle
-                                        > 
+                                        >
                       > GenTreeGeneratorWZ;
-typedef TreeGenerator<CompositeDaughter<CompositeDaughter<DressedGenParticle, DressedGenParticle>, 
-                                        CompositeDaughter<DressedGenParticle, DressedGenParticle> 
-                                        > 
+typedef TreeGenerator<CompositeDaughter<CompositeDaughter<DressedGenParticle, DressedGenParticle>,
+                                        CompositeDaughter<DressedGenParticle, DressedGenParticle>
+                                        >
                       > GenDressedTreeGeneratorZZ;
 typedef TreeGenerator<CompositeDaughter<CompositeDaughter<DressedGenParticle, DressedGenParticle>,
                                         DressedGenParticle
-                                        > 
+                                        >
                       > GenDressedTreeGeneratorWZ;
 
 
