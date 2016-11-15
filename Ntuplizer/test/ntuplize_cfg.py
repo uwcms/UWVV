@@ -86,10 +86,11 @@ options.register('mClosureShift', 0,
                  VarParsing.VarParsing.multiplicity.singleton,
                  VarParsing.VarParsing.varType.int,
                  'Muon calibration closure shift, in units of sigma.')
-options.register('lheWeights', 1,
+options.register('lheWeights', 2,
                  VarParsing.VarParsing.multiplicity.singleton,
                  VarParsing.VarParsing.varType.int,
-                 'Add LHE weights from Monte Carlo (default True)')
+                 'Add LHE weights from Monte Carlo. Option 1 = all weights, '
+                 ' option 2 = only scale (weights 0-9). Default 2.')
 
 options.parseArguments()
 
@@ -217,9 +218,12 @@ if options.isMC:
     from UWVV.Ntuplizer.templates.eventBranches import jesSystematicBranches
     extraInitialStateBranches.append(jesSystematicBranches)
     
-    if options.lheWeights:
-        from UWVV.Ntuplizer.templates.eventBranches import eventWeightBranches
-        extraInitialStateBranches.append(eventWeightBranches)
+    if options.lheWeights == 1:
+        from UWVV.Ntuplizer.templates.eventBranches import lheWeightBranches
+        extraInitialStateBranches.append(lheWeightBranches)
+    elif options.lheWeights == 2:
+        from UWVV.Ntuplizer.templates.eventBranches import lheScaleWeightBranches
+        extraInitialStateBranches.append(lheScaleWeightBranches)
 
     from UWVV.Ntuplizer.templates.eventBranches import eventGenBranches
     extraInitialStateBranches.append(eventGenBranches)

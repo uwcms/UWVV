@@ -29,7 +29,13 @@ eventBranches = cms.PSet(
         ),
     )
 
-eventWeightBranches = cms.PSet(
+lheScaleWeightBranches = cms.PSet(
+    vFloats = cms.PSet(
+        lheWeights = cms.vstring('lheWeights::0,9'),
+        ),
+    )
+
+lheWeightBranches = cms.PSet(
     vFloats = cms.PSet(
         lheWeights = cms.vstring('lheWeights'),
         ),
