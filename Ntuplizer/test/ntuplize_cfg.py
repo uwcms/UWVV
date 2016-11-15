@@ -65,6 +65,11 @@ options.register('genInfo', 0,
                  VarParsing.VarParsing.multiplicity.singleton,
                  VarParsing.VarParsing.varType.int,
                  "1 if gen-level ntuples are desired.")
+options.register('genLeptonType', 'hardProcessFS',
+                 VarParsing.VarParsing.multiplicity.singleton,
+                 VarParsing.VarParsing.varType.string,
+                 "lepton type. Options: dressedHPFS, dressedFS, "
+                 "hardProcesFS, hardProcess")
 options.register('eScaleShift', 0,
                  VarParsing.VarParsing.multiplicity.singleton,
                  VarParsing.VarParsing.varType.int,
@@ -84,6 +89,23 @@ options.register('mClosureShift', 0,
 
 options.parseArguments()
 
+genLepChoices =  {"hardProcess" : "isHardProcess()", 
+        "hardProcessFS" : "fromHardProcessFinalState()",
+        "finalstate" : "status() == 1", 
+        "promptFS" : "isPromptFinalState()", 
+        "dressedHPFS" : "fromHardProcessFinalState()",
+        "dressedFS" : "status() == 1", 
+        "dressedPromptFS" : "isPromptFinalState()", 
+}
+if options.genLeptonType not in genLepChoices:
+    print "ERROR: Invalid GEN-lepton type %s" % options.genLeptonType
+    print "Valid optons and corresponding status flags are"
+    print "    Format: keyword: status flag"
+    print "    Default: hardProcessFS: fromHardProcessFinalState()"
+    print "-"*80
+    for key, value in genLepChoices.iteritems():
+        print "    %s: %s" % (key, value)
+    exit(1)
 
 channels = parseChannels(options.channels)
 zz = any(len(c) == 4 for c in channels)
@@ -193,9 +215,9 @@ if options.isMC:
 
     from UWVV.Ntuplizer.templates.eventBranches import eventGenBranches
     extraInitialStateBranches.append(eventGenBranches)
-    from UWVV.Ntuplizer.templates.leptonBranches import leptonGenBranches
-    extraFinalObjectBranches['e'].append(leptonGenBranches)
-    extraFinalObjectBranches['m'].append(leptonGenBranches)
+    from UWVV.Ntuplizer.templates.leptonBranches import matchedGenLeptonBranches
+    extraFinalObjectBranches['e'].append(matchedGenLeptonBranches)
+    extraFinalObjectBranches['m'].append(matchedGenLeptonBranches)
 
 if any(len(c) == 4 for c in channels):
     from UWVV.Ntuplizer.templates.eventBranches import centralJetBranches
@@ -346,13 +368,19 @@ if zz and options.isMC and options.genInfo:
     process.genTreeSequence = cms.Sequence()
 
     from UWVV.AnalysisTools.templates.GenZZBase import GenZZBase
-    from UWVV.AnalysisTools.templates.GenLeptonBase import GenLeptonBase
     from UWVV.Ntuplizer.templates.vbsBranches import vbsGenBranches
-
-    GenFlow = createFlow(GenLeptonBase, GenZZBase)
+    
+    if "dressed" in options.genLeptonType:
+        from UWVV.AnalysisTools.templates.DressedGenLeptonBase import DressedGenLeptonBase
+        from UWVV.Ntuplizer.templates.leptonBranches import dressedGenLeptonBranches
+        GenFlow = createFlow(DressedGenLeptonBase, GenZZBase)
+    else:
+        from UWVV.AnalysisTools.templates.GenLeptonBase import GenLeptonBase
+        GenFlow = createFlow(GenLeptonBase, GenZZBase)
     genFlow = GenFlow('genFlow', process, suffix='Gen', e='prunedGenParticles',
-                      m='prunedGenParticles', j='slimmedGenJets',
-                      pfCands='packedGenParticles')
+                    m='prunedGenParticles', a='prunedGenParticles', j='slimmedGenJets',
+                    pfCands='packedGenParticles', 
+                    leptonStatusFlag=genLepChoices[options.genLeptonType])
 
     genTrg = trgBranches.clone(trigNames=cms.vstring())
 
@@ -360,7 +388,11 @@ if zz and options.isMC and options.genInfo:
         genMod = cms.EDAnalyzer(
         'GenTreeGeneratorZZ',
         src = genFlow.finalObjTag(chan),
-        branches = makeGenBranchSet(chan, extraInitialStateBranches=[vbsGenBranches]),
+        branches = makeGenBranchSet(chan, extraInitialStateBranches=[vbsGenBranches])
+            if "dressed" not in options.genLeptonType else makeGenBranchSet(chan, 
+                extraInitialStateBranches=[vbsGenBranches],
+                e=dressedGenLeptonBranches,
+                m=dressedGenLeptonBranches),
         eventParams = makeGenEventParams(genFlow.finalTags()),
         triggers = genTrg,
         )
