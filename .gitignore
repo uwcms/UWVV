@@ -80,7 +80,7 @@ process.DAT
 ffwarn.dat
 
 # Generated WZ submissions scripts
-scripts/WZSubmission/GeneratedScripts
+scripts/WZSubmission/GeneratedScripts/*
 
 # Plugins that are stored as text files unless they're actually used
 AnalysisTools/plugins/ZZDiscriminantEmbedder.cc

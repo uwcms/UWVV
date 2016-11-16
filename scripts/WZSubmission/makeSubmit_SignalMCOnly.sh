@@ -1,6 +1,5 @@
 #!/bin/bash
 DATE=`date +%Y-%m-%d`
-echo $DATE
 if [ -z "$CMSSW_BASE" ]; then
     echo "Must submit within a CMS environment"
     exit 1

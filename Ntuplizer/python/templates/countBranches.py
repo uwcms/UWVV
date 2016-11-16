@@ -13,6 +13,8 @@ wzCountBranches = cms.PSet(
                                 'userInt("nTightMuon") : 999'),
         nMediumMuonICHEP = cms.string('? hasUserInt("nMediumMuonICHEP") ? '
                                       'userInt("nMediumMuonICHEP") : 999'),
+        nWZMediumMuon = cms.string('? hasUserInt("nWZMediumMuon") ? '
+                                      'userInt("nWZMediumMuon") : 999'),
         nJetJPL = cms.string('? hasUserInt("nJetJPL") ? '
                               'userInt("nJetJPL") : 999'),
         nJetJPM = cms.string('? hasUserInt("nJetJPM") ? ' 

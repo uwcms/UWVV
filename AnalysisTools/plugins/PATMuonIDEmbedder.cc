@@ -28,6 +28,7 @@ private:
   void endJob() {}
 
   bool isMediumMuonICHEP(const reco::Muon& recoMu);
+  bool isWZMediumMuon(const reco::Muon& recoMu, const reco::Vertex& pv);
   bool isSoftMuonICHEP(const reco::Muon& recoMu, const reco::Vertex& pv);
 
   // Data
@@ -62,6 +63,7 @@ void MuonIdEmbedder::produce(edm::Event& iEvent, const edm::EventSetup& iSetup)
 
     newObj.addUserInt("isTightMuon", obj.isTightMuon(pv));
     newObj.addUserInt("isMediumMuonICHEP", isMediumMuonICHEP(obj));
+    newObj.addUserInt("isWZMediumMuon", isWZMediumMuon(obj, pv));
     newObj.addUserInt("isSoftMuon", obj.isSoftMuon(pv));
     newObj.addUserInt("isSoftMuonICHEP", isSoftMuonICHEP(obj,pv));
     newObj.addUserInt("isHighPtMuon", obj.isHighPtMuon(pv));
@@ -92,7 +94,13 @@ bool MuonIdEmbedder::isMediumMuonICHEP(const reco::Muon & recoMu)
                     muon::segmentCompatibility(recoMu) > (goodGlob ? 0.303 : 0.451); 
     return isMedium; 
   }
-
+bool MuonIdEmbedder::isWZMediumMuon(const reco::Muon & recoMu, const reco::Vertex& pv) 
+  {
+    double dxy = std::abs(recoMu.innerTrack()->dxy(pv.position()));
+    return isMediumMuonICHEP(recoMu) && 
+        ( recoMu.pt() > 20. ? dxy < 0.02 : dxy < 0.01 ) &&
+        std::abs(recoMu.innerTrack()->dz(pv.position())) < 0.1;
+  }
 
 bool MuonIdEmbedder::isSoftMuonICHEP(const reco::Muon & recoMu, const reco::Vertex& pv) 
   {
