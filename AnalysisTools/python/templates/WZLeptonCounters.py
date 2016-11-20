@@ -16,8 +16,8 @@ class WZLeptonCounters(AnalysisFlowBase):
         if stepName == 'initialStateEmbedding':
             muCounters = {"TightMuon" : 'pt() > 10 && userInt("isTightMuon")',
                     "MediumMuonICHEP" : 'pt() > 10 && userInt("isMediumMuonICHEP")',
+                    "WZLooseMuon"   : self.getWZLooseMuonID(),
                     "WZMediumMuon"   : self.getWZMediumMuonID(),
-                    "WZTightMuon"   : self.getWZMediumMuonID(),
             }
                          
             mod = cms.EDProducer(
@@ -28,9 +28,11 @@ class WZLeptonCounters(AnalysisFlowBase):
                 )
             step.addModule("muCounter", mod)
 
-            eCounters = {"CBVIDtightElec" : 'pt() > 10 && userFloat("isCBVIDtight")',
-                "CBVInDmediumElec" :  'pt() > 10 && userFloat("isCBVIDmedium")',
-                "CBVIDlooseElec" :  'pt() > 10 && userFloat("isCBVIDloose")',
+            eCounters = {"CBVIDTightElec" : 'pt() > 10 && userFloat("isCBVIDtight")',
+                "CBVIDMediumElec" :  'pt() > 10 && userFloat("isCBVIDmedium")',
+                "CBVIDLooseElec" :  'pt() > 10 && userFloat("isCBVIDloose")',
+                "WWLooseElec" :  'pt() > 10 && userInt("isWWLoose")',
+                "WWLooseCBVIDMedElec" :  'pt() > 10 && userInt("isWWLoose") && userFloat("isCBVIDmedium")',
             }
                          
             mod = cms.EDProducer(

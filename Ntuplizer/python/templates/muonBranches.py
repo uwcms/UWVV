@@ -46,8 +46,10 @@ muonBranches = cms.PSet(
                                  'userInt("isTightMuon") : 0'),
         IsMediumMuonICHEP = cms.string('? hasUserInt("isMediumMuonICHEP") ?'
                                        'userInt("isMediumMuonICHEP") : 0'),
-        IsWZMediumMuonNoIso = cms.string('? hasUserInt("isWZMediumMuon") ?'
+        IsWZMediumMuon = cms.string('? hasUserInt("isWZMediumMuon") ?'
                                        'userInt("isWZMediumMuon") : 0'),
+        IsWZLooseMuon = cms.string('? hasUserInt("isWZLooseMuon") ?'
+                                       'userInt("isWZLooseMuon") : 0'),
 
         HighPtID = cms.string('? hasUserFloat("ZZIDPassHighPt") ? '
                               'userFloat("ZZIDPassHighPt") : 0.'),

@@ -69,5 +69,7 @@ electronBranches = cms.PSet(
                                    'userFloat("isCBVIDmedium") : 0'),
         IsCBVIDLoose = cms.string('? hasUserFloat("isCBVIDloose") ? '
                                   'userFloat("isCBVIDloose") : 0'),
+        IsWWLoose = cms.string('? hasUserInt("isWWLoose") ? '
+                                  'userInt("isWWLoose") : 0'),
         )
     )
