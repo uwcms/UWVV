@@ -115,6 +115,7 @@ if options.genLeptonType not in genLepChoices:
 channels = parseChannels(options.channels)
 zz = any(len(c) == 4 for c in channels)
 zl = any(len(c) == 3 for c in channels)
+wz = "wz" in options.channels 
 z  = any(len(c) == 2 for c in channels)
 l  = any(len(c) == 1 for c in channels)
 
@@ -257,9 +258,10 @@ if any(len(c) == 4 for c in channels):
     from UWVV.Ntuplizer.templates.eventBranches import centralJetBranches
     extraInitialStateBranches.append(centralJetBranches)
 
-# FSR and ZZ/HZZ stuff
-from UWVV.AnalysisTools.templates.ZZFlow import ZZFlow
-FlowSteps.append(ZZFlow)
+if not wz:
+    # FSR and ZZ/HZZ stuff
+    from UWVV.AnalysisTools.templates.ZZFlow import ZZFlow
+    FlowSteps.append(ZZFlow)
 
 # make final states
 if zz:
@@ -285,10 +287,10 @@ if zz:
     from UWVV.AnalysisTools.templates.ZZSkim import ZZSkim
     FlowSteps.append(ZZSkim)
 
-elif zl or z:
+elif zl or z or wz:
     from UWVV.AnalysisTools.templates.ZPlusXBaseFlow import ZPlusXBaseFlow
     FlowSteps.append(ZPlusXBaseFlow)
-    if zl:
+    if wz:
         from UWVV.AnalysisTools.templates.ZPlusXInitialStateBaseFlow import ZPlusXInitialStateBaseFlow
         FlowSteps.append(ZPlusXInitialStateBaseFlow)
 
