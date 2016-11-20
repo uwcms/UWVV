@@ -262,6 +262,9 @@ if not wz:
     # FSR and ZZ/HZZ stuff
     from UWVV.AnalysisTools.templates.ZZFlow import ZZFlow
     FlowSteps.append(ZZFlow)
+else:
+    from UWVV.AnalysisTools.templates.WZCrossCleaning import WZCrossCleaning
+    FlowSteps.append(WZCrossCleaning)
 
 # make final states
 if zz:
