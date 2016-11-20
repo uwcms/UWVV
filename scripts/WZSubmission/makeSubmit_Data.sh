@@ -18,7 +18,7 @@ ${uwvv}/Utilities/scripts/submitJobs.py \
     --filesPerJob 2 \
     UWVVNtuples_WZData_Run2016B-PromptReco-v2_$DATE \
     $uwvv/Ntuplizer/test/ntuplize_cfg.py \
-        channels=zl \
+        channels=wz \
         isMC=0 \
         eCalib=1 
         muCalib=1 \
@@ -35,7 +35,7 @@ ${uwvv}/Utilities/scripts/submitJobs.py \
     --filesPerJob 2 \
     UWVVNtuples_WZData_Run2016C-PromptReco-v2_$DATE \
     $uwvv/Ntuplizer/test/ntuplize_cfg.py \
-        channels=zl \
+        channels=wz \
         isMC=0 \
         eCalib=1 
         muCalib=1 \
@@ -51,7 +51,7 @@ ${uwvv}/Utilities/scripts/submitJobs.py \
     --filesPerJob 2 \
     UWVVNtuples_WZData_Run2016D-PromptReco-v2_$DATE \
     $uwvv/Ntuplizer/test/ntuplize_cfg.py \
-        channels=zl \
+        channels=wz \
         isMC=0 \
         eCalib=1 
         muCalib=1 \

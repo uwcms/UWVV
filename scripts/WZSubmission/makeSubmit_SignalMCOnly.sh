@@ -14,7 +14,7 @@ ${uwvv}/Utilities/scripts/submitJobs.py \
    --filesPerJob 3 \
     UWVVNtuples_WZSignalMonteCarlo_$DATE \
     $uwvv/Ntuplizer/test/ntuplize_cfg.py \
-        channels=zl \
+        channels=wz \
         isMC=1 \
         eCalib=1 
         muCalib=1 \
@@ -28,7 +28,7 @@ ${uwvv}/Utilities/scripts/submitJobs.py \
     --filesPerJob 3 \
     UWVVNtuples_WZSignalMonteCarlo_$DATE \
     $uwvv/Ntuplizer/test/ntuplize_cfg.py \
-        channels=zl \
+        channels=wz \
         isMC=1 \
         eCalib=1 
         muCalib=1 \
