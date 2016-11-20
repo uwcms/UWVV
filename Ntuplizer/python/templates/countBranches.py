@@ -3,12 +3,16 @@ import FWCore.ParameterSet.Config as cms
 
 wzCountBranches = cms.PSet(
     uints = cms.PSet(
-        nCBVIDTightElec = cms.string('? hasUserInt("nCBVIDtightElec") ?'
-                                     'userInt("nCBVIDtightElec") : 999'),
-        nCBVIDMediumElec = cms.string('? hasUserInt("nCBVIDmediumElec") ?'
-                                      'userInt("nCBVIDmediumElec") : 999'),
-        nCBVIDLooseElec = cms.string('? hasUserInt("nCBVIDlooseElec") ?'
-                                     'userInt("nCBVIDlooseElec") : 999'),
+        nCBVIDTightElec = cms.string('? hasUserInt("nCBVIDTightElec") ?'
+                                     'userInt("nCBVIDTightElec") : 999'),
+        nCBVIDMediumElec = cms.string('? hasUserInt("nCBVIDMediumElec") ?'
+                                      'userInt("nCBVIDMediumElec") : 999'),
+        nCBVIDLooseElec = cms.string('? hasUserInt("nCBVIDLooseElec") ?'
+                                     'userInt("nCBVIDLooseElec") : 999'),
+        nWWLooseElec = cms.string('? hasUserInt("nWWLooseElec") ? '
+                                      'userInt("nWWLooseElec") : 999'),
+        nWWLooseCBVIDMedElec = cms.string('? hasUserInt("nWWLooseCBVIDMedElec") ? '
+                                      'userInt("nWWLooseCBVIDMedElec") : 999'),
         nTightMuon = cms.string('? hasUserInt("nTightMuon") ? '
                                 'userInt("nTightMuon") : 999'),
         nMediumMuonICHEP = cms.string('? hasUserInt("nMediumMuonICHEP") ? '
