@@ -23,30 +23,13 @@ class WZID(AnalysisFlowBase):
 
     def getWZLooseMuonID(self):
         return 'userInt("isWZLooseMuon") && ' \
-               'pt() > 10 &&' \
-               '((pfIsolationR04().sumChargedHadronPt' \
-               '+ max(0., pfIsolationR04().sumNeutralHadronEt' \
-               '+ pfIsolationR04().sumPhotonEt' \
-               '- 0.5*pfIsolationR04().sumPUPt))' \
-               '/pt() < 0.25)'
-
+               'pt() > 10'
     def getWZMediumMuonID(self):
         return 'userInt("isWZMediumMuon") && ' \
-               'pt() > 10 &&' \
-               '((pfIsolationR04().sumChargedHadronPt' \
-               '+ max(0., pfIsolationR04().sumNeutralHadronEt' \
-               '+ pfIsolationR04().sumPhotonEt' \
-               '- 0.5*pfIsolationR04().sumPUPt))' \
-               '/pt() < 0.15)'
-
+               'pt() > 10'
     def getWZTightMuonID(self):
         return 'userInt("isTightMuon") && ' \
-               'pt() > 10 &&' \
-               '((pfIsolationR04().sumChargedHadronPt' \
-               '+ max(0., pfIsolationR04().sumNeutralHadronEt' \
-               '+ pfIsolationR04().sumPhotonEt' \
-               '- 0.5*pfIsolationR04().sumPUPt))' \
-               '/pt() < 0.15)'
-    
+               'pt() > 10'
     def getWZLooseElectronID(self):
-        return 'userInt("isWWLoose")'
+        return 'userInt("isWWLoose") && ' \
+               'pt() > 10'
