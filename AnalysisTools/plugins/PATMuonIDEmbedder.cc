@@ -66,7 +66,9 @@ void MuonIdEmbedder::produce(edm::Event& iEvent, const edm::EventSetup& iSetup)
     newObj.addUserInt("isTightMuon", obj.isTightMuon(pv));
     newObj.addUserInt("isMediumMuonICHEP", isMediumMuonICHEP(obj));
     newObj.addUserInt("isWZMediumMuon", isWZMediumMuon(obj, pv));
+    newObj.addUserInt("isWZMediumMuonNoIso", isWZMediumMuonNoIso(obj, pv));
     newObj.addUserInt("isWZLooseMuon", isWZLooseMuon(obj));
+    newObj.addUserInt("isWZLooseMuonNoIso", isWZLooseMuonNoIso(obj));
     newObj.addUserInt("isSoftMuon", obj.isSoftMuon(pv));
     newObj.addUserInt("isSoftMuonICHEP", isSoftMuonICHEP(obj,pv));
     newObj.addUserInt("isHighPtMuon", obj.isHighPtMuon(pv));
@@ -100,14 +102,32 @@ bool MuonIdEmbedder::isMediumMuonICHEP(const reco::Muon & recoMu)
 bool MuonIdEmbedder::isWZLooseMuon(const pat::Muon& patMu) 
   {
     return isMediumMuonICHEP(patMu) && 
-        patMu.trackIso()/patMu.pt() < 0.4;
+        patMu.trackIso()/patMu.pt() < 0.4 &&;
+  }
+bool MuonIdEmbedder::isWZLooseMuonNoIso(const pat::Muon& patMu) 
+  {
+    float pfIsoDB04 = (patMu.pfIsolationR04().sumChargedHadronPt()
+                        + max(0., patMu.pfIsolationR04().sumNeutralHadronEt()
+                        + pfIsolationR04().sumPhotonEt()
+                        - 0.5*pfIsolationR04().sumPUPt())) / pt();
+    return isMediumMuonICHEP(patMu) && 
+        patMu.trackIso()/patMu.pt() < 0.4 &&
+        pfIsoDB04 < 0.25;
+  }
+bool MuonIdEmbedder::isWZMediumMuonNoIso(const pat::Muon& patMu, const reco::Vertex& pv) 
+  {
+    double dxy = std::abs(patMu.innerTrack()->dxy(pv.position()));
+    return isWZLooseMuonNoIso(patMu) && 
+        ( patMu.pt() > 20. ? dxy < 0.02 : dxy < 0.01 ) &&
+        std::abs(patMu.innerTrack()->dz(pv.position())) < 0.1;
   }
 bool MuonIdEmbedder::isWZMediumMuon(const pat::Muon& patMu, const reco::Vertex& pv) 
   {
-    double dxy = std::abs(patMu.innerTrack()->dxy(pv.position()));
-    return isWZLooseMuon(patMu) && 
-        ( patMu.pt() > 20. ? dxy < 0.02 : dxy < 0.01 ) &&
-        std::abs(patMu.innerTrack()->dz(pv.position())) < 0.1;
+    float pfIsoDB04 = (patMu.pfIsolationR04().sumChargedHadronPt()
+                        + max(0., patMu.pfIsolationR04().sumNeutralHadronEt()
+                        + pfIsolationR04().sumPhotonEt()
+                        - 0.5*pfIsolationR04().sumPUPt())) / pt();
+    return isWZMediumMuonNoIso(patMu, pv) && pfIsoDB04 < 0.15;
   }
 bool MuonIdEmbedder::isSoftMuonICHEP(const reco::Muon & recoMu, const reco::Vertex& pv) 
   {
