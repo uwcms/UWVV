@@ -29,6 +29,18 @@ eventBranches = cms.PSet(
         ),
     )
 
+lheScaleWeightBranches = cms.PSet(
+    vFloats = cms.PSet(
+        lheWeights = cms.vstring('lheWeights::0,9'),
+        ),
+    )
+
+lheWeightBranches = cms.PSet(
+    vFloats = cms.PSet(
+        lheWeights = cms.vstring('lheWeights'),
+        ),
+    )
+
 # gen information branches for regular ntuple
 eventGenBranches = cms.PSet(
     floats = cms.PSet(

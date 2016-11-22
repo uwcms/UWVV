@@ -86,6 +86,11 @@ options.register('mClosureShift', 0,
                  VarParsing.VarParsing.multiplicity.singleton,
                  VarParsing.VarParsing.varType.int,
                  'Muon calibration closure shift, in units of sigma.')
+options.register('lheWeights', 2,
+                 VarParsing.VarParsing.multiplicity.singleton,
+                 VarParsing.VarParsing.varType.int,
+                 'Add LHE weights from Monte Carlo. Option 1 = all weights, '
+                 ' option 2 = only scale (weights 0-9). Default 2.')
 
 options.parseArguments()
 
@@ -212,6 +217,13 @@ FlowSteps.append(JetBaseFlow)
 if options.isMC:
     from UWVV.Ntuplizer.templates.eventBranches import jesSystematicBranches
     extraInitialStateBranches.append(jesSystematicBranches)
+    
+    if options.lheWeights == 1:
+        from UWVV.Ntuplizer.templates.eventBranches import lheWeightBranches
+        extraInitialStateBranches.append(lheWeightBranches)
+    elif options.lheWeights == 2:
+        from UWVV.Ntuplizer.templates.eventBranches import lheScaleWeightBranches
+        extraInitialStateBranches.append(lheScaleWeightBranches)
 
     from UWVV.Ntuplizer.templates.eventBranches import eventGenBranches
     extraInitialStateBranches.append(eventGenBranches)
@@ -266,13 +278,12 @@ elif zl or z:
 
         from UWVV.Ntuplizer.templates.countBranches import wzCountBranches
         extraInitialStateBranches.append(wzCountBranches)
-
 elif l:
     from UWVV.AnalysisTools.templates.ZZSkim import ZZSkim
     FlowSteps.append(ZZSkim)
 
 
-if zz or zl or z:
+if (zz or zl or z) and not "wz" in options.channels:
     for f in FlowSteps:
         if f.__name__ in ['ZZFSR', 'ZZFlow']:
             from UWVV.Ntuplizer.templates.fsrBranches import compositeObjectFSRBranches, leptonFSRBranches
