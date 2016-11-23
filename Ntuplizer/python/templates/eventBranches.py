@@ -93,18 +93,16 @@ genNtupleEventBranches = cms.PSet(
         ),
     )
 
-jesSystematicBranches = cms.PSet(
-    floats = cms.PSet(
-        mjj_jesUp = cms.string('mjj::jesUp'),
-        mjj_jesDown = cms.string('mjj::jesDown'),
-        mjj_jerUp = cms.string('mjj::jerUp'),
-        mjj_jerDown = cms.string('mjj::jerDown'),
-        ),
+jetSystematicBranches = cms.PSet(
     vFloats = cms.PSet(
         jetPt_jesUp = cms.vstring('jetPt::jesUp'),
         jetPt_jesDown = cms.vstring('jetPt::jesDown'),
         jetPt_jerUp = cms.vstring('jetPt::jerUp'),
         jetPt_jerDown = cms.vstring('jetPt::jerDown'),
+        jetEta_jesUp = cms.vstring('jetEta::jesUp'),
+        jetEta_jesDown = cms.vstring('jetEta::jesDown'),
+        jetEta_jerUp = cms.vstring('jetEta::jerUp'),
+        jetEta_jerDown = cms.vstring('jetEta::jerDown'),
         ),
     uints = cms.PSet(
         nJets_jesUp = cms.string('nJets::jesUp'),
@@ -115,11 +113,10 @@ jesSystematicBranches = cms.PSet(
     )
 
 centralJetBranches = cms.PSet(
-    floats = cms.PSet(
-        mjj_eta2p4 = cms.string('mjj::eta2p4'),
-        ),
     vFloats = cms.PSet(
         jetPt_eta2p4 = cms.vstring('jetPt::eta2p4'),
+        jetEta_eta2p4 = cms.vstring('jetEta::eta2p4'),
+        jetPhi_eta2p4 = cms.vstring('jetPhi::eta2p4'),
         ),
     uints = cms.PSet(
         nJets_eta2p4 = cms.string('nJets::eta2p4'),

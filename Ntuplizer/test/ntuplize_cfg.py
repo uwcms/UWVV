@@ -216,8 +216,8 @@ FlowSteps.append(ElectronScaleFactors)
 from UWVV.AnalysisTools.templates.JetBaseFlow import JetBaseFlow
 FlowSteps.append(JetBaseFlow)
 if options.isMC:
-    from UWVV.Ntuplizer.templates.eventBranches import jesSystematicBranches
-    extraInitialStateBranches.append(jesSystematicBranches)
+    from UWVV.Ntuplizer.templates.eventBranches import jetSystematicBranches
+    extraInitialStateBranches.append(jetSystematicBranches)
 
     if options.lheWeights == 1:
         from UWVV.Ntuplizer.templates.eventBranches import lheScaleWeightBranches
@@ -319,8 +319,9 @@ if options.muCalib:
 
 # VBS variables for ZZ
 if zz:
-    from UWVV.Ntuplizer.templates.vbsBranches import vbsBranches
+    from UWVV.Ntuplizer.templates.vbsBranches import vbsBranches, vbsSystematicBranches
     extraInitialStateBranches.append(vbsBranches)
+    extraInitialStateBranches.append(vbsSystematicBranches)
 
 
 flowOpts = {
