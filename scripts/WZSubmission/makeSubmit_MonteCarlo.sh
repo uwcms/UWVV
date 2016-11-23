@@ -27,6 +27,7 @@ ${uwvv}/Utilities/scripts/submitJobs.py \
         "WWG_TuneCUETP8M1_13TeV-amcatnlo-pythia8" \
         "TTZToLLNuNu_M-10_TuneCUETP8M1_13TeV-amcatnlo-pythia8" \
         "TTWJetsToLNu_TuneCUETP8M1_13TeV-amcatnloFXFX-madspin-pythia8" \
+        "tZq_ll_4f_13TeV-amcatnlo-pythia8" \
         "ST_s-channel_4f_leptonDecays_13TeV-amcatnlo-pythia8_TuneCUETP8M1" \
         "ST_t-channel_antitop_4f_leptonDecays_13TeV-powheg-pythia8_TuneCUETP8M1" \
         "ST_t-channel_top_4f_leptonDecays_13TeV-powheg-pythia8_TuneCUETP8M1" \
@@ -66,7 +67,6 @@ ${uwvv}/Utilities/scripts/submitJobs.py \
     --samples \
         "WLLJJToLNu_M-60_EWK_13TeV-madgraph-pythia8" \
         "tZq_ll_4f_13TeV-amcatnlo-herwigpp" \
-        "tZq_ll_4f_13TeV-amcatnlo-pythia8" \
         "TTZToLLNuNu_M-10_TuneCUETP8M1_13TeV-amcatnlo-pythia8" \
         "TTWJetsToLNu_TuneCUETP8M1_13TeV-amcatnloFXFX-madspin-pythia8" \
     --filesPerJob 3 \
