@@ -23,13 +23,13 @@ class WZID(AnalysisFlowBase):
 
     def getWZLooseMuonID(self):
         return 'userInt("isWZLooseMuon") && ' \
-               'pt() > 10'
+               'pt() > 10 && abs(eta) < 2.4'
     def getWZMediumMuonID(self):
         return 'userInt("isWZMediumMuon") && ' \
-               'pt() > 10'
+               'pt() > 10 && abs(eta) < 2.4'
     def getWZTightMuonID(self):
         return 'userInt("isTightMuon") && ' \
-               'pt() > 10'
+               'pt() > 10 && abs(eta) < 2.4'
     def getWZLooseElectronID(self):
         return 'userInt("isWWLoose") && ' \
-               'pt() > 10'
+               'pt() > 10 && abs(eta) < 2.5'
