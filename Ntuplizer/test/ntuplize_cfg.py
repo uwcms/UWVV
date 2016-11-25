@@ -319,9 +319,11 @@ if options.muCalib:
 
 # VBS variables for ZZ
 if zz:
-    from UWVV.Ntuplizer.templates.vbsBranches import vbsBranches, vbsSystematicBranches
+    from UWVV.Ntuplizer.templates.vbsBranches import vbsBranches
     extraInitialStateBranches.append(vbsBranches)
-    extraInitialStateBranches.append(vbsSystematicBranches)
+    if options.isMC:
+        from UWVV.Ntuplizer.templates.vbsBranches import vbsSystematicBranches
+        extraInitialStateBranches.append(vbsSystematicBranches)
 
 
 flowOpts = {
