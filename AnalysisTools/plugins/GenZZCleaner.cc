@@ -99,20 +99,19 @@ void GenZZCleaner::produce(edm::Event& iEvent,
       CCandPtr c = in->ptrAt(i);
 
       float mZ1 = c->daughter(0)->mass();
-      if(mZ1 < z1MassMin || mZ1 > z1MassMax)
-        continue;
       float mZ2 = c->daughter(1)->mass();
-      if(mZ2 < z2MassMin || mZ2 > z2MassMax)
-        continue;
 
       float dz1 = std::abs(mZ1 - 91.1876);
       float dz2 = std::abs(mZ2 - 91.1876);
-
       float betterDZ = (dz1 < dz2 ? dz1 : dz2);
 
       bool best = betterDZ < bestDZ;
-
       if(!best)
+        continue;
+
+      if(mZ1 < z1MassMin || mZ1 > z1MassMax)
+        continue;
+      if(mZ2 < z2MassMin || mZ2 > z2MassMax)
         continue;
 
       std::vector<const Cand*> daughters;

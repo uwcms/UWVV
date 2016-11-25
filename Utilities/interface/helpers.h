@@ -59,14 +59,13 @@ namespace uwvv
       return zMassDistance(v.mass());
     }
 
-    // Return true if the first daughter is 
+    // Return true if the first daughter is
     // farther from the nominal Z mass than the second daughter
-    template<class T12, class T34>
-      bool zsNeedReorder(const edm::Ptr<pat::CompositeCandidate>& cand)
+    bool zsNeedReorder(const edm::Ptr<pat::CompositeCandidate>& cand)
     {
       math::XYZTLorentzVector p4a = cand->daughter(0)->p4();
       math::XYZTLorentzVector p4b = cand->daughter(1)->p4();
-      
+
       return std::abs(p4b.mass() - 91.1876) < std::abs(p4a.mass() - 91.1876);
     }
 

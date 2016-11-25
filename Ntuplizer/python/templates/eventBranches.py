@@ -31,13 +31,37 @@ eventBranches = cms.PSet(
 
 lheScaleWeightBranches = cms.PSet(
     vFloats = cms.PSet(
-        lheWeights = cms.vstring('lheWeights::0,9'),
+        scaleWeights = cms.vstring('lheWeights::0,9'),
+        ),
+    floats = cms.PSet(
+        minScaleWeight = cms.string('minLHEWeight::0,9'),
+        maxScaleWeight = cms.string('maxLHEWeight::0,9'),
         ),
     )
 
-lheWeightBranches = cms.PSet(
+lheScaleAndPDFWeightBranches = cms.PSet(
     vFloats = cms.PSet(
-        lheWeights = cms.vstring('lheWeights'),
+        scaleWeights = cms.vstring('lheWeights::0,9'),
+        pdfWeights = cms.vstring('lheWeights::9,111'),
+        ),
+    floats = cms.PSet(
+        minScaleWeight = cms.string('minLHEWeight::0,9'),
+        maxScaleWeight = cms.string('maxLHEWeight::0,9'),
+        minPDFWeight = cms.string('minLHEWeight::9,111'),
+        maxPDFWeight = cms.string('maxLHEWeight::9,111'),
+        ),
+    )
+
+lheAllWeightBranches = cms.PSet(
+    vFloats = cms.PSet(
+        scaleWeights = cms.vstring('lheWeights::0,9'),
+        pdfWeights = cms.vstring('lheWeights::9,9999'),
+        ),
+    floats = cms.PSet(
+        minScaleWeight = cms.string('minLHEWeight::0,9'),
+        maxScaleWeight = cms.string('maxLHEWeight::0,9'),
+        minPDFWeight = cms.string('minLHEWeight::9,9999'),
+        maxPDFWeight = cms.string('maxLHEWeight::9,9999'),
         ),
     )
 
