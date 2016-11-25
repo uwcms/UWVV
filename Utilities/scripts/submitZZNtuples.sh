@@ -131,17 +131,25 @@ then
         echo Submitting ZZ MC Ntuples as UWVVZZ_MC_"$ID"
 
         # reHLT
-        python Utilities/scripts/submitJobs.py --campaign RunIISpring16MiniAODv2-PUSpring16RAWAODSIM_reHLT_80X_mcRun2_asymptotic_v14-v1 --samples 'ZZTo4L*amcatnlo*'  'DYJetsToLL_M-50*amcatnlo*' 'TTJets*' 'GluGluHToZZTo4L_M125*pythia8' --filesPerJob 2 -o /data/nawoods/uwvvZZ_mc_"$ID".sh UWVVZZ_MC_"$ID" Ntuplizer/test/ntuplize_cfg.py channels='zz' isMC=1 eCalib=1 muCalib=1 genInfo=1 globalTag="$GT_MC" genLeptonType=dressedHPFS
+        python Utilities/scripts/submitJobs.py --campaign RunIISpring16MiniAODv2-PUSpring16RAWAODSIM_reHLT_80X_mcRun2_asymptotic_v14-v1 --samples 'ZZTo4L*amcatnlo*' 'GluGluHToZZTo4L_M125*pythia8' --filesPerJob 2 -o /data/nawoods/uwvvZZ_mc_"$ID".sh UWVVZZ_MC_"$ID" Ntuplizer/test/ntuplize_cfg.py channels='zz' isMC=1 eCalib=1 muCalib=1 genInfo=1 globalTag="$GT_MC" genLeptonType=dressedHPFS lheWeights=2
 
         nohup bash /data/nawoods/uwvvZZ_mc_"$ID".sh &
 
+        python Utilities/scripts/submitJobs.py --campaign RunIISpring16MiniAODv2-PUSpring16RAWAODSIM_reHLT_80X_mcRun2_asymptotic_v14-v1 --samples 'DYJetsToLL_M-50*amcatnlo*' 'TTJets*' --filesPerJob 2 -o /data/nawoods/uwvvZZ_mcNoPDF_"$ID".sh UWVVZZ_MC_"$ID" Ntuplizer/test/ntuplize_cfg.py channels='zz' isMC=1 eCalib=1 muCalib=1 genInfo=1 globalTag="$GT_MC" genLeptonType=dressedHPFS
+
+        nohup bash /data/nawoods/uwvvZZ_mcNoPDF_"$ID".sh &
+
         # no HLT
-        python Utilities/scripts/submitJobs.py --campaign RunIISpring16MiniAODv2-PUSpring16_80X_mcRun2_asymptotic_2016_miniAODv2_v0-v1 --samples 'WZTo3LNu_TuneCUETP8M1_13TeV-powheg-pythia8' 'GluGluToContinToZZTo4*' 'GluGluToContinToZZTo2e2mu*' 'GluGluToContinToZZTo2e2tau*' 'GluGluToContinToZZTo2mu2tau*' 'ZZTo4L*powheg*' 'WWZ*' --filesPerJob 2 -o /data/nawoods/uwvvZZ_mcNoHLT_"$ID".sh UWVVZZ_MC_"$ID" Ntuplizer/test/ntuplize_cfg.py channels='zz' isMC=1 eCalib=1 muCalib=1 genInfo=1 globalTag="$GT_MC" genLeptonType=dressedHPFS
+        python Utilities/scripts/submitJobs.py --campaign RunIISpring16MiniAODv2-PUSpring16_80X_mcRun2_asymptotic_2016_miniAODv2_v0-v1 --samples 'GluGluToContinToZZTo4*' 'GluGluToContinToZZTo2e2mu*' 'GluGluToContinToZZTo2e2tau*' 'GluGluToContinToZZTo2mu2tau*' 'ZZTo4L*powheg*' --filesPerJob 2 -o /data/nawoods/uwvvZZ_mcNoHLT_"$ID".sh UWVVZZ_MC_"$ID" Ntuplizer/test/ntuplize_cfg.py channels='zz' isMC=1 eCalib=1 muCalib=1 genInfo=1 globalTag="$GT_MC" genLeptonType=dressedHPFS lheWeights=2
 
         nohup bash /data/nawoods/uwvvZZ_mcNoHLT_"$ID".sh &
 
+        python Utilities/scripts/submitJobs.py --campaign RunIISpring16MiniAODv2-PUSpring16_80X_mcRun2_asymptotic_2016_miniAODv2_v0-v1 --samples 'WZTo3LNu_TuneCUETP8M1_13TeV-powheg-pythia8' 'WWZ*' --filesPerJob 2 -o /data/nawoods/uwvvZZ_mcNoHLTNoPDF_"$ID".sh UWVVZZ_MC_"$ID" Ntuplizer/test/ntuplize_cfg.py channels='zz' isMC=1 eCalib=1 muCalib=1 genInfo=1 globalTag="$GT_MC" genLeptonType=dressedHPFS
+
+        nohup bash /data/nawoods/uwvvZZ_mcNoHLTNoPDF_"$ID".sh &
+
         # alternative production
-        python Utilities/scripts/submitJobs.py --campaign RunIISpring16MiniAODv2-premix_withHLT_80X_mcRun2_asymptotic_v14-v1 --samples 'ZZJJTo4L_EWK_13TeV-madgraph-pythia8' --filesPerJob 2 -o /data/nawoods/uwvvZZ_mcSpecial_"$ID".sh UWVVZZ_MC_"$ID" Ntuplizer/test/ntuplize_cfg.py channels='zz' isMC=1 eCalib=1 muCalib=1 genInfo=1 globalTag="$GT_MC" genLeptonType=dressedHPFS
+        python Utilities/scripts/submitJobs.py --campaign RunIISpring16MiniAODv2-premix_withHLT_80X_mcRun2_asymptotic_v14-v1 --samples 'ZZJJTo4L_EWK_13TeV-madgraph-pythia8' --filesPerJob 2 -o /data/nawoods/uwvvZZ_mcSpecial_"$ID".sh UWVVZZ_MC_"$ID" Ntuplizer/test/ntuplize_cfg.py channels='zz' isMC=1 eCalib=1 muCalib=1 genInfo=1 globalTag="$GT_MC" genLeptonType=dressedHPFS lheWeights=2
 
         nohup bash /data/nawoods/uwvvZZ_mcSpecial_"$ID".sh &
 
@@ -156,121 +164,121 @@ then
             echo Submitting ZZ MC Ntuples with Systematic Shifts
 
             # EES+
-            python Utilities/scripts/submitJobs.py --campaign RunIISpring16MiniAODv2-PUSpring16RAWAODSIM_reHLT_80X_mcRun2_asymptotic_v14-v1 --samples 'ZZTo4L*amcatnlo*' 'GluGluHToZZTo4L_M125*pythia8' --filesPerJob 2 -o /data/nawoods/uwvvZZ_mc_eScaleUp_"$ID".sh UWVVZZ_MC_ESCALEUP_"$ID" Ntuplizer/test/ntuplize_cfg.py channels='eeee,eemm' isMC=1 eCalib=1 muCalib=1 eScaleShift=1 globalTag="$GT_MC"
+            python Utilities/scripts/submitJobs.py --campaign RunIISpring16MiniAODv2-PUSpring16RAWAODSIM_reHLT_80X_mcRun2_asymptotic_v14-v1 --samples 'ZZTo4L*amcatnlo*' 'GluGluHToZZTo4L_M125*pythia8' --filesPerJob 2 -o /data/nawoods/uwvvZZ_mc_eScaleUp_"$ID".sh UWVVZZ_MC_ESCALEUP_"$ID" Ntuplizer/test/ntuplize_cfg.py channels='eeee,eemm' isMC=1 eCalib=1 muCalib=1 eScaleShift=1 globalTag="$GT_MC" lheWeights=0
 
             nohup bash /data/nawoods/uwvvZZ_mc_eScaleUp_"$ID".sh &
 
-            python Utilities/scripts/submitJobs.py --campaign RunIISpring16MiniAODv2-PUSpring16_80X_mcRun2_asymptotic_2016_miniAODv2_v0-v1 --samples 'GluGluToContinToZZTo4*' 'GluGluToContinToZZTo2e2mu*' 'ZZTo4L*powheg*' 'WWZ*' --filesPerJob 2 -o /data/nawoods/uwvvZZ_mcNoHLT_eScaleUp_"$ID".sh UWVVZZ_MC_ESCALEUP_"$ID" Ntuplizer/test/ntuplize_cfg.py channels='eeee,eemm' isMC=1 eCalib=1 muCalib=1 eScaleShift=1 globalTag="$GT_MC"
+            python Utilities/scripts/submitJobs.py --campaign RunIISpring16MiniAODv2-PUSpring16_80X_mcRun2_asymptotic_2016_miniAODv2_v0-v1 --samples 'GluGluToContinToZZTo4*' 'GluGluToContinToZZTo2e2mu*' 'ZZTo4L*powheg*' 'WWZ*' --filesPerJob 2 -o /data/nawoods/uwvvZZ_mcNoHLT_eScaleUp_"$ID".sh UWVVZZ_MC_ESCALEUP_"$ID" Ntuplizer/test/ntuplize_cfg.py channels='eeee,eemm' isMC=1 eCalib=1 muCalib=1 eScaleShift=1 globalTag="$GT_MC" lheWeights=0
 
             nohup bash /data/nawoods/uwvvZZ_mcNoHLT_eScaleUp_"$ID".sh &
 
-            python Utilities/scripts/submitJobs.py --campaign RunIISpring16MiniAODv2-premix_withHLT_80X_mcRun2_asymptotic_v14-v1 --samples 'ZZJJTo4L_EWK_13TeV-madgraph-pythia8' --filesPerJob 2 -o /data/nawoods/uwvvZZ_mcSpecial_eScaleUp_"$ID".sh UWVVZZ_MC_ESCALEUP_"$ID" Ntuplizer/test/ntuplize_cfg.py channels='eeee,eemm' isMC=1 eCalib=1 muCalib=1 eScaleShift=1 globalTag="$GT_MC"
+            python Utilities/scripts/submitJobs.py --campaign RunIISpring16MiniAODv2-premix_withHLT_80X_mcRun2_asymptotic_v14-v1 --samples 'ZZJJTo4L_EWK_13TeV-madgraph-pythia8' --filesPerJob 2 -o /data/nawoods/uwvvZZ_mcSpecial_eScaleUp_"$ID".sh UWVVZZ_MC_ESCALEUP_"$ID" Ntuplizer/test/ntuplize_cfg.py channels='eeee,eemm' isMC=1 eCalib=1 muCalib=1 eScaleShift=1 globalTag="$GT_MC" lheWeights=0
 
             nohup bash /data/nawoods/uwvvZZ_mcSpecial_eScaleUp_"$ID".sh &
 
-            python Utilities/scripts/submitJobs.py --campaign RunIISpring16MiniAODv2-premix_withHLT_80X_mcRun2_asymptotic_v14_ext1-v1 --samples 'TTZToLLNuNu_M-10_TuneCUETP8M1_13TeV-amcatnlo-pythia8' --filesPerJob 2 -o /data/nawoods/uwvvZZ_mcSpecial2_eScaleUp_"$ID".sh UWVVZZ_MC_ESCALEUP_"$ID" Ntuplizer/test/ntuplize_cfg.py channels='zz' isMC=1 eCalib=1 muCalib=1 eScaleShift=1 globalTag="$GT_MC"
+            python Utilities/scripts/submitJobs.py --campaign RunIISpring16MiniAODv2-premix_withHLT_80X_mcRun2_asymptotic_v14_ext1-v1 --samples 'TTZToLLNuNu_M-10_TuneCUETP8M1_13TeV-amcatnlo-pythia8' --filesPerJob 2 -o /data/nawoods/uwvvZZ_mcSpecial2_eScaleUp_"$ID".sh UWVVZZ_MC_ESCALEUP_"$ID" Ntuplizer/test/ntuplize_cfg.py channels='zz' isMC=1 eCalib=1 muCalib=1 eScaleShift=1 globalTag="$GT_MC" lheWeights=0
 
             nohup bash /data/nawoods/uwvvZZ_mcSpecial2_eScaleUp_"$ID".sh &
 
             # EES-
-            python Utilities/scripts/submitJobs.py --campaign RunIISpring16MiniAODv2-PUSpring16RAWAODSIM_reHLT_80X_mcRun2_asymptotic_v14-v1 --samples 'ZZTo4L*amcatnlo*' 'GluGluHToZZTo4L_M125*pythia8' --filesPerJob 2 -o /data/nawoods/uwvvZZ_mc_eScaleDn_"$ID".sh UWVVZZ_MC_ESCALEDN_"$ID" Ntuplizer/test/ntuplize_cfg.py channels='eeee,eemm' isMC=1 eCalib=1 muCalib=1 eScaleShift=-1 globalTag="$GT_MC"
+            python Utilities/scripts/submitJobs.py --campaign RunIISpring16MiniAODv2-PUSpring16RAWAODSIM_reHLT_80X_mcRun2_asymptotic_v14-v1 --samples 'ZZTo4L*amcatnlo*' 'GluGluHToZZTo4L_M125*pythia8' --filesPerJob 2 -o /data/nawoods/uwvvZZ_mc_eScaleDn_"$ID".sh UWVVZZ_MC_ESCALEDN_"$ID" Ntuplizer/test/ntuplize_cfg.py channels='eeee,eemm' isMC=1 eCalib=1 muCalib=1 eScaleShift=-1 globalTag="$GT_MC" lheWeights=0
 
             nohup bash /data/nawoods/uwvvZZ_mc_eScaleDn_"$ID".sh &
 
-            python Utilities/scripts/submitJobs.py --campaign RunIISpring16MiniAODv2-PUSpring16_80X_mcRun2_asymptotic_2016_miniAODv2_v0-v1 --samples 'GluGluToContinToZZTo4*' 'GluGluToContinToZZTo2e2mu*' 'ZZTo4L*powheg*' 'WWZ*' --filesPerJob 2 -o /data/nawoods/uwvvZZ_mcNoHLT_eScaleDn_"$ID".sh UWVVZZ_MC_ESCALEDN_"$ID" Ntuplizer/test/ntuplize_cfg.py channels='eeee,eemm' isMC=1 eCalib=1 muCalib=1 eScaleShift=-1 globalTag="$GT_MC"
+            python Utilities/scripts/submitJobs.py --campaign RunIISpring16MiniAODv2-PUSpring16_80X_mcRun2_asymptotic_2016_miniAODv2_v0-v1 --samples 'GluGluToContinToZZTo4*' 'GluGluToContinToZZTo2e2mu*' 'ZZTo4L*powheg*' 'WWZ*' --filesPerJob 2 -o /data/nawoods/uwvvZZ_mcNoHLT_eScaleDn_"$ID".sh UWVVZZ_MC_ESCALEDN_"$ID" Ntuplizer/test/ntuplize_cfg.py channels='eeee,eemm' isMC=1 eCalib=1 muCalib=1 eScaleShift=-1 globalTag="$GT_MC" lheWeights=0
 
             nohup bash /data/nawoods/uwvvZZ_mcNoHLT_eScaleDn_"$ID".sh &
 
-            python Utilities/scripts/submitJobs.py --campaign RunIISpring16MiniAODv2-premix_withHLT_80X_mcRun2_asymptotic_v14-v1 --samples 'ZZJJTo4L_EWK_13TeV-madgraph-pythia8' --filesPerJob 2 -o /data/nawoods/uwvvZZ_mcSpecial_eScaleDn_"$ID".sh UWVVZZ_MC_ESCALEDN_"$ID" Ntuplizer/test/ntuplize_cfg.py channels='eeee,eemm' isMC=1 eCalib=1 muCalib=1 eScaleShift=-1 globalTag="$GT_MC"
+            python Utilities/scripts/submitJobs.py --campaign RunIISpring16MiniAODv2-premix_withHLT_80X_mcRun2_asymptotic_v14-v1 --samples 'ZZJJTo4L_EWK_13TeV-madgraph-pythia8' --filesPerJob 2 -o /data/nawoods/uwvvZZ_mcSpecial_eScaleDn_"$ID".sh UWVVZZ_MC_ESCALEDN_"$ID" Ntuplizer/test/ntuplize_cfg.py channels='eeee,eemm' isMC=1 eCalib=1 muCalib=1 eScaleShift=-1 globalTag="$GT_MC" lheWeights=0
 
             nohup bash /data/nawoods/uwvvZZ_mcSpecial_eScaleDn_"$ID".sh &
 
-            python Utilities/scripts/submitJobs.py --campaign RunIISpring16MiniAODv2-premix_withHLT_80X_mcRun2_asymptotic_v14_ext1-v1 --samples 'TTZToLLNuNu_M-10_TuneCUETP8M1_13TeV-amcatnlo-pythia8' --filesPerJob 2 -o /data/nawoods/uwvvZZ_mcSpecial2_eScaleDn_"$ID".sh UWVVZZ_MC_ESCALEDN_"$ID" Ntuplizer/test/ntuplize_cfg.py channels='zz' isMC=1 eCalib=1 muCalib=1 eScaleShift=-1 globalTag="$GT_MC"
+            python Utilities/scripts/submitJobs.py --campaign RunIISpring16MiniAODv2-premix_withHLT_80X_mcRun2_asymptotic_v14_ext1-v1 --samples 'TTZToLLNuNu_M-10_TuneCUETP8M1_13TeV-amcatnlo-pythia8' --filesPerJob 2 -o /data/nawoods/uwvvZZ_mcSpecial2_eScaleDn_"$ID".sh UWVVZZ_MC_ESCALEDN_"$ID" Ntuplizer/test/ntuplize_cfg.py channels='zz' isMC=1 eCalib=1 muCalib=1 eScaleShift=-1 globalTag="$GT_MC" lheWeights=0
 
             nohup bash /data/nawoods/uwvvZZ_mcSpecial2_eScaleDn_"$ID".sh &
 
             # EER+ (rho)
-            python Utilities/scripts/submitJobs.py --campaign RunIISpring16MiniAODv2-PUSpring16RAWAODSIM_reHLT_80X_mcRun2_asymptotic_v14-v1 --samples 'ZZTo4L*amcatnlo*' 'GluGluHToZZTo4L_M125*pythia8' --filesPerJob 2 -o /data/nawoods/uwvvZZ_mc_eRhoResUp_"$ID".sh UWVVZZ_MC_ERHORESUP_"$ID" Ntuplizer/test/ntuplize_cfg.py channels='eeee,eemm' isMC=1 eCalib=1 muCalib=1 eRhoResShift=1 globalTag="$GT_MC"
+            python Utilities/scripts/submitJobs.py --campaign RunIISpring16MiniAODv2-PUSpring16RAWAODSIM_reHLT_80X_mcRun2_asymptotic_v14-v1 --samples 'ZZTo4L*amcatnlo*' 'GluGluHToZZTo4L_M125*pythia8' --filesPerJob 2 -o /data/nawoods/uwvvZZ_mc_eRhoResUp_"$ID".sh UWVVZZ_MC_ERHORESUP_"$ID" Ntuplizer/test/ntuplize_cfg.py channels='eeee,eemm' isMC=1 eCalib=1 muCalib=1 eRhoResShift=1 globalTag="$GT_MC" lheWeights=0
 
             nohup bash /data/nawoods/uwvvZZ_mc_eRhoResUp_"$ID".sh &
 
-            python Utilities/scripts/submitJobs.py --campaign RunIISpring16MiniAODv2-PUSpring16_80X_mcRun2_asymptotic_2016_miniAODv2_v0-v1 --samples 'GluGluToContinToZZTo4*' 'GluGluToContinToZZTo2e2mu*' 'ZZTo4L*powheg*' 'WWZ*' --filesPerJob 2 -o /data/nawoods/uwvvZZ_mcNoHLT_eRhoResUp_"$ID".sh UWVVZZ_MC_ERHORESUP_"$ID" Ntuplizer/test/ntuplize_cfg.py channels='eeee,eemm' isMC=1 eCalib=1 muCalib=1 eRhoResShift=1 globalTag="$GT_MC"
+            python Utilities/scripts/submitJobs.py --campaign RunIISpring16MiniAODv2-PUSpring16_80X_mcRun2_asymptotic_2016_miniAODv2_v0-v1 --samples 'GluGluToContinToZZTo4*' 'GluGluToContinToZZTo2e2mu*' 'ZZTo4L*powheg*' 'WWZ*' --filesPerJob 2 -o /data/nawoods/uwvvZZ_mcNoHLT_eRhoResUp_"$ID".sh UWVVZZ_MC_ERHORESUP_"$ID" Ntuplizer/test/ntuplize_cfg.py channels='eeee,eemm' isMC=1 eCalib=1 muCalib=1 eRhoResShift=1 globalTag="$GT_MC" lheWeights=0
 
             nohup bash /data/nawoods/uwvvZZ_mcNoHLT_eRhoResUp_"$ID".sh &
 
-            python Utilities/scripts/submitJobs.py --campaign RunIISpring16MiniAODv2-premix_withHLT_80X_mcRun2_asymptotic_v14-v1 --samples 'ZZJJTo4L_EWK_13TeV-madgraph-pythia8' --filesPerJob 2 -o /data/nawoods/uwvvZZ_mcSpecial_eRhoResUp_"$ID".sh UWVVZZ_MC_ERHORESUP_"$ID" Ntuplizer/test/ntuplize_cfg.py channels='eeee,eemm' isMC=1 eCalib=1 muCalib=1 eRhoResShift=1 globalTag="$GT_MC"
+            python Utilities/scripts/submitJobs.py --campaign RunIISpring16MiniAODv2-premix_withHLT_80X_mcRun2_asymptotic_v14-v1 --samples 'ZZJJTo4L_EWK_13TeV-madgraph-pythia8' --filesPerJob 2 -o /data/nawoods/uwvvZZ_mcSpecial_eRhoResUp_"$ID".sh UWVVZZ_MC_ERHORESUP_"$ID" Ntuplizer/test/ntuplize_cfg.py channels='eeee,eemm' isMC=1 eCalib=1 muCalib=1 eRhoResShift=1 globalTag="$GT_MC" lheWeights=0
 
             nohup bash /data/nawoods/uwvvZZ_mcSpecial_eRhoResUp_"$ID".sh &
 
-            python Utilities/scripts/submitJobs.py --campaign RunIISpring16MiniAODv2-premix_withHLT_80X_mcRun2_asymptotic_v14_ext1-v1 --samples 'TTZToLLNuNu_M-10_TuneCUETP8M1_13TeV-amcatnlo-pythia8' --filesPerJob 2 -o /data/nawoods/uwvvZZ_mcSpecial2_eRhoResUp_"$ID".sh UWVVZZ_MC_ERHORESUP_"$ID" Ntuplizer/test/ntuplize_cfg.py channels='zz' isMC=1 eCalib=1 muCalib=1 eRhoResShift=1 globalTag="$GT_MC"
+            python Utilities/scripts/submitJobs.py --campaign RunIISpring16MiniAODv2-premix_withHLT_80X_mcRun2_asymptotic_v14_ext1-v1 --samples 'TTZToLLNuNu_M-10_TuneCUETP8M1_13TeV-amcatnlo-pythia8' --filesPerJob 2 -o /data/nawoods/uwvvZZ_mcSpecial2_eRhoResUp_"$ID".sh UWVVZZ_MC_ERHORESUP_"$ID" Ntuplizer/test/ntuplize_cfg.py channels='zz' isMC=1 eCalib=1 muCalib=1 eRhoResShift=1 globalTag="$GT_MC" lheWeights=0
 
             nohup bash /data/nawoods/uwvvZZ_mcSpecial2_eRhoResUp_"$ID".sh &
 
             # EER- (rho)
-            python Utilities/scripts/submitJobs.py --campaign RunIISpring16MiniAODv2-PUSpring16RAWAODSIM_reHLT_80X_mcRun2_asymptotic_v14-v1 --samples 'ZZTo4L*amcatnlo*' 'GluGluHToZZTo4L_M125*pythia8' --filesPerJob 2 -o /data/nawoods/uwvvZZ_mc_eRhoResDn_"$ID".sh UWVVZZ_MC_ERHORESDN_"$ID" Ntuplizer/test/ntuplize_cfg.py channels='eeee,eemm' isMC=1 eCalib=1 muCalib=1 eRhoResShift=-1 globalTag="$GT_MC"
+            python Utilities/scripts/submitJobs.py --campaign RunIISpring16MiniAODv2-PUSpring16RAWAODSIM_reHLT_80X_mcRun2_asymptotic_v14-v1 --samples 'ZZTo4L*amcatnlo*' 'GluGluHToZZTo4L_M125*pythia8' --filesPerJob 2 -o /data/nawoods/uwvvZZ_mc_eRhoResDn_"$ID".sh UWVVZZ_MC_ERHORESDN_"$ID" Ntuplizer/test/ntuplize_cfg.py channels='eeee,eemm' isMC=1 eCalib=1 muCalib=1 eRhoResShift=-1 globalTag="$GT_MC" lheWeights=0
 
             nohup bash /data/nawoods/uwvvZZ_mc_eRhoResDn_"$ID".sh &
 
-            python Utilities/scripts/submitJobs.py --campaign RunIISpring16MiniAODv2-PUSpring16_80X_mcRun2_asymptotic_2016_miniAODv2_v0-v1 --samples 'GluGluToContinToZZTo4*' 'GluGluToContinToZZTo2e2mu*' 'ZZTo4L*powheg*' 'WWZ*' --filesPerJob 2 -o /data/nawoods/uwvvZZ_mcNoHLT_eRhoResDn_"$ID".sh UWVVZZ_MC_ERHORESDN_"$ID" Ntuplizer/test/ntuplize_cfg.py channels='eeee,eemm' isMC=1 eCalib=1 muCalib=1 eRhoResShift=-1 globalTag="$GT_MC"
+            python Utilities/scripts/submitJobs.py --campaign RunIISpring16MiniAODv2-PUSpring16_80X_mcRun2_asymptotic_2016_miniAODv2_v0-v1 --samples 'GluGluToContinToZZTo4*' 'GluGluToContinToZZTo2e2mu*' 'ZZTo4L*powheg*' 'WWZ*' --filesPerJob 2 -o /data/nawoods/uwvvZZ_mcNoHLT_eRhoResDn_"$ID".sh UWVVZZ_MC_ERHORESDN_"$ID" Ntuplizer/test/ntuplize_cfg.py channels='eeee,eemm' isMC=1 eCalib=1 muCalib=1 eRhoResShift=-1 globalTag="$GT_MC" lheWeights=0
 
             nohup bash /data/nawoods/uwvvZZ_mcNoHLT_eRhoResDn_"$ID".sh &
 
-            python Utilities/scripts/submitJobs.py --campaign RunIISpring16MiniAODv2-premix_withHLT_80X_mcRun2_asymptotic_v14-v1 --samples 'ZZJJTo4L_EWK_13TeV-madgraph-pythia8' --filesPerJob 2 -o /data/nawoods/uwvvZZ_mcSpecial_eRhoResDn_"$ID".sh UWVVZZ_MC_ERHORESDN_"$ID" Ntuplizer/test/ntuplize_cfg.py channels='eeee,eemm' isMC=1 eCalib=1 muCalib=1 eRhoResShift=-1 globalTag="$GT_MC"
+            python Utilities/scripts/submitJobs.py --campaign RunIISpring16MiniAODv2-premix_withHLT_80X_mcRun2_asymptotic_v14-v1 --samples 'ZZJJTo4L_EWK_13TeV-madgraph-pythia8' --filesPerJob 2 -o /data/nawoods/uwvvZZ_mcSpecial_eRhoResDn_"$ID".sh UWVVZZ_MC_ERHORESDN_"$ID" Ntuplizer/test/ntuplize_cfg.py channels='eeee,eemm' isMC=1 eCalib=1 muCalib=1 eRhoResShift=-1 globalTag="$GT_MC" lheWeights=0
 
             nohup bash /data/nawoods/uwvvZZ_mcSpecial_eRhoResDn_"$ID".sh &
 
-            python Utilities/scripts/submitJobs.py --campaign RunIISpring16MiniAODv2-premix_withHLT_80X_mcRun2_asymptotic_v14_ext1-v1 --samples 'TTZToLLNuNu_M-10_TuneCUETP8M1_13TeV-amcatnlo-pythia8' --filesPerJob 2 -o /data/nawoods/uwvvZZ_mcSpecial2_eRhoResDn_"$ID".sh UWVVZZ_MC_ERHORESDN_"$ID" Ntuplizer/test/ntuplize_cfg.py channels='zz' isMC=1 eCalib=1 muCalib=1 eRhoResShift=-1 globalTag="$GT_MC"
+            python Utilities/scripts/submitJobs.py --campaign RunIISpring16MiniAODv2-premix_withHLT_80X_mcRun2_asymptotic_v14_ext1-v1 --samples 'TTZToLLNuNu_M-10_TuneCUETP8M1_13TeV-amcatnlo-pythia8' --filesPerJob 2 -o /data/nawoods/uwvvZZ_mcSpecial2_eRhoResDn_"$ID".sh UWVVZZ_MC_ERHORESDN_"$ID" Ntuplizer/test/ntuplize_cfg.py channels='zz' isMC=1 eCalib=1 muCalib=1 eRhoResShift=-1 globalTag="$GT_MC" lheWeights=0
 
             nohup bash /data/nawoods/uwvvZZ_mcSpecial2_eRhoResDn_"$ID".sh &
 
             # EER+ (phi)
-            python Utilities/scripts/submitJobs.py --campaign RunIISpring16MiniAODv2-PUSpring16RAWAODSIM_reHLT_80X_mcRun2_asymptotic_v14-v1 --samples 'ZZTo4L*amcatnlo*' 'GluGluHToZZTo4L_M125*pythia8' --filesPerJob 2 -o /data/nawoods/uwvvZZ_mc_ePhiResUp_"$ID".sh UWVVZZ_MC_EPHIRESUP_"$ID" Ntuplizer/test/ntuplize_cfg.py channels='eeee,eemm' isMC=1 eCalib=1 muCalib=1 ePhiResShift=1 globalTag="$GT_MC"
+            python Utilities/scripts/submitJobs.py --campaign RunIISpring16MiniAODv2-PUSpring16RAWAODSIM_reHLT_80X_mcRun2_asymptotic_v14-v1 --samples 'ZZTo4L*amcatnlo*' 'GluGluHToZZTo4L_M125*pythia8' --filesPerJob 2 -o /data/nawoods/uwvvZZ_mc_ePhiResUp_"$ID".sh UWVVZZ_MC_EPHIRESUP_"$ID" Ntuplizer/test/ntuplize_cfg.py channels='eeee,eemm' isMC=1 eCalib=1 muCalib=1 ePhiResShift=1 globalTag="$GT_MC" lheWeights=0
 
             nohup bash /data/nawoods/uwvvZZ_mc_ePhiResUp_"$ID".sh &
 
-            python Utilities/scripts/submitJobs.py --campaign RunIISpring16MiniAODv2-PUSpring16_80X_mcRun2_asymptotic_2016_miniAODv2_v0-v1 --samples 'GluGluToContinToZZTo4*' 'GluGluToContinToZZTo2e2mu*' 'ZZTo4L*powheg*' 'WWZ*' --filesPerJob 2 -o /data/nawoods/uwvvZZ_mcNoHLT_ePhiResUp_"$ID".sh UWVVZZ_MC_EPHIRESUP_"$ID" Ntuplizer/test/ntuplize_cfg.py channels='eeee,eemm' isMC=1 eCalib=1 muCalib=1 ePhiResShift=1 globalTag="$GT_MC"
+            python Utilities/scripts/submitJobs.py --campaign RunIISpring16MiniAODv2-PUSpring16_80X_mcRun2_asymptotic_2016_miniAODv2_v0-v1 --samples 'GluGluToContinToZZTo4*' 'GluGluToContinToZZTo2e2mu*' 'ZZTo4L*powheg*' 'WWZ*' --filesPerJob 2 -o /data/nawoods/uwvvZZ_mcNoHLT_ePhiResUp_"$ID".sh UWVVZZ_MC_EPHIRESUP_"$ID" Ntuplizer/test/ntuplize_cfg.py channels='eeee,eemm' isMC=1 eCalib=1 muCalib=1 ePhiResShift=1 globalTag="$GT_MC" lheWeights=0
 
             nohup bash /data/nawoods/uwvvZZ_mcNoHLT_ePhiResUp_"$ID".sh &
 
-            python Utilities/scripts/submitJobs.py --campaign RunIISpring16MiniAODv2-premix_withHLT_80X_mcRun2_asymptotic_v14-v1 --samples 'ZZJJTo4L_EWK_13TeV-madgraph-pythia8' --filesPerJob 2 -o /data/nawoods/uwvvZZ_mcSpecial_ePhiResUp_"$ID".sh UWVVZZ_MC_EPHIRESUP_"$ID" Ntuplizer/test/ntuplize_cfg.py channels='eeee,eemm' isMC=1 eCalib=1 muCalib=1 ePhiResShift=1 globalTag="$GT_MC"
+            python Utilities/scripts/submitJobs.py --campaign RunIISpring16MiniAODv2-premix_withHLT_80X_mcRun2_asymptotic_v14-v1 --samples 'ZZJJTo4L_EWK_13TeV-madgraph-pythia8' --filesPerJob 2 -o /data/nawoods/uwvvZZ_mcSpecial_ePhiResUp_"$ID".sh UWVVZZ_MC_EPHIRESUP_"$ID" Ntuplizer/test/ntuplize_cfg.py channels='eeee,eemm' isMC=1 eCalib=1 muCalib=1 ePhiResShift=1 globalTag="$GT_MC" lheWeights=0
 
             nohup bash /data/nawoods/uwvvZZ_mcSpecial_ePhiResUp_"$ID".sh &
 
-            python Utilities/scripts/submitJobs.py --campaign RunIISpring16MiniAODv2-premix_withHLT_80X_mcRun2_asymptotic_v14_ext1-v1 --samples 'TTZToLLNuNu_M-10_TuneCUETP8M1_13TeV-amcatnlo-pythia8' --filesPerJob 2 -o /data/nawoods/uwvvZZ_mcSpecial2_ePhiResUp_"$ID".sh UWVVZZ_MC_EPHIRESUP_"$ID" Ntuplizer/test/ntuplize_cfg.py channels='zz' isMC=1 eCalib=1 muCalib=1 ePhiResShift=1 globalTag="$GT_MC"
+            python Utilities/scripts/submitJobs.py --campaign RunIISpring16MiniAODv2-premix_withHLT_80X_mcRun2_asymptotic_v14_ext1-v1 --samples 'TTZToLLNuNu_M-10_TuneCUETP8M1_13TeV-amcatnlo-pythia8' --filesPerJob 2 -o /data/nawoods/uwvvZZ_mcSpecial2_ePhiResUp_"$ID".sh UWVVZZ_MC_EPHIRESUP_"$ID" Ntuplizer/test/ntuplize_cfg.py channels='zz' isMC=1 eCalib=1 muCalib=1 ePhiResShift=1 globalTag="$GT_MC" lheWeights=0
 
             nohup bash /data/nawoods/uwvvZZ_mcSpecial2_ePhiResUp_"$ID".sh &
 
             # MES/MER+
-            python Utilities/scripts/submitJobs.py --campaign RunIISpring16MiniAODv2-PUSpring16RAWAODSIM_reHLT_80X_mcRun2_asymptotic_v14-v1 --samples 'ZZTo4L*amcatnlo*' 'GluGluHToZZTo4L_M125*pythia8' --filesPerJob 2 -o /data/nawoods/uwvvZZ_mc_mClosureUp_"$ID".sh UWVVZZ_MC_MCLOSUREUP_"$ID" Ntuplizer/test/ntuplize_cfg.py channels='eemm,mmmm' isMC=1 eCalib=1 muCalib=1 mClosureShift=1 globalTag="$GT_MC"
+            python Utilities/scripts/submitJobs.py --campaign RunIISpring16MiniAODv2-PUSpring16RAWAODSIM_reHLT_80X_mcRun2_asymptotic_v14-v1 --samples 'ZZTo4L*amcatnlo*' 'GluGluHToZZTo4L_M125*pythia8' --filesPerJob 2 -o /data/nawoods/uwvvZZ_mc_mClosureUp_"$ID".sh UWVVZZ_MC_MCLOSUREUP_"$ID" Ntuplizer/test/ntuplize_cfg.py channels='eemm,mmmm' isMC=1 eCalib=1 muCalib=1 mClosureShift=1 globalTag="$GT_MC" lheWeights=0
 
             nohup bash /data/nawoods/uwvvZZ_mc_mClosureUp_"$ID".sh &
 
-            python Utilities/scripts/submitJobs.py --campaign RunIISpring16MiniAODv2-PUSpring16_80X_mcRun2_asymptotic_2016_miniAODv2_v0-v1 --samples 'GluGluToContinToZZTo4*' 'GluGluToContinToZZTo2e2mu*' 'ZZTo4L*powheg*' 'WWZ*' --filesPerJob 2 -o /data/nawoods/uwvvZZ_mcNoHLT_mClosureUp_"$ID".sh UWVVZZ_MC_MCLOSUREUP_"$ID" Ntuplizer/test/ntuplize_cfg.py channels='eemm,mmmm' isMC=1 eCalib=1 muCalib=1 mClosureShift=1 globalTag="$GT_MC"
+            python Utilities/scripts/submitJobs.py --campaign RunIISpring16MiniAODv2-PUSpring16_80X_mcRun2_asymptotic_2016_miniAODv2_v0-v1 --samples 'GluGluToContinToZZTo4*' 'GluGluToContinToZZTo2e2mu*' 'ZZTo4L*powheg*' 'WWZ*' --filesPerJob 2 -o /data/nawoods/uwvvZZ_mcNoHLT_mClosureUp_"$ID".sh UWVVZZ_MC_MCLOSUREUP_"$ID" Ntuplizer/test/ntuplize_cfg.py channels='eemm,mmmm' isMC=1 eCalib=1 muCalib=1 mClosureShift=1 globalTag="$GT_MC" lheWeights=0
 
             nohup bash /data/nawoods/uwvvZZ_mcNoHLT_mClosureUp_"$ID".sh &
 
-            python Utilities/scripts/submitJobs.py --campaign RunIISpring16MiniAODv2-premix_withHLT_80X_mcRun2_asymptotic_v14-v1 --samples 'ZZJJTo4L_EWK_13TeV-madgraph-pythia8' --filesPerJob 2 -o /data/nawoods/uwvvZZ_mcSpecial_mClosureUp_"$ID".sh UWVVZZ_MC_MCLOSUREUP_"$ID" Ntuplizer/test/ntuplize_cfg.py channels='eemm,mmmm' isMC=1 eCalib=1 muCalib=1 mClosureShift=1 globalTag="$GT_MC"
+            python Utilities/scripts/submitJobs.py --campaign RunIISpring16MiniAODv2-premix_withHLT_80X_mcRun2_asymptotic_v14-v1 --samples 'ZZJJTo4L_EWK_13TeV-madgraph-pythia8' --filesPerJob 2 -o /data/nawoods/uwvvZZ_mcSpecial_mClosureUp_"$ID".sh UWVVZZ_MC_MCLOSUREUP_"$ID" Ntuplizer/test/ntuplize_cfg.py channels='eemm,mmmm' isMC=1 eCalib=1 muCalib=1 mClosureShift=1 globalTag="$GT_MC" lheWeights=0
 
             nohup bash /data/nawoods/uwvvZZ_mcSpecial_mClosureUp_"$ID".sh &
 
-            python Utilities/scripts/submitJobs.py --campaign RunIISpring16MiniAODv2-premix_withHLT_80X_mcRun2_asymptotic_v14_ext1-v1 --samples 'TTZToLLNuNu_M-10_TuneCUETP8M1_13TeV-amcatnlo-pythia8' --filesPerJob 2 -o /data/nawoods/uwvvZZ_mcSpecial2_mClosureUp_"$ID".sh UWVVZZ_MC_MCLOSUREUP_"$ID" Ntuplizer/test/ntuplize_cfg.py channels='zz' isMC=1 eCalib=1 muCalib=1 mClosureShift=1 globalTag="$GT_MC"
+            python Utilities/scripts/submitJobs.py --campaign RunIISpring16MiniAODv2-premix_withHLT_80X_mcRun2_asymptotic_v14_ext1-v1 --samples 'TTZToLLNuNu_M-10_TuneCUETP8M1_13TeV-amcatnlo-pythia8' --filesPerJob 2 -o /data/nawoods/uwvvZZ_mcSpecial2_mClosureUp_"$ID".sh UWVVZZ_MC_MCLOSUREUP_"$ID" Ntuplizer/test/ntuplize_cfg.py channels='zz' isMC=1 eCalib=1 muCalib=1 mClosureShift=1 globalTag="$GT_MC" lheWeights=0
 
             nohup bash /data/nawoods/uwvvZZ_mcSpecial2_mClosureUp_"$ID".sh &
 
             # MES/MER-
-            python Utilities/scripts/submitJobs.py --campaign RunIISpring16MiniAODv2-PUSpring16RAWAODSIM_reHLT_80X_mcRun2_asymptotic_v14-v1 --samples 'ZZTo4L*amcatnlo*' 'GluGluHToZZTo4L_M125*pythia8' --filesPerJob 2 -o /data/nawoods/uwvvZZ_mc_mClosureDn_"$ID".sh UWVVZZ_MC_MCLOSUREDN_"$ID" Ntuplizer/test/ntuplize_cfg.py channels='eemm,mmmm' isMC=1 eCalib=1 muCalib=1 mClosureShift=-1 globalTag="$GT_MC"
+            python Utilities/scripts/submitJobs.py --campaign RunIISpring16MiniAODv2-PUSpring16RAWAODSIM_reHLT_80X_mcRun2_asymptotic_v14-v1 --samples 'ZZTo4L*amcatnlo*' 'GluGluHToZZTo4L_M125*pythia8' --filesPerJob 2 -o /data/nawoods/uwvvZZ_mc_mClosureDn_"$ID".sh UWVVZZ_MC_MCLOSUREDN_"$ID" Ntuplizer/test/ntuplize_cfg.py channels='eemm,mmmm' isMC=1 eCalib=1 muCalib=1 mClosureShift=-1 globalTag="$GT_MC" lheWeights=0
 
             nohup bash /data/nawoods/uwvvZZ_mc_mClosureDn_"$ID".sh &
 
-            python Utilities/scripts/submitJobs.py --campaign RunIISpring16MiniAODv2-PUSpring16_80X_mcRun2_asymptotic_2016_miniAODv2_v0-v1 --samples 'GluGluToContinToZZTo4*' 'GluGluToContinToZZTo2e2mu*' 'ZZTo4L*powheg*' 'WWZ*' --filesPerJob 2 -o /data/nawoods/uwvvZZ_mcNoHLT_mClosureDn_"$ID".sh UWVVZZ_MC_MCLOSUREDN_"$ID" Ntuplizer/test/ntuplize_cfg.py channels='eemm,mmmm' isMC=1 eCalib=1 muCalib=1 mClosureShift=-1 globalTag="$GT_MC"
+            python Utilities/scripts/submitJobs.py --campaign RunIISpring16MiniAODv2-PUSpring16_80X_mcRun2_asymptotic_2016_miniAODv2_v0-v1 --samples 'GluGluToContinToZZTo4*' 'GluGluToContinToZZTo2e2mu*' 'ZZTo4L*powheg*' 'WWZ*' --filesPerJob 2 -o /data/nawoods/uwvvZZ_mcNoHLT_mClosureDn_"$ID".sh UWVVZZ_MC_MCLOSUREDN_"$ID" Ntuplizer/test/ntuplize_cfg.py channels='eemm,mmmm' isMC=1 eCalib=1 muCalib=1 mClosureShift=-1 globalTag="$GT_MC" lheWeights=0
 
             nohup bash /data/nawoods/uwvvZZ_mcNoHLT_mClosureDn_"$ID".sh &
 
-            python Utilities/scripts/submitJobs.py --campaign RunIISpring16MiniAODv2-premix_withHLT_80X_mcRun2_asymptotic_v14-v1 --samples 'ZZJJTo4L_EWK_13TeV-madgraph-pythia8' --filesPerJob 2 -o /data/nawoods/uwvvZZ_mcSpecial_mClosureDn_"$ID".sh UWVVZZ_MC_MCLOSUREDN_"$ID" Ntuplizer/test/ntuplize_cfg.py channels='eemm,mmmm' isMC=1 eCalib=1 muCalib=1 mClosureShift=-1 globalTag="$GT_MC"
+            python Utilities/scripts/submitJobs.py --campaign RunIISpring16MiniAODv2-premix_withHLT_80X_mcRun2_asymptotic_v14-v1 --samples 'ZZJJTo4L_EWK_13TeV-madgraph-pythia8' --filesPerJob 2 -o /data/nawoods/uwvvZZ_mcSpecial_mClosureDn_"$ID".sh UWVVZZ_MC_MCLOSUREDN_"$ID" Ntuplizer/test/ntuplize_cfg.py channels='eemm,mmmm' isMC=1 eCalib=1 muCalib=1 mClosureShift=-1 globalTag="$GT_MC" lheWeights=0
 
             nohup bash /data/nawoods/uwvvZZ_mcSpecial_mClosureDn_"$ID".sh &
 
-            python Utilities/scripts/submitJobs.py --campaign RunIISpring16MiniAODv2-premix_withHLT_80X_mcRun2_asymptotic_v14_ext1-v1 --samples 'TTZToLLNuNu_M-10_TuneCUETP8M1_13TeV-amcatnlo-pythia8' --filesPerJob 2 -o /data/nawoods/uwvvZZ_mcSpecial2_mClosureDn_"$ID".sh UWVVZZ_MC_MCLOSUREDN_"$ID" Ntuplizer/test/ntuplize_cfg.py channels='zz' isMC=1 eCalib=1 muCalib=1 mClosureShift=-1 globalTag="$GT_MC"
+            python Utilities/scripts/submitJobs.py --campaign RunIISpring16MiniAODv2-premix_withHLT_80X_mcRun2_asymptotic_v14_ext1-v1 --samples 'TTZToLLNuNu_M-10_TuneCUETP8M1_13TeV-amcatnlo-pythia8' --filesPerJob 2 -o /data/nawoods/uwvvZZ_mcSpecial2_mClosureDn_"$ID".sh UWVVZZ_MC_MCLOSUREDN_"$ID" Ntuplizer/test/ntuplize_cfg.py channels='zz' isMC=1 eCalib=1 muCalib=1 mClosureShift=-1 globalTag="$GT_MC" lheWeights=0
 
             nohup bash /data/nawoods/uwvvZZ_mcSpecial2_mClosureDn_"$ID".sh &
         fi
@@ -281,12 +289,12 @@ then
         echo Submitting Z+L Data Ntuples as UWVVZPLUSL_MC_"$ID"
 
         # reHLT
-        python Utilities/scripts/submitJobs.py --campaign RunIISpring16MiniAODv2-PUSpring16RAWAODSIM_reHLT_80X_mcRun2_asymptotic_v14-v1 --samples 'DYJetsToLL_M-50*amcatnlo*' 'TTJets*' --filesPerJob 2 -o /data/nawoods/uwvvZPlusL_mc_"$ID".sh UWVVZPLUSL_MC_"$ID" Ntuplizer/test/ntuplize_cfg.py channels='zl' isMC=1 eCalib=1 muCalib=1 globalTag="$GT_MC"
+        python Utilities/scripts/submitJobs.py --campaign RunIISpring16MiniAODv2-PUSpring16RAWAODSIM_reHLT_80X_mcRun2_asymptotic_v14-v1 --samples 'DYJetsToLL_M-50*amcatnlo*' 'TTJets*' --filesPerJob 2 -o /data/nawoods/uwvvZPlusL_mc_"$ID".sh UWVVZPLUSL_MC_"$ID" Ntuplizer/test/ntuplize_cfg.py channels='zl' isMC=1 eCalib=1 muCalib=1 globalTag="$GT_MC" lheWeights=0
 
         nohup bash /data/nawoods/uwvvZPlusl_mc_"$ID".sh &
 
         # no HLT
-        python Utilities/scripts/submitJobs.py --campaign RunIISpring16MiniAODv2-PUSpring16_80X_mcRun2_asymptotic_2016_miniAODv2_v0-v1 --samples 'WZTo3LNu_TuneCUETP8M1_13TeV-powheg-pythia8' 'GluGluToContinToZZTo4*' 'GluGluToContinToZZTo2e2mu*' 'GluGluToContinToZZTo2e2tau*' 'GluGluToContinToZZTo2mu2tau*' 'ZZTo4L*powheg*' --filesPerJob 2 -o /data/nawoods/uwvvZPlusl_mcNoHLT_"$ID".sh UWVVZPLUSL_MC_"$ID" Ntuplizer/test/ntuplize_cfg.py channels='zl' isMC=1 eCalib=1 muCalib=1 globalTag="$GT_MC"
+        python Utilities/scripts/submitJobs.py --campaign RunIISpring16MiniAODv2-PUSpring16_80X_mcRun2_asymptotic_2016_miniAODv2_v0-v1 --samples 'WZTo3LNu_TuneCUETP8M1_13TeV-powheg-pythia8' 'GluGluToContinToZZTo4*' 'GluGluToContinToZZTo2e2mu*' 'GluGluToContinToZZTo2e2tau*' 'GluGluToContinToZZTo2mu2tau*' 'ZZTo4L*powheg*' --filesPerJob 2 -o /data/nawoods/uwvvZPlusl_mcNoHLT_"$ID".sh UWVVZPLUSL_MC_"$ID" Ntuplizer/test/ntuplize_cfg.py channels='zl' isMC=1 eCalib=1 muCalib=1 globalTag="$GT_MC" lheWeights=0
 
         nohup bash /data/nawoods/uwvvZPlusl_mcNoHLT_"$ID".sh &
     fi
@@ -295,7 +303,7 @@ then
     then
         echo Submitting Single Z Data Ntuples as UWVVSINGLEZ_MC_"$ID"
 
-        python Utilities/scripts/submitJobs.py --campaign RunIISpring16MiniAODv2-PUSpring16RAWAODSIM_reHLT_80X_mcRun2_asymptotic_v14-v1 --samples 'DYJetsToLL_M-50*amcatnlo*' 'TTJets*' --filesPerJob 2 -o /data/nawoods/uwvvSingleZ_mc_"$ID".sh UWVVSINGLEZ_MC_"$ID" Ntuplizer/test/ntuplize_cfg.py channels='z' isMC=1 eCalib=1 muCalib=1 globalTag="$GT_MC"
+        python Utilities/scripts/submitJobs.py --campaign RunIISpring16MiniAODv2-PUSpring16RAWAODSIM_reHLT_80X_mcRun2_asymptotic_v14-v1 --samples 'DYJetsToLL_M-50*amcatnlo*' 'TTJets*' --filesPerJob 2 -o /data/nawoods/uwvvSingleZ_mc_"$ID".sh UWVVSINGLEZ_MC_"$ID" Ntuplizer/test/ntuplize_cfg.py channels='z' isMC=1 eCalib=1 muCalib=1 globalTag="$GT_MC" lheWeights=0
 
         nohup bash /data/nawoods/uwvvSingleZ_mc_"$ID".sh &
     fi
