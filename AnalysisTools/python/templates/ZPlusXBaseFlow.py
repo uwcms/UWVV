@@ -24,10 +24,7 @@ class ZPlusXBaseFlow(AnalysisFlowBase):
             'PATCandViewShallowCloneCombiner',
             decay = cms.string('{0}@+ {0}@-'.format(step.getObjTagString('e'))),
             roles = cms.vstring('e1', 'e2'),
-            cut = cms.string('daughter("e1").pt > 7 && '
-                             'daughter("e2").pt > 7 && '
-                             'abs(daughter("e1").eta) < 2.5 && '
-                             'abs(daughter("e2").eta) < 2.5'),
+            cut = cms.string(self.__class__.getZEECuts()),
             checkCharge = cms.bool(True),
             setPdgId = cms.int32(23),
             )
@@ -36,13 +33,43 @@ class ZPlusXBaseFlow(AnalysisFlowBase):
             'PATCandViewShallowCloneCombiner',
             decay = cms.string('{0}@+ {0}@-'.format(step.getObjTagString('m'))),
             roles = cms.vstring('m1', 'm2'),
-            cut = cms.string('daughter("m1").masterClone.pt > 5 && '
-                             'daughter("m2").masterClone.pt > 5 && '
-                             'abs(daughter("m1").masterClone.eta) < 2.4 && '
-                             'abs(daughter("m2").masterClone.eta) < 2.4'),
+            cut = cms.string(self.__class__.getZMMCuts()),
             checkCharge = cms.bool(True),
             setPdgId = cms.int32(23),
             )
 
         step.addModule("zEECreation", zEEMod, 'ee')
         step.addModule("zMuMuCreation", zMuMuMod, 'mm')
+
+
+    @classmethod
+    def getZEECuts(cls):
+        return ('daughter("e1").pt > 7 && '
+                'daughter("e2").pt > 7 && '
+                'abs(daughter("e1").eta) < 2.5 && '
+                'abs(daughter("e2").eta) < 2.5')
+
+
+    @classmethod
+    def getZMMCuts(cls):
+        return ('daughter("m1").pt > 5 && '
+                    'daughter("m2").pt > 5 && '
+                    'abs(daughter("m1").eta) < 2.4 && '
+                    'abs(daughter("m2").eta) < 2.4')
+
+
+class ZPlusXBaseFlowGen(ZPlusXBaseFlow):
+    @classmethod
+    def getZEECuts(cls):
+        return ('daughter("e1").pt > 5 && '
+                'daughter("e2").pt > 5 && '
+                'abs(daughter("e1").eta) < 2.5 && '
+                'abs(daughter("e2").eta) < 2.5')
+
+
+    @classmethod
+    def getZMMCuts(cls):
+        return ('daughter("m1").pt > 5 && '
+                'daughter("m2").pt > 5 && '
+                'abs(daughter("m1").eta) < 2.5 && '
+                'abs(daughter("m2").eta) < 2.5')

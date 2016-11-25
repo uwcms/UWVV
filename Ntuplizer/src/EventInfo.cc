@@ -78,6 +78,10 @@ EventInfo::EventInfo(edm::ConsumesCollector cc,
                 config.exists("genEventInfoExtra") ? 
                 config.getParameter<edm::ParameterSet>("genEventInfoExtra") :
                 edm::ParameterSet()),
+  lheEventInfo_(cc, config.getParameter<edm::InputTag>("lheEventInfoSrc"),
+                config.exists("lheEventInfoExtra") ? 
+                config.getParameter<edm::ParameterSet>("lheEventInfoExtra") :
+                edm::ParameterSet()),
   genJets_(cc, config.getParameter<edm::InputTag>("genJetSrc"),
            config.exists("genJetExtra") ? 
            config.getParameter<edm::ParameterSet>("genJetExtra") :
@@ -102,6 +106,7 @@ void EventInfo::setEvent(const edm::Event& event)
   mets_.setEvent(event);
   puInfo_.setEvent(event);
   genEventInfo_.setEvent(event);
+  lheEventInfo_.setEvent(event);
   genJets_.setEvent(event);
   genParticles_.setEvent(event);
 

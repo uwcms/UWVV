@@ -86,16 +86,22 @@ options.register('mClosureShift', 0,
                  VarParsing.VarParsing.multiplicity.singleton,
                  VarParsing.VarParsing.varType.int,
                  'Muon calibration closure shift, in units of sigma.')
+options.register('lheWeights', 1,
+                 VarParsing.VarParsing.multiplicity.singleton,
+                 VarParsing.VarParsing.varType.int,
+                 'Add LHE weights from Monte Carlo. Option 1 = scale weights '
+                 '(weights 0-9), 2 = scale weights and one set of PDF weights '
+                 '(weights 0-111), 3 = all scale and PDF weights. Default 1.')
 
 options.parseArguments()
 
-genLepChoices =  {"hardProcess" : "isHardProcess()", 
+genLepChoices =  {"hardProcess" : "isHardProcess()",
         "hardProcessFS" : "fromHardProcessFinalState()",
-        "finalstate" : "status() == 1", 
-        "promptFS" : "isPromptFinalState()", 
+        "finalstate" : "status() == 1",
+        "promptFS" : "isPromptFinalState()",
         "dressedHPFS" : "fromHardProcessFinalState()",
-        "dressedFS" : "status() == 1", 
-        "dressedPromptFS" : "isPromptFinalState()", 
+        "dressedFS" : "status() == 1",
+        "dressedPromptFS" : "isPromptFinalState()",
 }
 if options.genLeptonType not in genLepChoices:
     print "ERROR: Invalid GEN-lepton type %s" % options.genLeptonType
@@ -213,6 +219,16 @@ if options.isMC:
     from UWVV.Ntuplizer.templates.eventBranches import jesSystematicBranches
     extraInitialStateBranches.append(jesSystematicBranches)
 
+    if options.lheWeights == 1:
+        from UWVV.Ntuplizer.templates.eventBranches import lheScaleWeightBranches
+        extraInitialStateBranches.append(lheScaleWeightBranches)
+    elif options.lheWeights == 2:
+        from UWVV.Ntuplizer.templates.eventBranches import lheScaleAndPDFWeightBranches
+        extraInitialStateBranches.append(lheScaleAndPDFWeightBranches)
+    elif options.lheWeights >= 3:
+        from UWVV.Ntuplizer.templates.eventBranches import lheAllWeightBranches
+        extraInitialStateBranches.append(lheAllWeightBranches)
+
     from UWVV.Ntuplizer.templates.eventBranches import eventGenBranches
     extraInitialStateBranches.append(eventGenBranches)
     from UWVV.Ntuplizer.templates.leptonBranches import matchedGenLeptonBranches
@@ -266,13 +282,12 @@ elif zl or z:
 
         from UWVV.Ntuplizer.templates.countBranches import wzCountBranches
         extraInitialStateBranches.append(wzCountBranches)
-
 elif l:
     from UWVV.AnalysisTools.templates.ZZSkim import ZZSkim
     FlowSteps.append(ZZSkim)
 
 
-if zz or zl or z:
+if (zz or zl or z) and not "wz" in options.channels:
     for f in FlowSteps:
         if f.__name__ in ['ZZFSR', 'ZZFlow']:
             from UWVV.Ntuplizer.templates.fsrBranches import compositeObjectFSRBranches, leptonFSRBranches
@@ -369,7 +384,7 @@ if zz and options.isMC and options.genInfo:
 
     from UWVV.AnalysisTools.templates.GenZZBase import GenZZBase
     from UWVV.Ntuplizer.templates.vbsBranches import vbsGenBranches
-    
+
     if "dressed" in options.genLeptonType:
         from UWVV.AnalysisTools.templates.DressedGenLeptonBase import DressedGenLeptonBase
         from UWVV.Ntuplizer.templates.leptonBranches import dressedGenLeptonBranches
@@ -379,18 +394,26 @@ if zz and options.isMC and options.genInfo:
         GenFlow = createFlow(GenLeptonBase, GenZZBase)
     genFlow = GenFlow('genFlow', process, suffix='Gen', e='prunedGenParticles',
                     m='prunedGenParticles', a='prunedGenParticles', j='slimmedGenJets',
-                    pfCands='packedGenParticles', 
+                    pfCands='packedGenParticles',
                     leptonStatusFlag=genLepChoices[options.genLeptonType])
 
     genTrg = trgBranches.clone(trigNames=cms.vstring())
+
+    extraInitialStateBranches = [vbsGenBranches]
+    if options.lheWeights == 1:
+        extraInitialStateBranches.append(lheScaleWeightBranches)
+    elif options.lheWeights == 2:
+        extraInitialStateBranches.append(lheScaleAndPDFWeightBranches)
+    elif options.lheWeights >= 3:
+        extraInitialStateBranches.append(lheAllWeightBranches)
 
     for chan in channels:
         genMod = cms.EDAnalyzer(
         'GenTreeGeneratorZZ',
         src = genFlow.finalObjTag(chan),
-        branches = makeGenBranchSet(chan, extraInitialStateBranches=[vbsGenBranches])
-            if "dressed" not in options.genLeptonType else makeGenBranchSet(chan, 
-                extraInitialStateBranches=[vbsGenBranches],
+        branches = makeGenBranchSet(chan, extraInitialStateBranches=extraInitialStateBranches)
+            if "dressed" not in options.genLeptonType else makeGenBranchSet(chan,
+                extraInitialStateBranches=extraInitialStateBranches,
                 e=dressedGenLeptonBranches,
                 m=dressedGenLeptonBranches),
         eventParams = makeGenEventParams(genFlow.finalTags()),

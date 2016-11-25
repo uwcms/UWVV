@@ -126,6 +126,60 @@ namespace
 
                                  return out;
                                });
+
+        addTo["lheWeights"] =
+          std::function<FType>([](const edm::Ptr<T>& obj, uwvv::EventInfo& evt, const std::string& option)
+                               {
+                                  std::vector<float> out;
+
+                                  if (!evt.lheEventInfo().isValid())
+                                    throw cms::Exception("ProductNotFound")
+                                        << "Unable to open LHE event information";
+
+                                  unsigned long first_weight = 0;
+                                  // Arbitrary choice, but 1000 weights would be pretty excessive
+                                  unsigned long last_weight = 1000;
+                                  if (option != "")
+                                    {
+                                      size_t pos = option.find(",");
+                                      // If only 1 weight is specified, take it as the last weight (start at 0)
+                                      if (pos == std::string::npos)
+                                        try
+                                          {
+                                            last_weight = std::stoul(option);
+                                          }
+                                        catch (const std::exception& e)
+                                          {
+                                            std::string message = "Unable to parse option " + option +
+                                                " for LHE weights. Error from ";
+                                            throw std::runtime_error(message + e.what());
+                                          }
+                                      else
+                                        {
+                                          std::string begin = option.substr(0, pos);
+                                          std::string end = option.substr(pos+1);
+                                          try
+                                            {
+                                              first_weight = std::stoul(begin);
+                                              last_weight = std::stoul(end);
+                                            }
+                                          catch (const std::exception& e)
+                                            {
+                                              std::string message = "Unable to parse option " + option +
+                                                  " for LHE weights. Error from ";
+                                              throw std::runtime_error(message + e.what());
+                                            }
+                                        }
+                                    }
+                                  auto weights = evt.lheEventInfo()->weights();
+                                  for (unsigned long i = first_weight; i <  weights.size(); i++)
+                                    {
+                                      if (i == last_weight)
+                                        break;
+                                      out.push_back(weights[i].wgt);
+                                    }
+                                  return out;
+                                });
       }
     };
 
@@ -303,6 +357,124 @@ namespace
 
                                  return std::abs(deltaPhi(obj->phi(), phiJJ));
                                });
+
+        addTo["minLHEWeight"] =
+          std::function<FType>([](const edm::Ptr<T>& obj, uwvv::EventInfo& evt, const std::string& option)
+                               {
+                                  if (!evt.lheEventInfo().isValid())
+                                    throw cms::Exception("ProductNotFound")
+                                        << "Unable to open LHE event information";
+
+                                  unsigned long first_weight = 0;
+                                  // Arbitrary choice, but 1000 weights would be pretty excessive
+                                  unsigned long last_weight = 1000;
+                                  if (option != "")
+                                    {
+                                      size_t pos = option.find(",");
+                                      // If only 1 weight is specified, take it as the last weight (start at 0)
+                                      if (pos == std::string::npos)
+                                        try
+                                          {
+                                            last_weight = std::stoul(option);
+                                          }
+                                        catch (const std::exception& e)
+                                          {
+                                            std::string message = "Unable to parse option " + option +
+                                                " for LHE weights. Error from ";
+                                            throw std::runtime_error(message + e.what());
+                                          }
+                                      else
+                                        {
+                                          std::string begin = option.substr(0, pos);
+                                          std::string end = option.substr(pos+1);
+                                          try
+                                            {
+                                              first_weight = std::stoul(begin);
+                                              last_weight = std::stoul(end);
+                                            }
+                                          catch (const std::exception& e)
+                                            {
+                                              std::string message = "Unable to parse option " + option +
+                                                  " for LHE weights. Error from ";
+                                              throw std::runtime_error(message + e.what());
+                                            }
+                                        }
+                                    }
+
+                                  float minWeight = 999.;
+
+                                  auto weights = evt.lheEventInfo()->weights();
+                                  for (unsigned long i = first_weight; i <  weights.size(); i++)
+                                    {
+                                      if (i == last_weight)
+                                        break;
+                                      if(i == 5 || i == 7) // some scale weights don't count, apparently
+                                        continue;
+                                      if(weights[i].wgt < minWeight)
+                                        minWeight = weights[i].wgt;
+                                    }
+
+                                  return minWeight;
+                                });
+
+        addTo["maxLHEWeight"] =
+          std::function<FType>([](const edm::Ptr<T>& obj, uwvv::EventInfo& evt, const std::string& option)
+                               {
+                                  if (!evt.lheEventInfo().isValid())
+                                    throw cms::Exception("ProductNotFound")
+                                        << "Unable to open LHE event information";
+
+                                  unsigned long first_weight = 0;
+                                  // Arbitrary choice, but 1000 weights would be pretty excessive
+                                  unsigned long last_weight = 1000;
+                                  if (option != "")
+                                    {
+                                      size_t pos = option.find(",");
+                                      // If only 1 weight is specified, take it as the last weight (start at 0)
+                                      if (pos == std::string::npos)
+                                        try
+                                          {
+                                            last_weight = std::stoul(option);
+                                          }
+                                        catch (const std::exception& e)
+                                          {
+                                            std::string message = "Unable to parse option " + option +
+                                                " for LHE weights. Error from ";
+                                            throw std::runtime_error(message + e.what());
+                                          }
+                                      else
+                                        {
+                                          std::string begin = option.substr(0, pos);
+                                          std::string end = option.substr(pos+1);
+                                          try
+                                            {
+                                              first_weight = std::stoul(begin);
+                                              last_weight = std::stoul(end);
+                                            }
+                                          catch (const std::exception& e)
+                                            {
+                                              std::string message = "Unable to parse option " + option +
+                                                  " for LHE weights. Error from ";
+                                              throw std::runtime_error(message + e.what());
+                                            }
+                                        }
+                                    }
+
+                                  float maxWeight = -999.;
+
+                                  auto weights = evt.lheEventInfo()->weights();
+                                  for (unsigned long i = first_weight; i <  weights.size(); i++)
+                                    {
+                                      if (i == last_weight)
+                                        break;
+                                      if(i == 5 || i == 7) // some scale weights don't count, apparently
+                                        continue;
+                                      if(weights[i].wgt > maxWeight)
+                                        maxWeight = weights[i].wgt;
+                                    }
+
+                                  return maxWeight;
+                                });
       }
     };
 

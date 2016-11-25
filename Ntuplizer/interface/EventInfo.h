@@ -19,6 +19,7 @@
 #include "SimDataFormats/PileupSummaryInfo/interface/PileupSummaryInfo.h"
 #include "FWCore/ParameterSet/interface/ParameterSet.h"
 #include "SimDataFormats/GeneratorProducts/interface/GenEventInfoProduct.h"
+#include "SimDataFormats/GeneratorProducts/interface/LHEEventProduct.h"
 #include "DataFormats/JetReco/interface/GenJet.h"
 #include "DataFormats/HepMCCandidate/interface/GenParticle.h"
 
@@ -121,6 +122,8 @@ namespace uwvv
     const edm::Handle<std::vector<PileupSummaryInfo> >& puInfo(const std::string& collection) {return puInfo_.get(collection);}
     const edm::Handle<GenEventInfoProduct>& genEventInfo() {return genEventInfo_.get();}
     const edm::Handle<GenEventInfoProduct>& genEventInfo(const std::string& collection) {return genEventInfo_.get(collection);}
+    const edm::Handle<LHEEventProduct>& lheEventInfo() {return lheEventInfo_.get();}
+    const edm::Handle<LHEEventProduct>& lheEventInfo(const std::string& collection) {return lheEventInfo_.get(collection);}
     const edm::Handle<edm::View<reco::GenJet> >& genJets() {return genJets_.get();}
     const edm::Handle<edm::View<reco::GenJet> >& genJets(const std::string& collection) {return genJets_.get(collection);}
     const edm::Handle<edm::View<reco::GenParticle> >& genParticles() {return genParticles_.get();}
@@ -139,6 +142,7 @@ namespace uwvv
     EventInfoHolder<pat::METCollection> mets_;
     EventInfoHolder<std::vector<PileupSummaryInfo> > puInfo_;
     EventInfoHolder<GenEventInfoProduct> genEventInfo_;
+    EventInfoHolder<LHEEventProduct> lheEventInfo_;
     EventInfoHolder<edm::View<reco::GenJet> > genJets_;
     EventInfoHolder<edm::View<reco::GenParticle> > genParticles_;
   };
