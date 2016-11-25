@@ -279,6 +279,39 @@ namespace
                                          -999.);
                                });
 
+        addTo["zeppenfeld"] =
+          std::function<FType>([](const edm::Ptr<T>& obj, uwvv::EventInfo& evt, const std::string& option)
+                               {
+                                 if(evt.jets(option)->size() < 2)
+                                   return -999.;
+
+                                 return std::abs(obj->rapidity() -
+                                                 (evt.jets(option)->at(0).rapidity() +
+                                                  evt.jets(option)->at(1).rapidity()) / 2.);
+                               });
+
+        addTo["zeppenfeldj3"] =
+          std::function<FType>([](const edm::Ptr<T>& obj, uwvv::EventInfo& evt, const std::string& option)
+                               {
+                                 if(evt.jets(option)->size() < 3)
+                                   return -999.;
+
+                                 return std::abs(evt.jets(option)->at(2).rapidity() -
+                                                 (evt.jets(option)->at(0).rapidity() +
+                                                  evt.jets(option)->at(1).rapidity()) / 2.);
+                               });
+
+        addTo["deltaPhiTojj"] =
+          std::function<FType>([](const edm::Ptr<T>& obj, uwvv::EventInfo& evt, const std::string& option)
+                               {
+                                 if(evt.jets(option)->size() < 2)
+                                   return -999.;
+
+                                 float phiJJ = (evt.jets(option)->at(0).p4() + evt.jets(option)->at(1).p4()).phi();
+
+                                 return std::abs(deltaPhi(obj->phi(), phiJJ));
+                               });
+
         addTo["jet1QGLikelihood"] =
           std::function<FType>([](const edm::Ptr<T>& obj, uwvv::EventInfo& evt, const std::string& option)
                                {
@@ -335,25 +368,35 @@ namespace
                                          -999.);
                                });
 
-
-        addTo["zeppenfeld"] =
+        addTo["zeppenfeldGen"] =
           std::function<FType>([](const edm::Ptr<T>& obj, uwvv::EventInfo& evt, const std::string& option)
                                {
-                                 if(evt.jets(option)->size() < 2)
+                                 if(evt.genJets(option)->size() < 2)
                                    return -999.;
 
                                  return std::abs(obj->rapidity() -
-                                                 (evt.jets(option)->at(0).rapidity() +
-                                                  evt.jets(option)->at(0).rapidity()) / 2.);
+                                                 (evt.genJets(option)->at(0).rapidity() +
+                                                  evt.genJets(option)->at(1).rapidity()) / 2.);
                                });
 
-        addTo["deltaPhiToJJ"] =
+        addTo["zeppenfeldj3Gen"] =
           std::function<FType>([](const edm::Ptr<T>& obj, uwvv::EventInfo& evt, const std::string& option)
                                {
-                                 if(evt.jets(option)->size() < 2)
+                                 if(evt.genJets(option)->size() < 3)
                                    return -999.;
 
-                                 float phiJJ = (evt.jets(option)->at(0).p4() + evt.jets(option)->at(1).p4()).phi();
+                                 return std::abs(evt.genJets(option)->at(2).rapidity() -
+                                                 (evt.genJets(option)->at(0).rapidity() +
+                                                  evt.genJets(option)->at(1).rapidity()) / 2.);
+                               });
+
+        addTo["deltaPhiTojjGen"] =
+          std::function<FType>([](const edm::Ptr<T>& obj, uwvv::EventInfo& evt, const std::string& option)
+                               {
+                                 if(evt.genJets(option)->size() < 2)
+                                   return -999.;
+
+                                 float phiJJ = (evt.genJets(option)->at(0).p4() + evt.genJets(option)->at(1).p4()).phi();
 
                                  return std::abs(deltaPhi(obj->phi(), phiJJ));
                                });
