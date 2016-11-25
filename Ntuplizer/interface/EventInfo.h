@@ -72,10 +72,10 @@ namespace uwvv
     void setEvent(const edm::Event& event);
 
     const edm::Handle<T>& get() {return primary_->get();}
-    const edm::Handle<T>& get(const std::string& item) {return data_[item]->get();}
+    const edm::Handle<T>& get(const std::string& item) {return data_.at(item)->get();}
 
    private:
-    DatumPtr<T>& setupData(edm::ConsumesCollector& cc, 
+    DatumPtr<T>& setupData(edm::ConsumesCollector& cc,
                            const edm::InputTag& primaryTag,
                            const edm::ParameterSet& moreTags);
 
