@@ -140,13 +140,13 @@ then
         nohup bash /data/nawoods/uwvvZZ_mcNoPDF_"$ID".sh &
 
         # no HLT
-        python Utilities/scripts/submitJobs.py --campaign RunIISpring16MiniAODv2-PUSpring16_80X_mcRun2_asymptotic_2016_miniAODv2_v0-v1 --samples 'GluGluToContinToZZTo4*' 'GluGluToContinToZZTo2e2mu*' 'GluGluToContinToZZTo2e2tau*' 'GluGluToContinToZZTo2mu2tau*' 'ZZTo4L*powheg*' --filesPerJob 2 -o /data/nawoods/uwvvZZ_mcNoHLT_"$ID".sh UWVVZZ_MC_"$ID" Ntuplizer/test/ntuplize_cfg.py channels='zz' isMC=1 eCalib=1 muCalib=1 genInfo=1 globalTag="$GT_MC" genLeptonType=dressedHPFS lheWeights=2
+        python Utilities/scripts/submitJobs.py --campaign RunIISpring16MiniAODv2-PUSpring16_80X_mcRun2_asymptotic_2016_miniAODv2_v0-v1 --samples 'ZZTo4L*powheg*' --filesPerJob 2 -o /data/nawoods/uwvvZZ_mcNoHLT_"$ID".sh UWVVZZ_MC_"$ID" Ntuplizer/test/ntuplize_cfg.py channels='zz' isMC=1 eCalib=1 muCalib=1 genInfo=1 globalTag="$GT_MC" genLeptonType=dressedHPFS lheWeights=2
 
         nohup bash /data/nawoods/uwvvZZ_mcNoHLT_"$ID".sh &
 
-        python Utilities/scripts/submitJobs.py --campaign RunIISpring16MiniAODv2-PUSpring16_80X_mcRun2_asymptotic_2016_miniAODv2_v0-v1 --samples 'WZTo3LNu_TuneCUETP8M1_13TeV-powheg-pythia8' 'WWZ*' --filesPerJob 2 -o /data/nawoods/uwvvZZ_mcNoHLTNoPDF_"$ID".sh UWVVZZ_MC_"$ID" Ntuplizer/test/ntuplize_cfg.py channels='zz' isMC=1 eCalib=1 muCalib=1 genInfo=1 globalTag="$GT_MC" genLeptonType=dressedHPFS
+        python Utilities/scripts/submitJobs.py --campaign RunIISpring16MiniAODv2-PUSpring16_80X_mcRun2_asymptotic_2016_miniAODv2_v0-v1 --samples 'WZTo3LNu_TuneCUETP8M1_13TeV-powheg-pythia8' 'WWZ*' 'GluGluToContinToZZTo4*' 'GluGluToContinToZZTo2e2mu*' 'GluGluToContinToZZTo2e2tau*' 'GluGluToContinToZZTo2mu2tau*' --filesPerJob 2 -o /data/nawoods/uwvvZZ_mcNoHLTNoLHE_"$ID".sh UWVVZZ_MC_"$ID" Ntuplizer/test/ntuplize_cfg.py channels='zz' isMC=1 eCalib=1 muCalib=1 genInfo=1 globalTag="$GT_MC" genLeptonType=dressedHPFS lheWeights=0
 
-        nohup bash /data/nawoods/uwvvZZ_mcNoHLTNoPDF_"$ID".sh &
+        nohup bash /data/nawoods/uwvvZZ_mcNoHLTNoLHE_"$ID".sh &
 
         # alternative production
         python Utilities/scripts/submitJobs.py --campaign RunIISpring16MiniAODv2-premix_withHLT_80X_mcRun2_asymptotic_v14-v1 --samples 'ZZJJTo4L_EWK_13TeV-madgraph-pythia8' --filesPerJob 2 -o /data/nawoods/uwvvZZ_mcSpecial_"$ID".sh UWVVZZ_MC_"$ID" Ntuplizer/test/ntuplize_cfg.py channels='zz' isMC=1 eCalib=1 muCalib=1 genInfo=1 globalTag="$GT_MC" genLeptonType=dressedHPFS lheWeights=2
