@@ -30,7 +30,9 @@ private:
 
   bool isMediumMuonICHEP(const reco::Muon& recoMu);
   bool isWZMediumMuon(const pat::Muon& patMu, const reco::Vertex& pv);
+  bool isWZMediumMuonNoIso(const pat::Muon& patMu, const reco::Vertex& pv);
   bool isWZLooseMuon(const pat::Muon& patMu);
+  bool isWZLooseMuonNoIso(const pat::Muon& patMu);
   bool isSoftMuonICHEP(const reco::Muon& recoMu, const reco::Vertex& pv);
 
   // Data
@@ -101,18 +103,18 @@ bool MuonIdEmbedder::isMediumMuonICHEP(const reco::Muon & recoMu)
   }
 bool MuonIdEmbedder::isWZLooseMuon(const pat::Muon& patMu) 
   {
-    return isMediumMuonICHEP(patMu) && 
-        patMu.trackIso()/patMu.pt() < 0.4 &&;
+    reco::MuonPFIsolation pfIsoDB04 = patMu.pfIsolationR04();
+    float muIso = (pfIsoDB04.sumChargedHadronPt
+                        + std::max(0., pfIsoDB04.sumNeutralHadronEt
+                            + pfIsoDB04.sumPhotonEt
+                            - 0.5*pfIsoDB04.sumPUPt)
+                  ) / patMu.pt();
+    return isWZLooseMuonNoIso(patMu) && muIso < 0.25;
   }
 bool MuonIdEmbedder::isWZLooseMuonNoIso(const pat::Muon& patMu) 
   {
-    float pfIsoDB04 = (patMu.pfIsolationR04().sumChargedHadronPt()
-                        + max(0., patMu.pfIsolationR04().sumNeutralHadronEt()
-                        + pfIsolationR04().sumPhotonEt()
-                        - 0.5*pfIsolationR04().sumPUPt())) / pt();
     return isMediumMuonICHEP(patMu) && 
-        patMu.trackIso()/patMu.pt() < 0.4 &&
-        pfIsoDB04 < 0.25;
+        patMu.trackIso()/patMu.pt() < 0.4;
   }
 bool MuonIdEmbedder::isWZMediumMuonNoIso(const pat::Muon& patMu, const reco::Vertex& pv) 
   {
@@ -123,11 +125,13 @@ bool MuonIdEmbedder::isWZMediumMuonNoIso(const pat::Muon& patMu, const reco::Ver
   }
 bool MuonIdEmbedder::isWZMediumMuon(const pat::Muon& patMu, const reco::Vertex& pv) 
   {
-    float pfIsoDB04 = (patMu.pfIsolationR04().sumChargedHadronPt()
-                        + max(0., patMu.pfIsolationR04().sumNeutralHadronEt()
-                        + pfIsolationR04().sumPhotonEt()
-                        - 0.5*pfIsolationR04().sumPUPt())) / pt();
-    return isWZMediumMuonNoIso(patMu, pv) && pfIsoDB04 < 0.15;
+    reco::MuonPFIsolation pfIsoDB04 = patMu.pfIsolationR04();
+    float muIso = (pfIsoDB04.sumChargedHadronPt
+                        + std::max(0., pfIsoDB04.sumNeutralHadronEt
+                            + pfIsoDB04.sumPhotonEt
+                            - 0.5*pfIsoDB04.sumPUPt)
+                  ) / patMu.pt();
+    return isWZMediumMuonNoIso(patMu, pv) && muIso < 0.15;
   }
 bool MuonIdEmbedder::isSoftMuonICHEP(const reco::Muon & recoMu, const reco::Vertex& pv) 
   {
