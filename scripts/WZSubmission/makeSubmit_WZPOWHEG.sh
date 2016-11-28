@@ -17,6 +17,7 @@ ${uwvv}/Utilities/scripts/submitJobs.py \
         isMC=1 \
         eCalib=1 
         muCalib=1 \
+        lheWeights=1 \
         globalTag=80X_mcRun2_asymptotic_2016_miniAODv2_v1
 chmod +x $CMSSW_BASE/src/UWVV/scripts/WZSubmission/GeneratedScripts/submitWZPOWHEGSignalMonteCarlo_$DATE.sh
 $CMSSW_BASE/src/UWVV/scripts/WZSubmission/GeneratedScripts/submitWZPOWHEGSignalMonteCarlo_$DATE.sh

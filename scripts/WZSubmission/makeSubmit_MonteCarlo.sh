@@ -18,15 +18,13 @@ ${uwvv}/Utilities/scripts/submitJobs.py \
         "ZZTo4L_13TeV_powheg_pythia8" \
         "ZZTo2L2Nu_13TeV_powheg_pythia8" \
         "ZZTo2L2Q_13TeV_amcatnloFXFX_madspin_pythia8" \
-        "TTJets_TuneCUETP8M1_13TeV-madgraphMLM-pythia8" \
+        "TT_TuneCUETP8M1_13TeV-powheg-pythia8" \
         "TTJets_DiLept_TuneCUETP8M1_13TeV-madgraphMLM-pythia8" \
         "ZZZ_TuneCUETP8M1_13TeV-amcatnlo-pythia8" \
         "WWW_4F_TuneCUETP8M1_13TeV-amcatnlo-pythia8" \
         "WWZ_TuneCUETP8M1_13TeV-amcatnlo-pythia8" \
         "WWTo2L2Nu_13TeV-powheg" \
         "WWG_TuneCUETP8M1_13TeV-amcatnlo-pythia8" \
-        "TTZToLLNuNu_M-10_TuneCUETP8M1_13TeV-amcatnlo-pythia8" \
-        "TTWJetsToLNu_TuneCUETP8M1_13TeV-amcatnloFXFX-madspin-pythia8" \
         "tZq_ll_4f_13TeV-amcatnlo-pythia8" \
         "ST_s-channel_4f_leptonDecays_13TeV-amcatnlo-pythia8_TuneCUETP8M1" \
         "ST_t-channel_antitop_4f_leptonDecays_13TeV-powheg-pythia8_TuneCUETP8M1" \
@@ -35,11 +33,13 @@ ${uwvv}/Utilities/scripts/submitJobs.py \
         "ST_tW_top_5f_NoFullyHadronicDecays_13TeV-powheg_TuneCUETP8M1" \
         "ZGTo2LG_TuneCUETP8M1_13TeV-amcatnloFXFX-pythia8" \
         "DYJetsToLL_M-10to50_TuneCUETP8M1_13TeV-amcatnloFXFX-pythia8" \
+        "DYJetsToLL_M-50_TuneCUETP8M1_13TeV-madgraphMLM-pythia8" \
     --filesPerJob 3 \
     UWVVNtuples_WZMonteCarlo_$DATE \
     $uwvv/Ntuplizer/test/ntuplize_cfg.py \
         channels=wz \
         isMC=1 \
+        lheWeights=1 \
         eCalib=1 
         muCalib=1 \
         globalTag=80X_mcRun2_asymptotic_2016_miniAODv2_v1
@@ -51,12 +51,12 @@ ${uwvv}/Utilities/scripts/submitJobs.py \
         "DYJetsToLL_M-50_TuneCUETP8M1_13TeV-amcatnloFXFX-pythia8" \
         "DYJetsToLL_M-50_TuneCUETP8M1_13TeV-madgraphMLM-pythia8" \
         "ZZTo4L_13TeV-amcatnloFXFX-pythia8" \
-        "TT_TuneCUETP8M1_13TeV-powheg-pythia8" \
     --filesPerJob 3 \
     UWVVNtuples_WZMonteCarlo_$DATE \
     $uwvv/Ntuplizer/test/ntuplize_cfg.py \
         channels=wz \
         isMC=1 \
+        lheWeights=1 \
         eCalib=1 
         muCalib=1 \
         globalTag=80X_mcRun2_asymptotic_2016_miniAODv2_v1
@@ -74,6 +74,7 @@ ${uwvv}/Utilities/scripts/submitJobs.py \
     $uwvv/Ntuplizer/test/ntuplize_cfg.py \
         channels=wz \
         isMC=1 \
+        lheWeights=1 \
         eCalib=1 
         muCalib=1 \
         globalTag=80X_mcRun2_asymptotic_2016_miniAODv2_v1
