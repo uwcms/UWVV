@@ -30,7 +30,11 @@ ${uwvv}/Utilities/scripts/submitJobs.py \
         "ST_tW_top_5f_NoFullyHadronicDecays_13TeV-powheg_TuneCUETP8M1" \
         "ZGTo2LG_TuneCUETP8M1_13TeV-amcatnloFXFX-pythia8" \
         "DYJetsToLL_M-10to50_TuneCUETP8M1_13TeV-amcatnloFXFX-pythia8" \
-        "DYJetsToLL_M-50_TuneCUETP8M1_13TeV-madgraphMLM-pythia8" \
+        "TTZToLLNuNu_M-10_TuneCUETP8M1_13TeV-amcatnlo-pythia8" \
+        "DY1JetsToLL_M-50_TuneCUETP8M1_13TeV-madgraphMLM-pythia8" \
+        "DY2JetsToLL_M-50_TuneCUETP8M1_13TeV-madgraphMLM-pythia8" \
+        "DY3JetsToLL_M-50_TuneCUETP8M1_13TeV-madgraphMLM-pythia8" \
+        "DY4JetsToLL_M-50_TuneCUETP8M1_13TeV-madgraphMLM-pythia8" \
     --filesPerJob 3 \
     UWVVNtuples_WZMonteCarlo_$DATE \
     $uwvv/Ntuplizer/test/ntuplize_cfg.py \
@@ -43,7 +47,7 @@ ${uwvv}/Utilities/scripts/submitJobs.py \
 # Tranche 2 reHLT samples
 ${uwvv}/Utilities/scripts/submitJobs.py \
     -o ${uwvv}/scripts/WZSubmission/GeneratedScripts/submitWZMonteCarloReHLT_$DATE.sh \
-    --campaign "RunIISpring16MiniAODv2-PUSpring16RAWAODSIM_reHLT_80X_mcRun2_asymptotic_v14-*" \
+    --campaign "RunIISpring16MiniAODv2-PUSpring16RAWAODSIM_reHLT_80X_mcRun2_asymptotic_v14*" \
     --samples \
         "DYJetsToLL_M-50_TuneCUETP8M1_13TeV-amcatnloFXFX-pythia8" \
         "DYJetsToLL_M-50_TuneCUETP8M1_13TeV-madgraphMLM-pythia8" \
@@ -60,7 +64,7 @@ ${uwvv}/Utilities/scripts/submitJobs.py \
 # Tranche 3 withHLT samples
 ${uwvv}/Utilities/scripts/submitJobs.py \
     -o ${uwvv}/scripts/WZSubmission/GeneratedScripts/submitWZMonteCarloWithHLT_$DATE.sh \
-    --campaign "RunIISpring16MiniAODv2-premix_withHLT_80X_mcRun2_asymptotic_v14-*" \
+    --campaign "RunIISpring16MiniAODv2-premix_withHLT_80X_mcRun2_asymptotic_v14*" \
     --samples \
         "WLLJJToLNu_M-60_EWK_13TeV-madgraph-pythia8" \
         "tZq_ll_4f_13TeV-amcatnlo-herwigpp" \
@@ -82,7 +86,6 @@ ${uwvv}/Utilities/scripts/submitJobs.py \
     --campaign "RunIISpring16MiniAODv2-PUSpring16_80X_mcRun2_asymptotic_2016_miniAODv2*" \
     --samples \
         "GluGluToContinToZZTo2e2mu_13TeV_MCFM701_pythia8" \
-        "GluGluToContinToZZTo2e2nu_13TeV_MCFM701_pythia8" \
         "GluGluToContinToZZTo4e_13TeV_MCFM701_pythia8" \
         "GluGluToContinToZZTo4mu_13TeV_MCFM701_pythia8" \
         "ST_s-channel_4f_leptonDecays_13TeV-amcatnlo-pythia8_TuneCUETP8M1" \
