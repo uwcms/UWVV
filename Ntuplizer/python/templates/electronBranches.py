@@ -63,6 +63,7 @@ electronBranches = cms.PSet(
         ),
     bools = cms.PSet(
         IsGap = cms.string('isGap'),
+        IsEB = cms.string('isEB'),
         IsCBVIDTight = cms.string('? hasUserFloat("isCBVIDtight") ? '
                                   'userFloat("isCBVIDtight") : 0'),
         IsCBVIDMedium = cms.string('? hasUserFloat("isCBVIDmedium") ?'

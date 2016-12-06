@@ -14,6 +14,8 @@ ${uwvv}/Utilities/scripts/submitJobs.py \
         DoubleEG \
         DoubleMuon \
         MuonEG \
+        SingleMuon \
+        SingleElectron \
     --filesPerJob 1 \
     UWVVNtuples_WZData_Run2016B-PromptReco-v2_$DATE \
     $uwvv/Ntuplizer/test/ntuplize_cfg.py \
@@ -31,6 +33,8 @@ ${uwvv}/Utilities/scripts/submitJobs.py \
         DoubleEG \
         DoubleMuon \
         MuonEG \
+        SingleMuon \
+        SingleElectron \
     --filesPerJob 1 \
     UWVVNtuples_WZData_Run2016C-PromptReco-v2_$DATE \
     $uwvv/Ntuplizer/test/ntuplize_cfg.py \
@@ -47,6 +51,8 @@ ${uwvv}/Utilities/scripts/submitJobs.py \
         DoubleEG \
         DoubleMuon \
         MuonEG \
+        SingleMuon \
+        SingleElectron \
     --filesPerJob 1 \
     UWVVNtuples_WZData_Run2016D-PromptReco-v2_$DATE \
     $uwvv/Ntuplizer/test/ntuplize_cfg.py \
