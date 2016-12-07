@@ -15,6 +15,7 @@
 #include "DataFormats/PatCandidates/interface/Jet.h"
 #include "DataFormats/PatCandidates/interface/Photon.h"
 #include "DataFormats/PatCandidates/interface/PackedCandidate.h"
+#include "DataFormats/PatCandidates/interface/CompositeCandidate.h"
 #include "DataFormats/Provenance/interface/EventID.h"
 #include "SimDataFormats/PileupSummaryInfo/interface/PileupSummaryInfo.h"
 #include "FWCore/ParameterSet/interface/ParameterSet.h"
@@ -128,6 +129,10 @@ namespace uwvv
     const edm::Handle<edm::View<reco::GenJet> >& genJets(const std::string& collection) {return genJets_.get(collection);}
     const edm::Handle<edm::View<reco::GenParticle> >& genParticles() {return genParticles_.get();}
     const edm::Handle<edm::View<reco::GenParticle> >& genParticles(const std::string& collection) {return genParticles_.get(collection);}
+    const edm::Handle<edm::View<pat::CompositeCandidate> >& initialStates() {return initialStates_.get();}
+    const edm::Handle<edm::View<pat::CompositeCandidate> >& initialStates(const std::string& collection) {return initialStates_.get(collection);}
+    const edm::Handle<edm::View<pat::CompositeCandidate> >& genInitialStates() {return genInitialStates_.get();}
+    const edm::Handle<edm::View<pat::CompositeCandidate> >& genInitialStates(const std::string& collection) {return genInitialStates_.get(collection);}
 
 
    private:
@@ -145,6 +150,8 @@ namespace uwvv
     EventInfoHolder<LHEEventProduct> lheEventInfo_;
     EventInfoHolder<edm::View<reco::GenJet> > genJets_;
     EventInfoHolder<edm::View<reco::GenParticle> > genParticles_;
+    EventInfoHolder<edm::View<pat::CompositeCandidate> > initialStates_;
+    EventInfoHolder<edm::View<pat::CompositeCandidate> > genInitialStates_;
   };
 
 } // namespace
