@@ -369,15 +369,24 @@ if zz and options.isMC and options.genInfo:
     elif options.lheWeights >= 3:
         extraInitialStateBranchesGen.append(lheAllWeightBranches)
 
+    extraIntermediateStateBranchesGen = []
+
+    if "dressed" in options.genLeptonType.lower():
+        from UWVV.Ntuplizer.templates.eventBranches import dressedGenCompositeStateBranches
+        extraInitialStateBranchesGen.append(dressedGenCompositeStateBranches)
+        extraIntermediateStateBranchesGen.append(dressedGenCompositeStateBranches)
+
     for chan in channels:
         if 'dressed' in options.genLeptonType.lower():
             genBranches = makeGenBranchSet(chan,
                                            extraInitialStateBranches=extraInitialStateBranchesGen,
+                                           extraIntermediateStateBranches=extraIntermediateStateBranchesGen,
                                            e=dressedGenLeptonBranches,
                                            m=dressedGenLeptonBranches)
         else:
             genBranches = makeGenBranchSet(chan,
-                                           extraInitialStateBranches=extraInitialStateBranchesGen)
+                                           extraInitialStateBranches=extraInitialStateBranchesGen,
+                                           extraIntermediateStateBranches=extraIntermediateStateBranchesGen)
         genMod = cms.EDAnalyzer(
             'GenTreeGeneratorZZ',
             src = genFlow.finalObjTag(chan),

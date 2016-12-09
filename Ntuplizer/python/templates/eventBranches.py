@@ -125,3 +125,12 @@ genInitialStateBranches = cms.PSet(
         GenMass = cms.string('genInitialStateMass'),
         ),
     )
+
+dressedGenCompositeStateBranches = cms.PSet(
+    floats = cms.PSet(
+        UndressedMass = cms.string('undressedMass'),
+        UndressedPt = cms.string('undressedPt'),
+        UndressedEta = cms.string('undressedEta'),
+        UndressedPhi = cms.string('undressedPhi'),
+        ),
+    )

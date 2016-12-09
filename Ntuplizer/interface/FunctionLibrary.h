@@ -10,13 +10,14 @@
 #include "UWVV/Ntuplizer/interface/EventInfo.h"
 #include "UWVV/Ntuplizer/interface/StringFunctionMaker.h"
 #include "UWVV/Utilities/interface/helpers.h"
+#include "UWVV/DataFormats/interface/DressedGenParticle.h"
 
 #include "DataFormats/PatCandidates/interface/Electron.h"
 #include "DataFormats/PatCandidates/interface/Muon.h"
 #include "DataFormats/PatCandidates/interface/CompositeCandidate.h"
 #include "DataFormats/Common/interface/Ptr.h"
 #include "DataFormats/Math/interface/deltaPhi.h"
-
+#include "DataFormats/Math/interface/LorentzVector.h"
 
 
 namespace
@@ -745,6 +746,30 @@ namespace
       }
     };
 
+  math::XYZTLorentzVector getUndressedP4(const edm::Ptr<pat::CompositeCandidate>& cand)
+    {
+      math::XYZTLorentzVector out;
+      for(size_t i = 0; i < cand->numberOfDaughters(); ++i)
+        {
+          const reco::Candidate* d = cand->daughter(i);
+          if(d->numberOfDaughters())
+            {
+              edm::Ptr<pat::CompositeCandidate> lep = d->masterClone().castTo<edm::Ptr<pat::CompositeCandidate> >();
+              out += ::getUndressedP4(lep);
+            }
+          else
+            {
+              const DressedGenParticle* lep = dynamic_cast<const DressedGenParticle*>(d->masterClone().get());
+              if(lep)
+                out += lep->undressedP4();
+              else // assume anything other than a DressedGenParticle is ok
+                out += d->p4();
+            }
+        }
+
+      return out;
+    }
+
   template<>
     struct ObjectFunctionList<float, pat::CompositeCandidate>
     {
@@ -792,6 +817,31 @@ namespace
                                {
                                  return uwvv::helpers::p4WithoutFSR(obj).energy();
                                });
+
+        addTo["undressedMass"] =
+          std::function<FType>([](const edm::Ptr<T>& obj, uwvv::EventInfo& evt, const std::string& option)
+                               {
+                                 return ::getUndressedP4(obj).mass();
+                               });
+
+        addTo["undressedPt"] =
+          std::function<FType>([](const edm::Ptr<T>& obj, uwvv::EventInfo& evt, const std::string& option)
+                               {
+                                 return ::getUndressedP4(obj).pt();
+                               });
+
+        addTo["undressedEta"] =
+          std::function<FType>([](const edm::Ptr<T>& obj, uwvv::EventInfo& evt, const std::string& option)
+                               {
+                                 return ::getUndressedP4(obj).eta();
+                               });
+
+        addTo["undressedPhi"] =
+          std::function<FType>([](const edm::Ptr<T>& obj, uwvv::EventInfo& evt, const std::string& option)
+                               {
+                                 return ::getUndressedP4(obj).phi();
+                               });
+
       }
     };
 
