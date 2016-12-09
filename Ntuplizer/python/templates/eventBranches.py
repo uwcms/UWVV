@@ -119,3 +119,9 @@ centralJetBranches = cms.PSet(
         ),
     )
 
+# gen-level initial state info for reco ntuple
+genInitialStateBranches = cms.PSet(
+    floats = cms.PSet(
+        GenMass = cms.string('genInitialStateMass'),
+        ),
+    )

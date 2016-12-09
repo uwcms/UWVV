@@ -518,6 +518,14 @@ namespace
 
                                   return maxWeight;
                                 });
+
+        addTo["genInitialStateMass"] =
+          std::function<FType>([](const edm::Ptr<T>& obj, uwvv::EventInfo& evt, const std::string& option)
+                               {
+                                 if(evt.initialStates()->size())
+                                   return evt.initialStates()->at(0).mass();
+                                 return -999.;
+                               });
       }
     };
 
