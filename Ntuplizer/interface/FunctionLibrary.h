@@ -527,6 +527,30 @@ namespace
                                    return evt.initialStates()->at(0).mass();
                                  return -999.;
                                });
+
+        addTo["genInitialStatePt"] =
+          std::function<FType>([](const edm::Ptr<T>& obj, uwvv::EventInfo& evt, const std::string& option)
+                               {
+                                 if(evt.initialStates()->size())
+                                   return evt.initialStates()->at(0).pt();
+                                 return -999.;
+                               });
+
+        addTo["genInitialStateEta"] =
+          std::function<FType>([](const edm::Ptr<T>& obj, uwvv::EventInfo& evt, const std::string& option)
+                               {
+                                 if(evt.initialStates()->size())
+                                   return evt.initialStates()->at(0).eta();
+                                 return -999.;
+                               });
+
+        addTo["genInitialStatePhi"] =
+          std::function<FType>([](const edm::Ptr<T>& obj, uwvv::EventInfo& evt, const std::string& option)
+                               {
+                                 if(evt.initialStates()->size())
+                                   return evt.initialStates()->at(0).phi();
+                                 return -999.;
+                               });
       }
     };
 

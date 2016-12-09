@@ -123,6 +123,9 @@ centralJetBranches = cms.PSet(
 genInitialStateBranches = cms.PSet(
     floats = cms.PSet(
         GenMass = cms.string('genInitialStateMass'),
+        GenPt = cms.string('genInitialStatePt'),
+        GenEta = cms.string('genInitialStateEta'),
+        GenPhi = cms.string('genInitialStatePhi'),
         ),
     )
 
