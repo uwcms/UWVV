@@ -105,7 +105,7 @@ def makeBranchSet(channel, extraInitialStateBranches=[],
 
         assert channel[0] == channel[1], "Invalid channel {}".format(channel)
 
-        branches.append(makeCrossDaughterBranches(channel))
+        branches.append(makeCrossDaughterBranches(channel, True))
 
         daughterSets = [
             makeZBranchSet(channel[0], 1, extraIntermediateStateBranches,
@@ -122,7 +122,7 @@ def makeBranchSet(channel, extraInitialStateBranches=[],
         assert channel[0] == channel[1] and channel[2] == channel[3], \
             'Invalid channel {}'.format(channel)
 
-        branches.append(makeCrossDaughterBranches(channel))
+        branches.append(makeCrossDaughterBranches(channel, True))
 
         daughterSets = [
             makeZBranchSet(channel[0], 1, extraIntermediateStateBranches,
@@ -158,6 +158,7 @@ def makeGenBranchSet(channel, extraInitialStateBranches=[],
                            "states. Please add it for {}".format(channel))
 
     branches = [genNtupleEventBranches, objectBranches] + extraInitialStateBranches
+    branches.append(makeCrossDaughterBranches(channel))
     branchSet = combinePSets(*branches)
 
     finalObjects = mapObjects(channel)
