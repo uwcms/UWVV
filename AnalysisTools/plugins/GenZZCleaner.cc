@@ -109,6 +109,8 @@ void GenZZCleaner::produce(edm::Event& iEvent,
       if(!best)
         continue;
 
+      bestDZ = betterDZ;
+
       if(mZ1 < z1MassMin || mZ1 > z1MassMax)
         continue;
       if(mZ2 < z2MassMin || mZ2 > z2MassMax)
@@ -156,7 +158,6 @@ void GenZZCleaner::produce(edm::Event& iEvent,
         continue;
 
       bestCand = i;
-      bestDZ = betterDZ;
     }
 
   if(bestCand < in->size())
