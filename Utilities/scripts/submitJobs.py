@@ -25,7 +25,7 @@ log = logging.getLogger("submitJobs")
 logging.basicConfig(level=logging.INFO, stream=sys.stderr)
 
 
-def writeFarmoutCommand(cfg, jobid, dataset, fullDataset, 
+def writeFarmoutCommand(cfg, jobid, dataset, fullDataset,
                         outdir='srm://cmssrm.hep.wisc.edu:8443/srm/v2/server?SFN=/hdfs/store/{}/{}/{}/',
                         **args):
     '''
@@ -114,7 +114,7 @@ def buildScript(cfg, jobid, scriptFile='',
     scriptFile (str or None): file to write script to, or None for stderr
     outdir (str): where to put the output
     samples(strs): which datasets/samples to use
-    args: command line arguments    
+    args: command line arguments
     '''
     lines = []
     lines.append('# Condor submission script\n')
@@ -127,7 +127,7 @@ def buildScript(cfg, jobid, scriptFile='',
     # mc
     if campaign:
         assert not dataEra, "You can't specify a data era and a MC campaign tag."
-        
+
         datasetStr = '/*/{}/MINIAODSIM'.format(campaign)
     # data
     else:
@@ -167,8 +167,9 @@ if __name__ == '__main__':
                         help='CMS config file to run.')
     parser.add_argument('--applyLumiMask', action='store_true',
                         help='Pass the appropriate lumi-mask JSON (data only).')
-    parser.add_argument('--lumiMaskJSON', type=str, 
-                        default='Cert_271036-277148_13TeV_PromptReco_Collisions16_JSON.txt', # 15.9/fb
+    parser.add_argument('--lumiMaskJSON', type=str,
+                        default='Final/Cert_271036-284044_13TeV_PromptReco_Collisions16_JSON.txt', # 36.42
+                        #default='Cert_271036-277148_13TeV_PromptReco_Collisions16_JSON.txt', # 15.9/fb
                         help=('Lumi mask JSON. Assumed to be in the standard '
                               'certification area unless a full path is given.'))
     parser.add_argument('--campaign', type=str, default='',
@@ -177,26 +178,26 @@ if __name__ == '__main__':
                         help='Run over data.')
     parser.add_argument('--samples', nargs='+', type=str, required=False,
                         help='Samples to run. May contain wildcards.')
-    parser.add_argument('--outdir', type=str, 
+    parser.add_argument('--outdir', type=str,
                         default='srm://cmssrm.hep.wisc.edu:8443/srm/v2/server?SFN=/hdfs/store/user/{user}/{jobid}/{dataset}/',
                         help = 'Where to put the output.  Default: %(default)s.')
     parser.add_argument('--filesPerJob', type=int, default=1,
                         help="Number of input files to pass to each job.")
-    parser.add_argument('--extraUsercodeFiles', nargs='*', type=str, 
+    parser.add_argument('--extraUsercodeFiles', nargs='*', type=str,
                         help='List of extra directories that need to be '
                         'included in the user_code tarball sent with the job. '
                         'Paths relative to $CMSSW_BASE.')
-    parser.add_argument('-o', type=str, dest="scriptFile", default="", required=False, 
+    parser.add_argument('-o', type=str, dest="scriptFile", default="", required=False,
                         help='File to write output bash script to (default: stdout).')
     parser.add_argument('cmsRunArgs', nargs=argparse.REMAINDER,
                         help="Arguments to cmsRun.")
 
     args = parser.parse_args()
 
-    buildScript(args.cfg, args.jobid, args.scriptFile, args.outdir, 
-                *args.samples, applyLumiMask=args.applyLumiMask, 
+    buildScript(args.cfg, args.jobid, args.scriptFile, args.outdir,
+                *args.samples, applyLumiMask=args.applyLumiMask,
                 lumiMaskJSON=args.lumiMaskJSON, campaign=args.campaign,
-                dataEra=args.dataEra, filesPerJob=args.filesPerJob, 
+                dataEra=args.dataEra, filesPerJob=args.filesPerJob,
                 extraUsercodeFiles=args.extraUsercodeFiles,
                 cmsRunArgs=args.cmsRunArgs)
-                        
+
