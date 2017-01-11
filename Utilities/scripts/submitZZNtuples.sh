@@ -86,19 +86,20 @@ fi
 # global tags
 GT_MC=80X_mcRun2_asymptotic_2016_miniAODv2_v1
 GT_DATA=80X_dataRun2_Prompt_ICHEP16JEC_v0
+GT_DATA_H=80X_dataRun2_Prompt_v14
 
 
 if [ "$DATA" ]
 then
 
-    for era in B C D E
+    for era in B C D E F G
     do
 
         if [ "$ZZ" ]
         then
             echo Submitting ZZ Data Ntuples as UWVVZZ_DATA_2016"$era"_"$ID"
 
-            python Utilities/scripts/submitJobs.py --applyLumiMask --dataEra Run2016"$era"-PromptReco-v2 --samples MuonEG SingleElectron SingleMuon DoubleMuon DoubleEG --filesPerJob 3 -o /data/nawoods/uwvvZZ_data_2016"$era"_"$ID".sh UWVVZZ_DATA_2016"$era"_"$ID" Ntuplizer/test/ntuplize_cfg.py channels='zz' isMC=0 eCalib=1 muCalib=1 globalTag="$GT_DATA"
+            python Utilities/scripts/submitJobs.py --applyLumiMask --dataEra "Run2016""$era""-PromptReco-v*" --samples MuonEG SingleElectron SingleMuon DoubleMuon DoubleEG --filesPerJob 3 -o /data/nawoods/uwvvZZ_data_2016"$era"_"$ID".sh UWVVZZ_DATA_2016"$era"_"$ID" Ntuplizer/test/ntuplize_cfg.py channels='zz' isMC=0 eCalib=1 muCalib=1 globalTag="$GT_DATA"
 
             nohup bash /data/nawoods/uwvvZZ_data_2016"$era"_"$ID".sh &
         fi
@@ -107,7 +108,7 @@ then
         then
             echo Submitting Z+L Data Ntuples as UWVVZPLUSL_DATA_2016"$era"_"$ID"
 
-            python Utilities/scripts/submitJobs.py --applyLumiMask --dataEra Run2016"$era"-PromptReco-v2 --samples MuonEG SingleElectron SingleMuon DoubleMuon DoubleEG --filesPerJob 3 -o /data/nawoods/uwvvZPlusl_data_2016"$era"_"$ID".sh UWVVZPLUSL_DATA_2016"$era"_"$ID" Ntuplizer/test/ntuplize_cfg.py channels='zl' isMC=0 eCalib=1 muCalib=1 globalTag="$GT_DATA"
+            python Utilities/scripts/submitJobs.py --applyLumiMask --dataEra "Run2016""$era""-PromptReco-v*" --samples MuonEG SingleElectron SingleMuon DoubleMuon DoubleEG --filesPerJob 3 -o /data/nawoods/uwvvZPlusl_data_2016"$era"_"$ID".sh UWVVZPLUSL_DATA_2016"$era"_"$ID" Ntuplizer/test/ntuplize_cfg.py channels='zl' isMC=0 eCalib=1 muCalib=1 globalTag="$GT_DATA"
 
             nohup bash /data/nawoods/uwvvZPlusl_data_2016"$era"_"$ID".sh &
         fi
@@ -116,11 +117,40 @@ then
         then
             echo Submitting Single Z Data Ntuples as UWVVSINGLEZ_DATA_2016"$era"_"$ID"
 
-            python Utilities/scripts/submitJobs.py --applyLumiMask --dataEra Run2016"$era"-PromptReco-v2 --samples SingleElectron SingleMuon DoubleMuon DoubleEG --filesPerJob 3 -o /data/nawoods/uwvvSingleZ_data_2016"$era"_"$ID".sh UWVVSINGLEZ_DATA_2016"$era"_"$ID" Ntuplizer/test/ntuplize_cfg.py channels='z' isMC=0 eCalib=1 muCalib=1 globalTag="$GT_DATA"
+            python Utilities/scripts/submitJobs.py --applyLumiMask --dataEra "Run2016""$era""-PromptReco-v*" --samples SingleElectron SingleMuon DoubleMuon DoubleEG --filesPerJob 3 -o /data/nawoods/uwvvSingleZ_data_2016"$era"_"$ID".sh UWVVSINGLEZ_DATA_2016"$era"_"$ID" Ntuplizer/test/ntuplize_cfg.py channels='z' isMC=0 eCalib=1 muCalib=1 globalTag="$GT_DATA"
 
             nohup bash /data/nawoods/uwvvSingleZ_data_2016"$era"_"$ID".sh &
         fi
     done
+
+
+    if [ "$ZZ" ]
+    then
+        echo Submitting ZZ Data Ntuples as UWVVZZ_DATA_2016H_"$ID"
+
+        python Utilities/scripts/submitJobs.py --applyLumiMask --dataEra "Run2016H-PromptReco-v*" --samples MuonEG SingleElectron SingleMuon DoubleMuon DoubleEG --filesPerJob 3 -o /data/nawoods/uwvvZZ_data_2016H_"$ID".sh UWVVZZ_DATA_2016H_"$ID" Ntuplizer/test/ntuplize_cfg.py channels='zz' isMC=0 eCalib=1 muCalib=1 globalTag="$GT_DATA_H"
+
+        nohup bash /data/nawoods/uwvvZZ_data_2016H_"$ID".sh &
+    fi
+
+    if [ "$ZL" ]
+    then
+        echo Submitting Z+L Data Ntuples as UWVVZPLUSL_DATA_2016H_"$ID"
+
+        python Utilities/scripts/submitJobs.py --applyLumiMask --dataEra "Run2016H-PromptReco-v*" --samples MuonEG SingleElectron SingleMuon DoubleMuon DoubleEG --filesPerJob 3 -o /data/nawoods/uwvvZPlusl_data_2016H_"$ID".sh UWVVZPLUSL_DATA_2016H_"$ID" Ntuplizer/test/ntuplize_cfg.py channels='zl' isMC=0 eCalib=1 muCalib=1 globalTag="$GT_DATA_H"
+
+        nohup bash /data/nawoods/uwvvZPlusl_data_2016H_"$ID".sh &
+    fi
+
+    if [ "$Z" ]
+    then
+        echo Submitting Single Z Data Ntuples as UWVVSINGLEZ_DATA_2016H_"$ID"
+
+        python Utilities/scripts/submitJobs.py --applyLumiMask --dataEra "Run2016H-PromptReco-v*" --samples SingleElectron SingleMuon DoubleMuon DoubleEG --filesPerJob 3 -o /data/nawoods/uwvvSingleZ_data_2016H_"$ID".sh UWVVSINGLEZ_DATA_2016H_"$ID" Ntuplizer/test/ntuplize_cfg.py channels='z' isMC=0 eCalib=1 muCalib=1 globalTag="$GT_DATA_H"
+
+        nohup bash /data/nawoods/uwvvSingleZ_data_2016H_"$ID".sh &
+    fi
+
 fi
 
 if [ "$MC" ]
