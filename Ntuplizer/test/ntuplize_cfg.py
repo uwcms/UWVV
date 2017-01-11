@@ -8,7 +8,6 @@ from UWVV.AnalysisTools.analysisFlowMaker import createFlow
 from UWVV.Utilities.helpers import parseChannels, expandChannelName
 from UWVV.Ntuplizer.makeBranchSet import makeBranchSet, makeGenBranchSet
 from UWVV.Ntuplizer.eventParams import makeEventParams, makeGenEventParams
-from UWVV.Ntuplizer.templates.triggerBranches import triggerBranches
 
 import os
 
@@ -333,7 +332,14 @@ if options.isMC and 'reHLT' not in options.inputFiles[0] and 'withHLT' not in op
         trigResultsSrc = cms.InputTag("TriggerResults", "", "HLT"),
         trigPrescaleSrc = cms.InputTag("patTrigger"),
         )
+elif 'Run2016G' in options.inputFiles[0]:
+    from UWVV.Ntuplizer.templates.triggerBranches import triggerBranches_2016G
+    trgBranches = triggerBranches_2016G
+elif 'Run2016H' in options.inputFiles[0]:
+    from UWVV.Ntuplizer.templates.triggerBranches import triggerBranches_2016H
+    trgBranches = triggerBranches_2016H
 else:
+    from UWVV.Ntuplizer.templates.triggerBranches import triggerBranches
     trgBranches = triggerBranches
 
     if 'reHLT' in options.inputFiles[0]:
