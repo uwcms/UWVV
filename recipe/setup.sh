@@ -10,10 +10,10 @@ fi
 
 if [ ! -d ./EgammaAnalysis ]; then
     echo "Setting up electron energy scale corrections"
-    git cms-merge-topic emanueledimarco:ecal_smear_fix_80X
+    git cms-merge-topic shervin86:Moriond2017_JEC_energyScales
 
     pushd EgammaAnalysis/ElectronTools/data
-    git clone -b ICHEP2016_v2 https://github.com/ECALELFS/ScalesSmearings.git
+    git clone https://github.com/ECALELFS/ScalesSmearings.git
     popd
 fi
 
