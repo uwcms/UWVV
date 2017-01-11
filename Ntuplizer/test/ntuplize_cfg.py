@@ -326,31 +326,6 @@ if zz:
         extraInitialStateBranches.append(vbsSystematicBranches)
 
 
-flowOpts = {
-    'isMC' : bool(options.isMC),
-    'isSync' : bool(options.isMC) and bool(options.isSync),
-
-    'electronScaleShift' : options.eScaleShift,
-    'electronRhoResShift' : options.eRhoResShift,
-    'electronPhiResShift' : options.ePhiResShift,
-    'muonClosureShift' : options.mClosureShift,
-    }
-
-# Turn all these into a single flow class
-FlowClass = createFlow(*FlowSteps)
-flow = FlowClass('flow', process, **flowOpts)
-
-
-
-### Set up tree makers
-
-# meta info tree first
-process.metaInfo = cms.EDAnalyzer(
-    'MetaTreeGenerator',
-    eventParams = makeEventParams(flow.finalTags()),
-    )
-process.treeSequence = cms.Sequence(process.metaInfo)
-
 # Trigger info is only in MC from reHLT campaign
 if options.isMC and 'reHLT' not in options.inputFiles[0] and 'withHLT' not in options.inputFiles[0]:
     trgBranches = cms.PSet(
@@ -363,22 +338,6 @@ else:
 
     if 'reHLT' in options.inputFiles[0]:
         trgBranches = trgBranches.clone(trigResultsSrc=cms.InputTag("TriggerResults", "", "HLT2"))
-
-
-# then the ntuples
-for chan in channels:
-    mod = cms.EDAnalyzer(
-        'TreeGenerator{}'.format(expandChannelName(chan)),
-        src = flow.finalObjTag(chan),
-        branches = makeBranchSet(chan, extraInitialStateBranches,
-                                 extraIntermediateStateBranches,
-                                 **extraFinalObjectBranches),
-        eventParams = makeEventParams(flow.finalTags()),
-        triggers = trgBranches,
-        )
-
-    setattr(process, chan, mod)
-    process.treeSequence += mod
 
 
 # Gen ntuples if desired
@@ -402,26 +361,39 @@ if zz and options.isMC and options.genInfo:
 
     genTrg = trgBranches.clone(trigNames=cms.vstring())
 
-    extraInitialStateBranches = [vbsGenBranches]
+    extraInitialStateBranchesGen = [vbsGenBranches]
     if options.lheWeights == 1:
-        extraInitialStateBranches.append(lheScaleWeightBranches)
+        extraInitialStateBranchesGen.append(lheScaleWeightBranches)
     elif options.lheWeights == 2:
-        extraInitialStateBranches.append(lheScaleAndPDFWeightBranches)
+        extraInitialStateBranchesGen.append(lheScaleAndPDFWeightBranches)
     elif options.lheWeights >= 3:
-        extraInitialStateBranches.append(lheAllWeightBranches)
+        extraInitialStateBranchesGen.append(lheAllWeightBranches)
+
+    extraIntermediateStateBranchesGen = []
+
+    if "dressed" in options.genLeptonType.lower():
+        from UWVV.Ntuplizer.templates.eventBranches import dressedGenCompositeStateBranches
+        extraInitialStateBranchesGen.append(dressedGenCompositeStateBranches)
+        extraIntermediateStateBranchesGen.append(dressedGenCompositeStateBranches)
 
     for chan in channels:
+        if 'dressed' in options.genLeptonType.lower():
+            genBranches = makeGenBranchSet(chan,
+                                           extraInitialStateBranches=extraInitialStateBranchesGen,
+                                           extraIntermediateStateBranches=extraIntermediateStateBranchesGen,
+                                           e=dressedGenLeptonBranches,
+                                           m=dressedGenLeptonBranches)
+        else:
+            genBranches = makeGenBranchSet(chan,
+                                           extraInitialStateBranches=extraInitialStateBranchesGen,
+                                           extraIntermediateStateBranches=extraIntermediateStateBranchesGen)
         genMod = cms.EDAnalyzer(
-        'GenTreeGeneratorZZ',
-        src = genFlow.finalObjTag(chan),
-        branches = makeGenBranchSet(chan, extraInitialStateBranches=extraInitialStateBranches)
-            if "dressed" not in options.genLeptonType else makeGenBranchSet(chan,
-                extraInitialStateBranches=extraInitialStateBranches,
-                e=dressedGenLeptonBranches,
-                m=dressedGenLeptonBranches),
-        eventParams = makeGenEventParams(genFlow.finalTags()),
-        triggers = genTrg,
-        )
+            'GenTreeGeneratorZZ',
+            src = genFlow.finalObjTag(chan),
+            branches = genBranches,
+            eventParams = makeGenEventParams(genFlow.finalTags()),
+            triggers = genTrg,
+            )
 
         setattr(process, chan+'Gen', genMod)
         process.genTreeSequence += genMod
@@ -429,6 +401,55 @@ if zz and options.isMC and options.genInfo:
     pGen = genFlow.getPath()
     pGen += process.genTreeSequence
     process.schedule.append(pGen)
+
+
+flowOpts = {
+    'isMC' : bool(options.isMC),
+    'isSync' : bool(options.isMC) and bool(options.isSync),
+
+    'electronScaleShift' : options.eScaleShift,
+    'electronRhoResShift' : options.eRhoResShift,
+    'electronPhiResShift' : options.ePhiResShift,
+    'muonClosureShift' : options.mClosureShift,
+    }
+
+# include gen initial states' input tags if needed
+if zz and options.isMC and options.genInfo:
+    for chan in channels:
+        flowOpts[chan+'Gen'] = genFlow.finalObjTagString(chan)
+    from UWVV.Ntuplizer.templates.eventBranches import genInitialStateBranches
+    extraInitialStateBranches.append(genInitialStateBranches)
+
+# Turn all these into a single flow class
+FlowClass = createFlow(*FlowSteps)
+flow = FlowClass('flow', process, **flowOpts)
+
+
+
+### Set up tree makers
+
+# meta info tree first
+process.metaInfo = cms.EDAnalyzer(
+    'MetaTreeGenerator',
+    eventParams = makeEventParams(flow.finalTags()),
+    )
+process.treeSequence = cms.Sequence(process.metaInfo)
+
+
+# then the ntuples
+for chan in channels:
+    mod = cms.EDAnalyzer(
+        'TreeGenerator{}'.format(expandChannelName(chan)),
+        src = flow.finalObjTag(chan),
+        branches = makeBranchSet(chan, extraInitialStateBranches,
+                                 extraIntermediateStateBranches,
+                                 **extraFinalObjectBranches),
+        eventParams = makeEventParams(flow.finalTags(),chan),
+        triggers = trgBranches,
+        )
+
+    setattr(process, chan, mod)
+    process.treeSequence += mod
 
 
 p = flow.getPath()

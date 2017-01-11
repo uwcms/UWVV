@@ -119,3 +119,21 @@ centralJetBranches = cms.PSet(
         ),
     )
 
+# gen-level initial state info for reco ntuple
+genInitialStateBranches = cms.PSet(
+    floats = cms.PSet(
+        GenMass = cms.string('genInitialStateMass'),
+        GenPt = cms.string('genInitialStatePt'),
+        GenEta = cms.string('genInitialStateEta'),
+        GenPhi = cms.string('genInitialStatePhi'),
+        ),
+    )
+
+dressedGenCompositeStateBranches = cms.PSet(
+    floats = cms.PSet(
+        UndressedMass = cms.string('undressedMass'),
+        UndressedPt = cms.string('undressedPt'),
+        UndressedEta = cms.string('undressedEta'),
+        UndressedPhi = cms.string('undressedPhi'),
+        ),
+    )

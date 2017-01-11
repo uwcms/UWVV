@@ -21,8 +21,8 @@ class GenZZBase(ZPlusXBaseFlowGen):
                     decay = cms.string('{0} {1}'.format(step.getObjTagString(chan[:2]),
                                                         step.getObjTagString(chan[2:]))),
                     roles = cms.vstring(z1Name, z2Name),
-                    cut = cms.string(('60. < daughter("{}").mass < 120. && '
-                                      '60. < daughter("{}").mass < 120.').format(z1Name, z2Name)),
+                    cut = cms.string(('4. < daughter("{}").mass < 120. && '
+                                      '4. < daughter("{}").mass < 120.').format(z1Name, z2Name)),
                     checkCharge = cms.bool(False),
                     setPdgId = cms.int32(25),
                     )
@@ -44,6 +44,17 @@ class GenZZBase(ZPlusXBaseFlowGen):
                     z2MassMax = cms.double(120.),
                     )
                 step.addModule(chan+'GenZZCleaner', cleaner, chan)
+
+        if stepName == 'initialStateEmbedding':
+            for chan in parseChannels('zz'):
+                mod = cms.EDProducer(
+                    'AlternateDaughterInfoEmbedder',
+                    src = step.getObjTag(chan),
+                    names = cms.vstring(*mapObjects(chan)),
+                    fsrLabel = cms.string(""),
+                    )
+                step.addModule(chan+'AlternatePairs', mod, chan)
+
 
         if stepName == 'selection':
             # select and cross clean gen jets
@@ -68,3 +79,16 @@ class GenZZBase(ZPlusXBaseFlowGen):
             step.addModule('genJetCleaner', mod, 'j')
 
         return step
+
+    def addAlternatePairInfo(self, step):
+        '''
+        Add modules to embed alternate lepton pair (e.g. e1+m1) info.
+        '''
+        for chan in parseChannels('zz'):
+            mod = cms.EDProducer(
+                'AlternateDaughterInfoEmbedder',
+                src = step.getObjTag(chan),
+                names = cms.vstring(*mapObjects(chan)),
+                fsrLabel = cms.string("fsr"),
+                )
+            step.addModule(chan+'AlternatePairs', mod, chan)
