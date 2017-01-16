@@ -50,7 +50,7 @@ PATJetIDEmbedder::PATJetIDEmbedder(const edm::ParameterSet& pset) :
 }
 
 
-void PATJetIDEmbedder::produce(edm::Event& iEvent, 
+void PATJetIDEmbedder::produce(edm::Event& iEvent,
                                const edm::EventSetup& iSetup)
 {
   edm::Handle<JetView> in;
@@ -82,7 +82,14 @@ bool PATJetIDEmbedder::passLoose(const Jet& jet) const
       return jet.neutralEmEnergyFraction() < 0.90 && jet.neutralMultiplicity() > 10;
     }
 
-  bool result = (jet.neutralHadronEnergyFraction() < 0.99 && 
+  if(absEta > 2.7)
+    {
+      return jet.neutralEmEnergyFraction() > 0.01 &&
+        jet.neutralHadronEnergyFraction() < 0.98 &&
+        jet.neutralMultiplicity() > 2;
+    }
+
+  bool result = (jet.neutralHadronEnergyFraction() < 0.99 &&
                  jet.neutralEmEnergyFraction() < 0.99 &&
                  (jet.chargedMultiplicity() + jet.neutralMultiplicity()) > 1);
 
@@ -102,7 +109,7 @@ bool PATJetIDEmbedder::passTight(const Jet& jet) const
 
   float absEta = std::abs(jet.eta());
 
-  if(absEta > 3.)
+  if(absEta > 2.7)
       return loose;
 
   return (jet.neutralHadronEnergyFraction() < 0.90 &&
@@ -114,7 +121,7 @@ bool PATJetIDEmbedder::passTightLepVeto(const Jet& jet) const
 {
   float absEta = std::abs(jet.eta());
 
-  if(absEta > 3.) // no meaning past endcaps
+  if(absEta > 2.7) // no meaning past endcaps
       return false;
 
   bool tight = passTight(jet);
