@@ -326,7 +326,7 @@ if zz:
 
 
 # Trigger info is only in MC from reHLT campaign
-if options.isMC and 'reHLT' not in options.inputFiles[0] and 'withHLT' not in options.inputFiles[0]:
+if 'RunIISpring16' in options.inputFiles[0] and 'reHLT' not in options.inputFiles[0] and 'withHLT' not in options.inputFiles[0]:
     trgBranches = cms.PSet(
         trigNames=cms.vstring(),
         trigResultsSrc = cms.InputTag("TriggerResults", "", "HLT"),
