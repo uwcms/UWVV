@@ -211,6 +211,10 @@ FlowSteps.append(MuonScaleFactors)
 from UWVV.AnalysisTools.templates.ElectronScaleFactors import ElectronScaleFactors
 FlowSteps.append(ElectronScaleFactors)
 
+# data and MCFM samples never have LHE info
+if not options.isMC or 'mcfm' in options.inputFiles[0].lower():
+    options.lheWeights = 0
+
 # jet energy corrections and basic preselection
 from UWVV.AnalysisTools.templates.JetBaseFlow import JetBaseFlow
 FlowSteps.append(JetBaseFlow)
