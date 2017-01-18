@@ -80,7 +80,8 @@ process.DAT
 ffwarn.dat
 
 # Generated WZ submissions scripts
+<<<<<<< HEAD
 scripts/WZSubmission/GeneratedScripts/*
 
-# Crab submit directories 
+# Crab submit directories
 crab_*
