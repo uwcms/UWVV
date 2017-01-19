@@ -1,11 +1,12 @@
 # Modified from N. Smith, U. Wisconsin
-from CRABClient.UserUtilities import config
+from CRABClient.UserUtilities import config, getUsernameFromSiteDB
 import ConfigParser
 import os
 import re
 import subprocess
 import sys
 import datetime
+import glob
 
 settingsFile = "local.txt"
 if not os.path.exists(settingsFile):
@@ -56,6 +57,7 @@ config.Data.outputDatasetTag = conditions
 configParams = [
     'isMC=%d' % isMC,
     "channels=%s" % localSettings.get("local", "channels"),
+    "lheWeights=%s" % localSettings.get("local", "lheWeights"),
     "eCalib=%s" % localSettings.get("local", "eCalib"),
     "muCalib=%s" % localSettings.get("local", "muCalib"),
     "globalTag=%s" % (localSettings.get("local", "mcGlobalTag") if isMC else \
@@ -88,12 +90,13 @@ config.General.transferLogs = True
 config.JobType.pluginName = 'ANALYSIS'
 config.JobType.psetName = '../../Ntuplizer/test/ntuplize_cfg.py'
 config.JobType.numCores = 1
+config.JobType.inputFiles = ["../../../UWVV/data"]
 
 config.Data.inputDBS = 'global'
 config.Data.useParent = False
 config.Data.publication = False
 outdir = localSettings.get("local", "outLFNDirBase").replace(
-    "$USER", os.environ["USER"]).replace("$DATE", today)
+    "$USER", getUsernameFromSiteDB()).replace("$DATE", today)
 config.Data.outLFNDirBase = outdir 
 config.Data.ignoreLocality = False
 
