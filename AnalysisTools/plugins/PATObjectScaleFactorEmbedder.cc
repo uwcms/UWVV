@@ -17,6 +17,7 @@
 #include <vector>
 #include <string>
 #include <iostream>
+#include <fstream>
 
 // CMS includes
 #include "FWCore/Framework/interface/Frameworkfwd.h"
@@ -50,8 +51,8 @@ private:
   virtual void produce(edm::Event& iEvent, const edm::EventSetup& iSetup);
 
   const edm::EDGetTokenT<edm::View<T> > srcToken;
-  const std::unique_ptr<TFile> file;
-  const std::unique_ptr<TH2F> h;
+  std::unique_ptr<TFile> file;
+  std::unique_ptr<TH2F> h;
   const std::string label;
   const bool useError;
 
@@ -63,10 +64,6 @@ private:
 template<typename T>
 PATObjectScaleFactorEmbedder<T>::PATObjectScaleFactorEmbedder(const edm::ParameterSet& iConfig) :
   srcToken(consumes<edm::View<T> >(iConfig.getParameter<edm::InputTag>("src"))),
-  file(new TFile(iConfig.getParameter<std::string>("fileName").c_str())),
-  h((file->IsOpen() && !file->IsZombie()) ? 
-    (TH2F*)(file->Get(iConfig.getParameter<std::string>("histName").c_str())->Clone()) :
-    new TH2F("h","h",1,0.,1.,1,0.,1.)),
   label(iConfig.getParameter<std::string>("label")),
   useError(iConfig.exists("useError") && 
            iConfig.getParameter<bool>("useError")),
@@ -77,6 +74,14 @@ PATObjectScaleFactorEmbedder<T>::PATObjectScaleFactorEmbedder(const edm::Paramet
             iConfig.getParameter<std::string>("yValue") :
             "pt")
 {
+  std::string baseName = iConfig.getParameter<std::string>("fileName");
+  std::ifstream checkfile(baseName);
+  if (!checkfile.good())
+    baseName = baseName.substr(baseName.find("UWVV/")+5);
+  file = std::unique_ptr<TFile>(new TFile(baseName.c_str()));
+  h = std::unique_ptr<TH2F>((file->IsOpen() && !file->IsZombie()) ? 
+      (TH2F*)(file->Get(iConfig.getParameter<std::string>("histName").c_str())->Clone()) :
+      new TH2F("h","h",1,0.,1.,1,0.,1.));
   if(file->IsZombie())
     throw cms::Exception("InvalidFile") 
       << "Scale factor file "<< iConfig.getParameter<std::string>("fileName")
