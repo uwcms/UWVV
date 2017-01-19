@@ -1,7 +1,7 @@
 # Copy to local.txt and change
 [local]
 campaign: UWVVNtuples_$DATE
-outLFNDirBase: /store/user/$USER/UWVVNtuples_18Jan2017/
+outLFNDirBase: /store/user/$USER/UWVVNtuples_$DATE/
 storageSite: T2_US_Wisconsin
 channels: wz
 eCalib: 1
