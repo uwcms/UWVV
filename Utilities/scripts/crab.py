@@ -5,6 +5,7 @@ import os
 import re
 import subprocess
 import sys
+import datetime
 
 settingsFile = "local.txt"
 if not os.path.exists(settingsFile):
@@ -19,7 +20,7 @@ if gitStatus != "":
     print "\033[33mWARNING: git status is dirty!\033[0m"
     print gitStatus
     gitDescription += "*"
-print gitDescription
+print "Git status is %s" % gitDescription
 # We have to hack our way around how crab parses command line arguments :<
 dataset = 'dummy'
 for arg in sys.argv:
@@ -52,16 +53,18 @@ def getUnitsPerJob(ds):
 config = config()
 config.Data.inputDataset = dataset
 config.Data.outputDatasetTag = conditions
-configParams = ['isMC=%d' % isMC]#, 'crabDataset='+dataset, 'gitversion="%s"' % gitDescription]
-configParams += ["channels=wz",
-    "eCalib=1",
-    "muCalib=1",
-    "globalTag=%s" % ("80X_mcRun2_asymptotic_2016_TrancheIV_v7" if isMC else \
-        "80X_dataRun2_2016SeptRepro_v6"),
+configParams = [
+    'isMC=%d' % isMC,
+    "channels=%s" % localSettings.get("local", "channels"),
+    "eCalib=%s" % localSettings.get("local", "eCalib"),
+    "muCalib=%s" % localSettings.get("local", "muCalib"),
+    "globalTag=%s" % (localSettings.get("local", "mcGlobalTag") if isMC else \
+        localSettings.get("local", "dataGlobalTag")),
 ]
-
+today = datetime.date.today().strftime("%d%b%Y")
+campaign_name = localSettings.get("local", "campaign").replace("$DATE", today)
 if isMC:
-    config.General.requestName = '_'.join([localSettings.get("local", "campaign"), primaryDS])
+    config.General.requestName = '_'.join([campaign_name, primaryDS])
     # Check for extension dataset, force unique request name
     m = re.match(r".*(_ext[0-9]*)-", conditions)
     if m:
@@ -70,7 +73,7 @@ if isMC:
     config.Data.unitsPerJob = getUnitsPerJob(primaryDS)
 else:
     # Since a PD will have several eras, add conditions to name to differentiate
-    config.General.requestName = '_'.join([localSettings.get("local", "campaign"), primaryDS, conditions])
+    config.General.requestName = '_'.join([campaign_name, primaryDS, conditions])
     config.Data.lumiMask ='/afs/cern.ch/cms/CAF/CMSCOMM/COMM_DQM/certification/Collisions16/13TeV/ReReco/Final/Cert_271036-284044_13TeV_23Sep2016ReReco_Collisions16_JSON.txt'
     config.Data.splitting = 'LumiBased'
     config.Data.unitsPerJob = getUnitsPerJob(primaryDS)
@@ -89,7 +92,9 @@ config.JobType.numCores = 1
 config.Data.inputDBS = 'global'
 config.Data.useParent = False
 config.Data.publication = False
-config.Data.outLFNDirBase = localSettings.get("local", "outLFNDirBase").replace("$USER", os.environ["USER"])
+outdir = localSettings.get("local", "outLFNDirBase").replace(
+    "$USER", os.environ["USER"]).replace("$DATE", today)
+config.Data.outLFNDirBase = outdir 
 config.Data.ignoreLocality = False
 
 config.Site.storageSite = localSettings.get("local", "storageSite")
