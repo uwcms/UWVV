@@ -2,13 +2,12 @@
 # Usage examples:
 # . submit.sh twoLepton-tranche4.txt | grep 'DYJets' | . /dev/stdin
 # . submit.sh twoLepton-data.txt | . /dev/stdin
-config=CrabTemplates/local.onlyscaleweights.txt
 if [[ $1 == *"AllLHEWeights"* ]]; then
   config=CrabTemplates/local.allweights.txt
 elif [[ $1 == *"NoLHEWeights"* ]]; then
   config=CrabTemplates/local.noweights.txt
 else
-  config=CrabTemplates/local.txt
+  config=CrabTemplates/local.onlyscaleweights.txt
 fi 
 (>&2 echo "Using config file $config")
 cp $config local.txt

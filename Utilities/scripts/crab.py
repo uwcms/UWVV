@@ -57,7 +57,7 @@ config.Data.outputDatasetTag = conditions
 configParams = [
     'isMC=%d' % isMC,
     "channels=%s" % localSettings.get("local", "channels"),
-    "lheWeights=%s" % localSettings.get("local", "lheWeights"),
+    "lheWeights=%s" % (localSettings.get("local", "lheWeights") if isMC else "0"),
     "eCalib=%s" % localSettings.get("local", "eCalib"),
     "muCalib=%s" % localSettings.get("local", "muCalib"),
     "globalTag=%s" % (localSettings.get("local", "mcGlobalTag") if isMC else \
@@ -90,7 +90,7 @@ config.General.transferLogs = True
 config.JobType.pluginName = 'ANALYSIS'
 config.JobType.psetName = '../../Ntuplizer/test/ntuplize_cfg.py'
 config.JobType.numCores = 1
-config.JobType.inputFiles = ["../../../UWVV/data"]
+config.JobType.inputFiles = ["../../data"]
 
 config.Data.inputDBS = 'global'
 config.Data.useParent = False
