@@ -184,7 +184,8 @@ if __name__ == '__main__':
     parser.add_argument('--applyLumiMask', action='store_true',
                         help='Pass the appropriate lumi-mask JSON (data only).')
     parser.add_argument('--lumiMaskJSON', type=str,
-                        default='Final/Cert_271036-284044_13TeV_PromptReco_Collisions16_JSON.txt', # 36.42
+                        default='Final/Cert_271036-284044_13TeV_23Sep2016ReReco_Collisions16_JSON.txt', # 36.814/fb
+                        #default='Final/Cert_271036-284044_13TeV_PromptReco_Collisions16_JSON.txt', # 36.42
                         #default='Cert_271036-277148_13TeV_PromptReco_Collisions16_JSON.txt', # 15.9/fb
                         help=('Lumi mask JSON. Assumed to be in the standard '
                               'certification area unless a full path is given.'))
