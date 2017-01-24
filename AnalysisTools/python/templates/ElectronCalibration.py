@@ -33,7 +33,7 @@ class ElectronCalibration(AnalysisFlowBase):
                 initialSeed = cms.untracked.uint32(987),
                 )
 
-            correctionFile = 'EgammaAnalysis/ElectronTools/data/ScalesSmearings/80X_ichepV1_2016_ele'
+            correctionFile = 'EgammaAnalysis/ElectronTools/data/ScalesSmearings/Winter_2016_reReco_v1_ele'
 
             calibratedPatElectrons = cms.EDProducer(
                 "CalibratedPatElectronProducerRun2",
