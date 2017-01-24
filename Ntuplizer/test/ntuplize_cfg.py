@@ -334,7 +334,7 @@ if zz or wz:
     from UWVV.Ntuplizer.templates.vbsBranches import vbsPrimitiveBranches
     extraInitialStateBranches.append(vbsPrimitiveBranches)
     if zz:
-        from UWVV.Ntuplizer.templates.vbsBranches import vbsPrimitiveBranches
+        from UWVV.Ntuplizer.templates.vbsBranches import vbsDerivedBranches
         extraInitialStateBranches.append(vbsDerivedBranches)
     if options.isMC:
         from UWVV.Ntuplizer.templates.vbsBranches import vbsPrimitiveSystematicBranches
