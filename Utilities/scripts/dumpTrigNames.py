@@ -19,7 +19,7 @@ triggerObjects, triggerObjectLabel  = Handle("std::vector<pat::TriggerObjectStan
 triggerPrescales, triggerPrescaleLabel  = Handle("pat::PackedTriggerPrescales"), "patTrigger"
 
 # open file (you can use 'edmFileUtil -d /store/whatever.root' to get the physical file name)
-events = Events("root://eoscms.cern.ch//store/data/Run2016B/MuonEG/MINIAOD/PromptReco-v2/000/273/158/00000/CC82FDA4-201A-E611-BC48-02163E013552.root")
+events = Events("root://eoscms.cern.ch//store/mc/RunIISummer16MiniAODv2/ZZTo4L_13TeV_powheg_pythia8/MINIAODSIM/PUMoriond17_80X_mcRun2_asymptotic_2016_TrancheIV_v6-v1/120000/267B458E-19C5-E611-8FCB-001E6757E05C.root")
 
 for iev,event in enumerate(events):
     event.getByLabel(triggerBitLabel, triggerBits)
@@ -30,7 +30,7 @@ for iev,event in enumerate(events):
     print "\n === TRIGGER PATHS ==="
     names = event.object().triggerNames(triggerBits.product())
     for i in xrange(triggerBits.product().size()):
-        print "Trigger ", names.triggerName(i), ", prescale ", triggerPrescales.product().getPrescaleForIndex(i), ": ", ("PASS" if triggerBits.product().accept(i) else "fail (or not run)") 
+        print "Trigger ", names.triggerName(i), ", prescale ", triggerPrescales.product().getPrescaleForIndex(i), ": ", ("PASS" if triggerBits.product().accept(i) else "fail (or not run)")
 
     print "\n === TRIGGER OBJECTS ==="
     for j,to in enumerate(triggerObjects.product()):
@@ -40,5 +40,5 @@ for iev,event in enumerate(events):
         print "         type ids: ", ", ".join([str(f) for f in to.filterIds()])
         print "         filters: ", ", ".join([str(f) for f in to.filterLabels()])
         pathslast = set(to.pathNames(True))
-        print "         paths:   ", ", ".join([("%s*" if f in pathslast else "%s")%f for f in to.filterLabels()]) 
+        print "         paths:   ", ", ".join([("%s*" if f in pathslast else "%s")%f for f in to.filterLabels()])
     if iev > 1: break
