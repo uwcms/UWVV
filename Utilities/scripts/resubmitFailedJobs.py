@@ -24,7 +24,7 @@ logging.basicConfig(level=logging.INFO, stream=_stdout,
                     format='%(message)s')
 
 
-def resubmit(sample, dryrun=False):
+def resubmit(sample, dryrun=False, quiet=False):
     """
     Check the dag status file of the sample for failed jobs. If any, submit
     the rescue dag files to farmoutAnalysisJobs.
@@ -60,11 +60,12 @@ def resubmit(sample, dryrun=False):
         _log.error("DAG status file {} is broken somehow".format(statusDag))
         raise
 
-    _log.info('    ' + sample)
-    _log.info("        Total: {0} Done: {1} Queued: {2} Failed: {3}".format(total-ignore,succeeded,inProgress,failed))
+    if failed or not quiet:
+        _log.info('    ' + sample)
+        _log.info("        Total: {0} Done: {1} Queued: {2} Failed: {3}".format(total-ignore,succeeded,inProgress,failed))
 
 
-    if inProgress:
+    if inProgress and (failed or not quiet):
         _log.info("        Not done, try again later")
     elif failed:
         _log.info("        Resubmitting...")
@@ -127,6 +128,8 @@ if __name__ == "__main__":
 
     parser.add_argument('--dry-run', dest='dryrun', action='store_true',
                         help='Show samples to submit without submitting them')
+    parser.add_argument('--quiet', '-q', action='store_true',
+                        help='Only print information about samples with failed jobs')
 
     args = parser.parse_args()
 
@@ -144,7 +147,7 @@ if __name__ == "__main__":
 
     for s in samples:
         try:
-            succ, fail, prog = resubmit(s, args.dryrun)
+            succ, fail, prog = resubmit(s, args.dryrun, args.quiet)
         except (KeyError, IOError):
             _log.error("Error in sample {} -- skipping!".format(s))
             continue
