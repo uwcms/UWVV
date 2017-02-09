@@ -13,8 +13,8 @@ class ZZSkim(AnalysisFlowBase):
         step = super(ZZSkim, self).makeAnalysisStep(stepName, **inputs)
 
         if stepName == 'selection':
-            step.addBasicSelector('e', 'userFloat("{}") > 0.5'.format(self.getZZIDLabel()))
-            step.addBasicSelector('m', 'userFloat("{}") > 0.5'.format(self.getZZIDLabel()))
+            step.addBasicSelector('e', 'userFloat("{}") > 0.5'.format(self.getZZIDLabel()+'NoVtx'))
+            step.addBasicSelector('m', 'userFloat("{}") > 0.5'.format(self.getZZIDLabel()+'NoVtx'))
 
         if stepName == 'intermediateStateSelection':
             if isinstance(self, ZPlusXBaseFlow):
