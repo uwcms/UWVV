@@ -6,6 +6,11 @@ leptonBranches = cms.PSet(
         ZZIso = cms.string('? hasUserFloat("ZZIsoVal") ? userFloat("ZZIsoVal") : 999.'),
 
         SIP3D = cms.string('SIP3D'),
+        IP3D = cms.string('IP3D'),
+        IP3DUncertainty = cms.string('IP3DUncertainty'),
+        SIP2D = cms.string('SIP2D'),
+        IP2D = cms.string('IP2D'),
+        IP2DUncertainty = cms.string('IP2DUncertainty'),
         PVDXY = cms.string('PVDXY'),
         PVDZ = cms.string('PVDZ'),
         ),

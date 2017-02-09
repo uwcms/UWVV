@@ -684,6 +684,36 @@ namespace
                                  return fabs(obj->dB(T::PV3D)) / obj->edB(T::PV3D);
                                });
 
+        addTo["IP3D"] =
+          std::function<FType>([](const edm::Ptr<T>& obj, uwvv::EventInfo& evt, const std::string& option)
+                               {
+                                 return fabs(obj->dB(T::PV3D));
+                               });
+
+        addTo["IP3DUncertainty"] =
+          std::function<FType>([](const edm::Ptr<T>& obj, uwvv::EventInfo& evt, const std::string& option)
+                               {
+                                 return obj->edB(T::PV3D);
+                               });
+
+        addTo["SIP2D"] =
+          std::function<FType>([](const edm::Ptr<T>& obj, uwvv::EventInfo& evt, const std::string& option)
+                               {
+                                 return fabs(obj->dB(T::PV2D)) / obj->edB(T::PV2D);
+                               });
+
+        addTo["IP2D"] =
+          std::function<FType>([](const edm::Ptr<T>& obj, uwvv::EventInfo& evt, const std::string& option)
+                               {
+                                 return fabs(obj->dB(T::PV2D));
+                               });
+
+        addTo["IP2DUncertainty"] =
+          std::function<FType>([](const edm::Ptr<T>& obj, uwvv::EventInfo& evt, const std::string& option)
+                               {
+                                 return obj->edB(T::PV2D);
+                               });
+
         addTo["PVDZ"] =
           std::function<FType>([](const edm::Ptr<T>& obj, uwvv::EventInfo& evt, const std::string& option)
                                {
@@ -713,6 +743,36 @@ namespace
           std::function<FType>([](const edm::Ptr<T>& obj, uwvv::EventInfo& evt, const std::string& option)
                                {
                                  return fabs(obj->dB(T::PV3D)) / obj->edB(T::PV3D);
+                               });
+
+        addTo["IP3D"] =
+          std::function<FType>([](const edm::Ptr<T>& obj, uwvv::EventInfo& evt, const std::string& option)
+                               {
+                                 return fabs(obj->dB(T::PV3D));
+                               });
+
+        addTo["IP3DUncertainty"] =
+          std::function<FType>([](const edm::Ptr<T>& obj, uwvv::EventInfo& evt, const std::string& option)
+                               {
+                                 return obj->edB(T::PV3D);
+                               });
+
+        addTo["SIP2D"] =
+          std::function<FType>([](const edm::Ptr<T>& obj, uwvv::EventInfo& evt, const std::string& option)
+                               {
+                                 return fabs(obj->dB(T::PV2D)) / obj->edB(T::PV2D);
+                               });
+
+        addTo["IP2D"] =
+          std::function<FType>([](const edm::Ptr<T>& obj, uwvv::EventInfo& evt, const std::string& option)
+                               {
+                                 return fabs(obj->dB(T::PV2D));
+                               });
+
+        addTo["IP2DUncertainty"] =
+          std::function<FType>([](const edm::Ptr<T>& obj, uwvv::EventInfo& evt, const std::string& option)
+                               {
+                                 return obj->edB(T::PV2D);
                                });
 
         addTo["PVDZ"] =
