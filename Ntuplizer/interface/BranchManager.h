@@ -59,12 +59,14 @@ namespace uwvv
 
     const std::string name;
 
-    std::vector<std::unique_ptr<BranchHolder<float, T> > >              floatBranches;
-    std::vector<std::unique_ptr<BranchHolder<bool, T> > >               boolBranches;
-    std::vector<std::unique_ptr<BranchHolder<int, T> > >                intBranches;
-    std::vector<std::unique_ptr<BranchHolder<unsigned, T> > >           uintBranches;
-    std::vector<std::unique_ptr<BranchHolder<unsigned long long, T> > > ullBranches;
-    std::vector<std::unique_ptr<BranchHolder<std::vector<float>, T> > > vFloatBranches;
+    std::vector<std::unique_ptr<BranchHolder<float, T> > >                  floatBranches;
+    std::vector<std::unique_ptr<BranchHolder<bool, T> > >                   boolBranches;
+    std::vector<std::unique_ptr<BranchHolder<int, T> > >                    intBranches;
+    std::vector<std::unique_ptr<BranchHolder<unsigned, T> > >               uintBranches;
+    std::vector<std::unique_ptr<BranchHolder<unsigned long long, T> > >     ullBranches;
+    std::vector<std::unique_ptr<BranchHolder<std::vector<float>, T> > >     vFloatBranches;
+    std::vector<std::unique_ptr<BranchHolder<std::vector<int>, T> > >       vIntBranches;
+    std::vector<std::unique_ptr<BranchHolder<std::vector<unsigned>, T> > >  vUIntBranches;
   };
 
 
@@ -131,6 +133,16 @@ namespace uwvv
       addVectorBranchesFromPSet(vFloatBranches,
                                 config.getParameter<edm::ParameterSet>("vFloats"),
                                 tree);
+
+    if(config.exists("vInts"))
+      addVectorBranchesFromPSet(vIntBranches,
+                                config.getParameter<edm::ParameterSet>("vInts"),
+                                tree);
+
+    if(config.exists("vUInts"))
+      addVectorBranchesFromPSet(vUIntBranches,
+                                config.getParameter<edm::ParameterSet>("vUInts"),
+                                tree);
   }
 
 
@@ -193,6 +205,12 @@ namespace uwvv
       b->fill(obj, evt);
 
     for(auto&& b : vFloatBranches)
+      b->fill(obj, evt);
+
+    for(auto&& b : vIntBranches)
+      b->fill(obj, evt);
+
+    for(auto&& b : vUIntBranches)
       b->fill(obj, evt);
   }
 

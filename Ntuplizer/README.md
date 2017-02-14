@@ -53,6 +53,8 @@ The definitions of the branches are passed to the TreeGenerator as a cms.PSet ca
   * `bools`
   * `ulls` (unsigned long long ints)
   * `vFloats` (`std::vector<float>`)
+  * `vInts` (`std::vector<int>`)
+  * `vUInts` (`std::vector<unsigned int>`)
 * `daughterNames`, a cms.vstring with the names of the first daughters, if any
 * `daughterParams`, a cms.VPSet containing exactly one cms.PSet for each daughter, containing the same items as in this list, to define the branches related to the daughters
 
