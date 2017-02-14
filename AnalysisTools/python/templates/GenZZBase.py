@@ -38,9 +38,9 @@ class GenZZBase(ZPlusXBaseFlowGen):
                     l4PtCut = cms.double(5.),
                     etaCut = cms.double(2.5),
                     ossfMassCut = cms.double(4.),
-                    z1MassMin = cms.double(60.),
+                    z1MassMin = cms.double(40.),
                     z1MassMax = cms.double(120.),
-                    z2MassMin = cms.double(60.),
+                    z2MassMin = cms.double(4.),
                     z2MassMax = cms.double(120.),
                     )
                 step.addModule(chan+'GenZZCleaner', cleaner, chan)
