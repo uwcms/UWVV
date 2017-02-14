@@ -14,7 +14,7 @@ class JetBaseFlow(AnalysisFlowBase):
 
         if stepName == 'preliminary':
             # Pileup veto
-            # This puts the IDs in the event stream, not an updated 
+            # This puts the IDs in the event stream, not an updated
             # jet collection
             self.process.load("RecoJets.JetProducers.PileupJetID_cfi")
             self.process.pileupJetIdUpdated = self.process.pileupJetId.clone(
@@ -23,7 +23,7 @@ class JetBaseFlow(AnalysisFlowBase):
                 applyJec = True,
                 vertexes = step.getObjTag('v'),
                 )
-            step.addModule('pileupJetIdUpdated', 
+            step.addModule('pileupJetIdUpdated',
                            self.process.pileupJetIdUpdated,
                            'puID', puID='fullId')
 
@@ -45,7 +45,7 @@ class JetBaseFlow(AnalysisFlowBase):
                 self.process.patJetCorrFactorsUpdatedJEC
                 * self.process.updatedPatJetsUpdatedJEC
                 )
-            step.addModule('jecSequence', 
+            step.addModule('jecSequence',
                            self.process.jecSequence,
                            'j')
 
@@ -75,17 +75,17 @@ class JetBaseFlow(AnalysisFlowBase):
                     src = step.getObjTag('j_jesDown'),
                     )
                 step.addModule('jetIDEmbeddingJESDown', jetIDEmbedding_jesDown, 'j_jesDown')
-                
-                
+
+
                 jetSmearing = cms.EDProducer(
                     "PATJetSmearing",
                     src = step.getObjTag('j'),
                     rhoSrc = cms.InputTag("fixedGridRhoFastjetAll"),
                     systematics = cms.bool(True),
                     )
-                step.addModule("jetSmearing", jetSmearing, 'j', 'j_jerUp', 
+                step.addModule("jetSmearing", jetSmearing, 'j', 'j_jerUp',
                                'j_jerDown', j_jerUp='jerUp', j_jerDown='jerDown')
-                
+
                 jetSmearing_jesUp = jetSmearing.clone(src = step.getObjTag('j_jesUp'),
                                                       systematics = cms.bool(False))
                 step.addModule("jetSmearingJESUp", jetSmearing_jesUp, 'j_jesUp')
@@ -94,12 +94,17 @@ class JetBaseFlow(AnalysisFlowBase):
                 step.addModule("jetSmearingJESDown", jetSmearing_jesDown, 'j_jesDown')
 
         if stepName == 'preselection':
-            # use medium PU ID
-            # PU IDs are stored as a userInt where the first three digits are
-            # tight, medium, and loose PUID decisions (going right to left)
-            selectionString = ('pt>30. && abs(eta) < 4.7 && '
-                               'userFloat("idLoose") > 0.5 && '
-                               'userInt("{}") >= 6').format(step.getObjTagString('puID'))
+            # For now, we're not using the PU ID, but we'll store it in the
+            # ntuples later
+            selectionString = ('pt > 30. && abs(eta) < 4.7 && '
+                               'userFloat("idLoose") > 0.5')
+
+            # # use medium PU ID
+            # # PU IDs are stored as a userInt where the first three digits are
+            # # tight, medium, and loose PUID decisions (going right to left)
+            # selectionString = ('pt>30. && abs(eta) < 4.7 && '
+            #                    'userFloat("idLoose") > 0.5 && '
+            #                    'userInt("{}") >= 6').format(step.getObjTagString('puID'))
 
             step.addBasicSelector('j', selectionString)
             if self.isMC:

@@ -14,6 +14,9 @@ eventBranches = cms.PSet(
         jetEta = cms.vstring('jetEta'),
         jetPhi = cms.vstring('jetPhi'),
         ),
+    vInts = cms.PSet(
+        jetPUID = cms.vstring('jetPUID'),
+        ),
     bools = cms.PSet(
         pvIsValid = cms.string('pvIsValid'),
         pvIdFake = cms.string('pvIsFake'),
@@ -100,6 +103,12 @@ jetSystematicBranches = cms.PSet(
         jetEta_jerUp = cms.vstring('jetEta::jerUp'),
         jetEta_jerDown = cms.vstring('jetEta::jerDown'),
         ),
+    vInts = cms.PSet(
+        jetPUID_jesUp = cms.vstring('jetPUID::jesUp'),
+        jetPUID_jesDown = cms.vstring('jetPUID::jesDown'),
+        jetPUID_jerUp = cms.vstring('jetPUID::jerUp'),
+        jetPUID_jerDown = cms.vstring('jetPUID::jerDown'),
+        ),
     uints = cms.PSet(
         nJets_jesUp = cms.string('nJets::jesUp'),
         nJets_jesDown = cms.string('nJets::jesDown'),
@@ -114,6 +123,9 @@ centralJetBranches = cms.PSet(
         jetEta_eta2p4 = cms.vstring('jetEta::eta2p4'),
         jetPhi_eta2p4 = cms.vstring('jetPhi::eta2p4'),
         ),
+    #vInts = cms.PSet(
+    #    jetPUID_eta2p4 = cms.vstring('jetPUID::eta2p4'),
+    #    ),
     uints = cms.PSet(
         nJets_eta2p4 = cms.string('nJets::eta2p4'),
         ),
