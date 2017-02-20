@@ -58,7 +58,19 @@ def writeFarmoutCommand(cfg, jobid, dataset, fullDataset,
     dagDir = '/' + os.path.join(*(submitDir.split('/')[:-1]+['dags', 'dag']))
 
     dasFilesCmd = 'file dataset={}'.format(fullDataset)
-    dasFiles = get_das_info(dasFilesCmd)
+
+    # das throws a lot of exceptions, but they're usually transient, so try a
+    # few times if needed
+    for i in range(5):
+        try:
+            dasFiles = get_das_info(dasFilesCmd)
+        except RuntimeError as ex:
+            continue
+        else:
+            break
+    else:
+        raise RuntimeError("Failed to get file list from DAS with exception {}."
+                           " Check connection to client.".format(ex.message))
 
     mkdirCmd = "mkdir -p {}inputs".format(dagDir)
     os.system(mkdirCmd)
@@ -139,7 +151,19 @@ def buildScript(cfg, jobid, scriptFile='',
 
         postfixPattern = _compileRE('(?<=Run201\\d[B-H]-)[a-zA-Z0-9_-]*')
 
-    datasets = get_das_info(datasetStr)
+    # das throws a lot of exceptions, but they're usually transient, so try a
+    # few times if needed
+    for i in range(5):
+        try:
+            datasets = get_das_info(datasetStr)
+        except RuntimeError as ex:
+            continue
+        else:
+            break
+    else:
+        raise RuntimeError("Failed to get dataset list from DAS with "
+                           "exception {}. Check connection to "
+                           "client.".format(ex.message))
 
     found = set()
 
