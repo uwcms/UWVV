@@ -33,6 +33,14 @@ class MuonCalibration(AnalysisFlowBase):
 
             step.addModule('calibratedPatMuons', muCalibrator, 'm')
 
+            # need to re-sort now that we're calibrated
+            mSort = cms.EDProducer(
+                "PATMuonCollectionSorter",
+                src = step.getObjTag('m'),
+                function = cms.string('pt'),
+                )
+            step.addModule('muonSorting', mSort, 'm')
+
         return step
 
 

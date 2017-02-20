@@ -93,6 +93,43 @@ class JetBaseFlow(AnalysisFlowBase):
                                                       systematics = cms.bool(False))
                 step.addModule("jetSmearingJESDown", jetSmearing_jesDown, 'j_jesDown')
 
+                # need to re-sort now that we're calibrated
+                jSort_jesUp = cms.EDProducer(
+                    "PATJetCollectionSorter",
+                    src = step.getObjTag('j_jesUp'),
+                    function = cms.string('pt'),
+                    )
+                step.addModule('jetSortingJESUp', jSort_jesUp, 'j_jesUp')
+
+                jSort_jesDn = cms.EDProducer(
+                    "PATJetCollectionSorter",
+                    src = step.getObjTag('j_jesDown'),
+                    function = cms.string('pt'),
+                    )
+                step.addModule('jetSortingJESDn', jSort_jesDn, 'j_jesDown')
+
+                jSort_jerUp = cms.EDProducer(
+                    "PATJetCollectionSorter",
+                    src = step.getObjTag('j_jerUp'),
+                    function = cms.string('pt'),
+                    )
+                step.addModule('jetSortingJERUp', jSort_jerUp, 'j_jerUp')
+
+                jSort_jerDn = cms.EDProducer(
+                    "PATJetCollectionSorter",
+                    src = step.getObjTag('j_jerDown'),
+                    function = cms.string('pt'),
+                    )
+                step.addModule('jetSortingJERDn', jSort_jerDn, 'j_jerDown')
+
+            # need to re-sort now that we're calibrated
+            jSort = cms.EDProducer(
+                "PATJetCollectionSorter",
+                src = step.getObjTag('j'),
+                function = cms.string('pt'),
+                )
+            step.addModule('jetSorting', jSort, 'j')
+
         if stepName == 'preselection':
             # For now, we're not using the PU ID, but we'll store it in the
             # ntuples later
