@@ -19,8 +19,6 @@
 #include "DataFormats/PatCandidates/interface/Jet.h"
 
 
-
-
 template<class T>
 class PATObjectPrinter : public edm::one::EDAnalyzer<>
 {
@@ -77,6 +75,9 @@ void PATObjectPrinter<T>::printCandInfo(const T& cand) const
             << " eta: " << cand.eta() << " phi: " << cand.phi();
   anythingElse(cand);
 
+  if(cand.hasUserFloat("idLoose"))
+    std::cout << " Loose ID: " << cand.userFloat("idLoose");
+
   if(cand.hasUserInt("pileupJetIdUpdated:fullId"))
     std::cout << " PUID: " << cand.userInt("pileupJetIdUpdated:fullId");
 
@@ -109,6 +110,7 @@ template<>
 void PATObjectPrinter<pat::Electron>::anythingElse(const pat::Electron& cand) const
 {
   std::cout << " SIP3D: " << fabs(cand.dB(pat::Electron::PV3D)) / cand.edB(pat::Electron::PV3D);
+  std::cout << " SCEta: " << cand.superCluster()->eta();
 }
 
 
