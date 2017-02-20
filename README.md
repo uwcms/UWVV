@@ -1,12 +1,12 @@
 # UWVV
 Some tools for CMS analyses
 
-UWVV is designed for analyses that use final state particles (typically leptons) to reconstruct intermediate and initial states. For example, in the H->ZZ->4l analysis, electron and muon pairs are built into Z candidates, and the Z candidates are built into Higgs candidates. It contains tools for building a full analysis flow out of CMS EDM modules, and for making flat ntuples where each row represents one initial state candidate. 
+UWVV is designed for analyses that use final state particles (typically leptons) to reconstruct intermediate and initial states. For example, in the H->ZZ->4l analysis, electron and muon pairs are built into Z candidates, and the Z candidates are built into Higgs candidates. It contains tools for building a full analysis flow out of CMS EDM modules, and for making flat ntuples where each row represents one initial state candidate.
 
-It uses the [CMSSW framework](https://github.com/cms-sw/cmssw) and expects [miniAOD](https://twiki.cern.ch/twiki/bin/view/CMSPublic/WorkBookMiniAOD2016) input. Much of the inspiration (and a little bit of the code) comes from [FSA](https://github.com/uwcms/FinalStateAnalysis/). A few tools, like the batch submission scripts, are specific to the computing infrastructure at the University of Wisconsin - Madison. 
+It uses the [CMSSW framework](https://github.com/cms-sw/cmssw) and expects [miniAOD](https://twiki.cern.ch/twiki/bin/view/CMSPublic/WorkBookMiniAOD2016) input. Much of the inspiration (and a little bit of the code) comes from [FSA](https://github.com/uwcms/FinalStateAnalysis/). A few tools, like the batch submission scripts, are specific to the computing infrastructure at the University of Wisconsin - Madison.
 
 ## Setup
-Current supported CMSSW release: `CMSSW_8_0_20+` 
+Current supported CMSSW release: `CMSSW_8_0_26_patch2+`
 
 ```bash
 scram pro -n uwvv CMSSW CMSSW_8_0_[current version]
@@ -27,7 +27,7 @@ To set up a python virtual environment with Rootpy, a non-bugged IPython, and so
 source recipe/setupPython.sh
 ```
 
-The first time you call `setupPython.sh`, it creates the virtualenv, installs the packages in it, and activates it. 
+The first time you call `setupPython.sh`, it creates the virtualenv, installs the packages in it, and activates it.
 After that, it just activates it.
 
 
