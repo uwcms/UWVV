@@ -17,56 +17,36 @@ class ElectronScaleFactors(AnalysisFlowBase):
         if stepName == 'embedding' and self.isMC:
 
             sfFile = path.join(UWVV_BASE_PATH, 'data', 'LeptonScaleFactors',
-                               'ele_scale_factors_v3.root')
+                               'eleSelectionSF_HZZ_Moriond17.root')
+            sfFileGap = path.join(UWVV_BASE_PATH, 'data', 'LeptonScaleFactors',
+                                  'eleSelectionSFGap_HZZ_Moriond17.root')
 
             scaleFactorEmbedder = cms.EDProducer(
                 "PATElectronScaleFactorEmbedder",
                 src = step.getObjTag('e'),
                 fileName = cms.string(sfFile),
-                histName = cms.string('ele_scale_factors'),
+                histName = cms.string('EGamma_SF2D'),
                 label = cms.string("effScaleFactor"),
-                xValue = cms.string('abs(eta)'),
+                xValue = cms.string('superCluster.eta'),
                 yValue = cms.string('pt'),
+                useError = cms.bool(True),
                 )
             step.addModule('scaleFactorEmbedderE', scaleFactorEmbedder, 'e')
 
             scaleFactorEmbedderGap = cms.EDProducer(
                 "PATElectronScaleFactorEmbedder",
                 src = step.getObjTag('e'),
-                fileName = cms.string(sfFile),
-                histName = cms.string('ele_scale_factors_gap'),
+                fileName = cms.string(sfFileGap),
+                histName = cms.string('EGamma_SF2D'),
                 label = cms.string("effScaleFactorGap"),
-                xValue = cms.string('abs(eta)'),
+                xValue = cms.string('superCluster.eta'),
                 yValue = cms.string('pt'),
+                useError = cms.bool(True),
                 )
             step.addModule('scaleFactorEmbedderEGap', scaleFactorEmbedderGap, 'e')
 
-            scaleFactorErrorEmbedder = cms.EDProducer(
-                "PATElectronScaleFactorEmbedder",
-                src = step.getObjTag('e'),
-                fileName = cms.string(sfFile),
-                histName = cms.string('ele_scale_factors_uncertainties'),
-                label = cms.string("effScaleFactorError"),
-                xValue = cms.string('abs(eta)'),
-                yValue = cms.string('pt'),
-                )
-            step.addModule('scaleFactorErrorEmbedderE', 
-                           scaleFactorErrorEmbedder, 'e')
-
-            scaleFactorErrorEmbedderGap = cms.EDProducer(
-                "PATElectronScaleFactorEmbedder",
-                src = step.getObjTag('e'),
-                fileName = cms.string(sfFile),
-                histName = cms.string('ele_scale_factors_gap_uncertainties'),
-                label = cms.string("effScaleFactorGapError"),
-                xValue = cms.string('abs(eta)'),
-                yValue = cms.string('pt'),
-                )
-            step.addModule('scaleFactorErrorEmbedderEGap', 
-                           scaleFactorErrorEmbedderGap, 'e')
-
             trkRecoSFFile = path.join(UWVV_BASE_PATH, 'data', 'LeptonScaleFactors',
-                                      'ele_gsfTrackRecoEff_ichep12p9.root')
+                                      'eleRecoSF_HZZ_Moriond17.root')
 
             gsfTrackRecoScaleFactorEmbedder = cms.EDProducer(
                 "PATElectronScaleFactorEmbedder",
@@ -78,6 +58,16 @@ class ElectronScaleFactors(AnalysisFlowBase):
                 yValue = cms.string('pt'),
                 useError = cms.bool(True),
                 )
-            step.addModule('gsfTrackRecoScaleFactorEmbedder', gsfTrackRecoScaleFactorEmbedder, 'e')
+            step.addModule('gsfTrackRecoScaleFactorEmbedder',
+                           gsfTrackRecoScaleFactorEmbedder, 'e')
+
+            gsfTrackRecoExtraUncertaintyEmbedder = cms.EDProducer(
+                "PATElectronExpressionEmbedder",
+                src = step.getObjTag('e'),
+                labels = cms.untracked.vstring('trkRecoEffScaleFactorExtraError'),
+                functions = cms.untracked.vstring('? pt < 20. || pt > 75. ? 0.01 : 0.'),
+                )
+            step.addModule('gsfTrackRecoExtraUncertaintyEmbedder',
+                           gsfTrackRecoExtraUncertaintyEmbedder, 'e')
 
         return step
