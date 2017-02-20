@@ -62,7 +62,7 @@ class PATJetSmearing : public edm::stream::EDProducer<>
 PATJetSmearing::PATJetSmearing(const edm::ParameterSet& pset) :
   srcToken(consumes<JetView>(pset.getParameter<edm::InputTag>("src"))),
   rhoToken(consumes<double>(pset.getParameter<edm::InputTag>("rhoSrc"))),
-  systematics(pset.exists("systematics") ? 
+  systematics(pset.exists("systematics") ?
               pset.getParameter<bool>("systematics") : false)
 {
   produces<VJet>();
@@ -74,7 +74,7 @@ PATJetSmearing::PATJetSmearing(const edm::ParameterSet& pset) :
 }
 
 
-void PATJetSmearing::produce(edm::Event& iEvent, 
+void PATJetSmearing::produce(edm::Event& iEvent,
                              const edm::EventSetup& iSetup)
 {
   edm::Handle<JetView> in;
@@ -86,14 +86,14 @@ void PATJetSmearing::produce(edm::Event& iEvent,
   std::unique_ptr<VJet> outUp(new VJet());
   std::unique_ptr<VJet> outDn(new VJet());
 
-  JME::JetResolutionScaleFactor resSF = 
+  JME::JetResolutionScaleFactor resSF =
     JME::JetResolutionScaleFactor::get(iSetup, "AK4PFchs");
   JME::JetResolution resPt = JME::JetResolution::get(iSetup, "AK4PFchs_pt");
 
   for(size_t i = 0; i < in->size(); ++i)
     {
       const Jet& jet = in->at(i);
-      
+
       float pt = jet.pt();
       float eta = jet.eta();
       float phi = jet.phi();
@@ -105,7 +105,7 @@ void PATJetSmearing::produce(edm::Event& iEvent,
 
       JME::JetParameters paramsSF;
       paramsSF.setJetEta(eta).setRho(*rho);
-      
+
       float sf = resSF.getScaleFactor(paramsSF);
       float sfUp = systematics ? resSF.getScaleFactor(paramsSF, Variation::UP) : 0.;
       float sfDn = systematics ? resSF.getScaleFactor(paramsSF, Variation::DOWN) : 0.;
@@ -141,11 +141,11 @@ void PATJetSmearing::produce(edm::Event& iEvent,
       math::XYZTLorentzVector p4JER = jerCorr * jet.p4();
       math::XYZTLorentzVector p4JERUp = jerCorrUp * jet.p4();
       math::XYZTLorentzVector p4JERDn = jerCorrDn * jet.p4();
-      
+
       out->push_back(jet);
       out->back().setP4(p4JER);
       out->back().addUserFloat("jerCorrInverse", 1./jerCorr);
-      
+
       if(systematics)
         {
           outUp->push_back(jet);
