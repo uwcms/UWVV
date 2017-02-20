@@ -248,7 +248,7 @@ then
         fi
 
         # background (no gen info)
-        #python Utilities/scripts/submitJobs.py --campaign 'RunIISummer16MiniAODv2-PUMoriond17_80X_mcRun2_asymptotic_2016_TrancheIV_v6*' --samples 'DYJetsToLL_M-50_TuneCUETP8M1_13TeV-madgraphMLM-pythia8' 'TTTo2L2Nu_TuneCUETP8M2_ttHtranche3_13TeV-powheg-pythia8' 'TTJets_TuneCUETP8M2T4_13TeV-amcatnloFXFX-pythia8' 'WZTo3LNu_TuneCUETP8M1_13TeV-powheg-pythia8' 'WWZ*' 'TTZToLLNuNu_M-10_TuneCUETP8M1_13TeV-amcatnlo-pythia8' --filesPerJob 2 -o /data/nawoods/uwvvZZ_mcNoGen_"$JOBID".sh UWVVZZ_MC_"$JOBID" Ntuplizer/test/ntuplize_cfg.py channels='zz' isMC=1 eCalib=1 muCalib=1 genInfo=0 globalTag="$GT_MC" genLeptonType=dressedHPFS
+        python Utilities/scripts/submitJobs.py --campaign 'RunIISummer16MiniAODv2-PUMoriond17_80X_mcRun2_asymptotic_2016_TrancheIV_v6*' --samples 'DYJetsToLL_M-50_TuneCUETP8M1_13TeV-madgraphMLM-pythia8' 'TTTo2L2Nu_TuneCUETP8M2_ttHtranche3_13TeV-powheg-pythia8' 'TTJets_TuneCUETP8M2T4_13TeV-amcatnloFXFX-pythia8' 'WZTo3LNu_TuneCUETP8M1_13TeV-powheg-pythia8' 'WWZ*' 'TTZToLLNuNu_M-10_TuneCUETP8M1_13TeV-amcatnlo-pythia8' --filesPerJob 2 -o /data/nawoods/uwvvZZ_mcNoGen_"$JOBID".sh UWVVZZ_MC_"$JOBID" Ntuplizer/test/ntuplize_cfg.py channels='zz' isMC=1 eCalib=1 muCalib=1 genInfo=0 globalTag="$GT_MC" genLeptonType=dressedHPFS
 
         if [ "$NO_SUB" == '' ]
         then
