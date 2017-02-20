@@ -31,11 +31,11 @@ options.register('isMC', 1,
                  VarParsing.VarParsing.multiplicity.singleton,
                  VarParsing.VarParsing.varType.int,
                  "1 if simulation, 0 if data")
-options.register('eCalib', 0,
+options.register('eCalib', 1,
                  VarParsing.VarParsing.multiplicity.singleton,
                  VarParsing.VarParsing.varType.int,
                  "1 if electron energy corrections are desired")
-options.register('muCalib', 0,
+options.register('muCalib', 1,
                  VarParsing.VarParsing.multiplicity.singleton,
                  VarParsing.VarParsing.varType.int,
                  "1 if muon momentum corrections are desired")
@@ -200,11 +200,24 @@ FlowSteps.append(VertexCleaning)
 # everybody needs basic lepton stuff
 from UWVV.AnalysisTools.templates.ElectronBaseFlow import ElectronBaseFlow
 FlowSteps.append(ElectronBaseFlow)
-from UWVV.AnalysisTools.templates.RecomputeElectronID import RecomputeElectronID
-FlowSteps.append(RecomputeElectronID)
 
 from UWVV.AnalysisTools.templates.MuonBaseFlow import MuonBaseFlow
 FlowSteps.append(MuonBaseFlow)
+
+# Lepton calibrations
+if options.eCalib:
+    from UWVV.AnalysisTools.templates.ElectronCalibration import ElectronCalibration
+    FlowSteps.append(ElectronCalibration)
+
+if options.muCalib:
+    from UWVV.AnalysisTools.templates.MuonCalibration import MuonCalibration
+    FlowSteps.append(MuonCalibration)
+
+    from UWVV.Ntuplizer.templates.muonBranches import muonCalibrationBranches
+    extraFinalObjectBranches['m'].append(muonCalibrationBranches)
+
+from UWVV.AnalysisTools.templates.RecomputeElectronID import RecomputeElectronID
+FlowSteps.append(RecomputeElectronID)
 
 from UWVV.AnalysisTools.templates.MuonScaleFactors import MuonScaleFactors
 FlowSteps.append(MuonScaleFactors)
@@ -306,18 +319,6 @@ if (zz or zl or z) and not "wz" in options.channels:
             from UWVV.Ntuplizer.templates.countBranches import zzCountBranches
             extraInitialStateBranches.append(zzCountBranches)
             break
-
-# Lepton calibrations
-if options.eCalib:
-    from UWVV.AnalysisTools.templates.ElectronCalibration import ElectronCalibration
-    FlowSteps.append(ElectronCalibration)
-
-if options.muCalib:
-    from UWVV.AnalysisTools.templates.MuonCalibration import MuonCalibration
-    FlowSteps.append(MuonCalibration)
-
-    from UWVV.Ntuplizer.templates.muonBranches import muonCalibrationBranches
-    extraFinalObjectBranches['m'].append(muonCalibrationBranches)
 
 
 # VBS variables for ZZ

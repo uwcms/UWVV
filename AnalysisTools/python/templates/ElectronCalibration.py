@@ -25,6 +25,21 @@ class ElectronCalibration(AnalysisFlowBase):
         step = super(ElectronCalibration, self).makeAnalysisStep(stepName, **inputs)
 
         if stepName == 'preliminary':
+            from EgammaAnalysis.ElectronTools.regressionWeights_cfi import regressionWeights
+            self.process = regressionWeights(self.process)
+
+            from EgammaAnalysis.ElectronTools.regressionApplication_cff import slimmedElectrons as eReg
+
+            eReg.src = step.getObjTag('e')
+            step.addModule('electronRegression', eReg, 'e')
+
+            cutOnSCEta = cms.EDFilter(
+                "PATElectronSelector",
+                src = step.getObjTag('e'),
+                cut = cms.string('pt >= 5. && abs(superCluster.eta) < 2.5'),
+                )
+            step.addModule('selectElectronsBeforeID', cutOnSCEta, 'e')
+
             if not hasattr(self.process, 'RandomNumberGeneratorService'):
                 self.process.RandomNumberGeneratorService = cms.Service(
                     'RandomNumberGeneratorService',
@@ -33,12 +48,19 @@ class ElectronCalibration(AnalysisFlowBase):
                 initialSeed = cms.untracked.uint32(987),
                 )
 
-            correctionFile = 'EgammaAnalysis/ElectronTools/data/ScalesSmearings/Winter_2016_reReco_v1_ele'
+            correctionFile = 'EgammaAnalysis/ElectronTools/data/ScalesSmearings/Moriond17_23Jan_ele'
 
             calibratedPatElectrons = cms.EDProducer(
                 "CalibratedPatElectronProducerRun2",
                 electrons = step.getObjTag('e'),
-                gbrForestName = cms.string("gedelectron_p4combination_25ns"),
+                gbrForestName = cms.vstring('electron_eb_ECALTRK_lowpt',
+                                            'electron_eb_ECALTRK',
+                                            'electron_ee_ECALTRK_lowpt',
+                                            'electron_ee_ECALTRK',
+                                            'electron_eb_ECALTRK_lowpt_var',
+                                            'electron_eb_ECALTRK_var',
+                                            'electron_ee_ECALTRK_lowpt_var',
+                                            'electron_ee_ECALTRK_var'),
                 isMC = cms.bool(self.isMC),
                 isSynchronization = cms.bool(self.isSync),
                 correctionFile = cms.string(correctionFile),
@@ -61,5 +83,14 @@ class ElectronCalibration(AnalysisFlowBase):
                     )
 
                 step.addModule('electronSystematicShift', shiftMod, 'e')
+
+        if stepName == 'selection':
+            # need to re-sort now that we're calibrated
+            eSort = cms.EDProducer(
+                "PATElectronCollectionSorter",
+                src = step.getObjTag('e'),
+                function = cms.string('pt'),
+                )
+            step.addModule('electronSorting', eSort, 'e')
 
         return step
