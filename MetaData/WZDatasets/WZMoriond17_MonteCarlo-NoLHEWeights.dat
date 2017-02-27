@@ -1,4 +1,8 @@
 ##### SINGLE TOP
+# Private VBFNLO samples made by Matthias
+/VBSWZ_H7VBFNLO_SF_unweight/mmozer-Dec16_300k_Moriond17_MINIAOD-28028af67189b3de7224b79195bd0e1d/USER
+/VBSWZ_H7VBFNLO_OF_unweight/mmozer-Dec16_300k_Moriond17_MINIAOD-28028af67189b3de7224b79195bd0e1d/USER
+
 # ST t-channel leptonDecays not in Tranche4 yet
 /ST_t-channel_top_4f_inclusiveDecays_13TeV-powhegV2-madspin-pythia8_TuneCUETP8M1/RunIISummer16MiniAODv2-PUMoriond17_80X_mcRun2_asymptotic_2016_TrancheIV_v6-v1/MINIAODSIM
 /ST_t-channel_antitop_4f_inclusiveDecays_13TeV-powhegV2-madspin-pythia8_TuneCUETP8M1/RunIISummer16MiniAODv2-PUMoriond17_80X_mcRun2_asymptotic_2016_TrancheIV_v6-v1/MINIAODSIM

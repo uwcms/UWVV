@@ -91,6 +91,10 @@ options.register('lheWeights', 1,
                  'Add LHE weights from Monte Carlo. Option 1 = scale weights '
                  '(weights 0-9), 2 = scale weights and one set of PDF weights '
                  '(weights 0-111), 3 = all scale and PDF weights. Default 1.')
+options.register('datasetName', '',
+                 VarParsing.VarParsing.multiplicity.singleton,
+                 VarParsing.VarParsing.varType.string,
+                 "dataset name")
 
 options.parseArguments()
 
@@ -139,7 +143,6 @@ if options.profile:
 
 
 # Basic stuff for all jobs
-
 process.load("Configuration.StandardSequences.GeometryRecoDB_cff")
 
 process.load("Configuration.StandardSequences.FrontierConditions_GlobalTag_cff")
@@ -371,16 +374,17 @@ process.metaTreePath = cms.Path(process.metaInfo)
 process.schedule.append(process.metaTreePath)
 
 # Trigger info is only in MC from reHLT campaign
-if 'RunIISpring16' in options.inputFiles[0] and 'reHLT' not in options.inputFiles[0] and 'withHLT' not in options.inputFiles[0]:
+if 'RunIISpring16' in options.inputFiles[0] and 'reHLT' not in options.inputFiles[0] and 'withHLT' not in options.inputFiles[0] \
+        or "RunIISpring16" in options.datasetName:
     trgBranches = cms.PSet(
         trigNames=cms.vstring(),
         trigResultsSrc = cms.InputTag("TriggerResults", "", "HLT"),
         trigPrescaleSrc = cms.InputTag("patTrigger"),
         )
-elif 'Run2016G' in options.inputFiles[0]:
+elif 'Run2016G' in options.inputFiles[0] or "Run2016G" in options.datasetName:
     from UWVV.Ntuplizer.templates.triggerBranches import triggerBranches_2016G
     trgBranches = triggerBranches_2016G
-elif 'Run2016H' in options.inputFiles[0]:
+elif 'Run2016H' in options.inputFiles[0] or "Run2016H" in options.datasetName:
     from UWVV.Ntuplizer.templates.triggerBranches import triggerBranches_2016H
     trgBranches = triggerBranches_2016H
 else:
