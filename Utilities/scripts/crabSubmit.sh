@@ -11,6 +11,8 @@ elif [[ $1 == *"NoLHEWeights"* ]]; then
   config=$config_path/local.noweights.txt
 elif [[ $1 == *"LHEScaleWeights"* ]]; then
   config=$config_path/local.onlyscaleweights.txt
+elif [[ $1 == *"Run2016H-PromptReco"* ]]; then
+  config=$config_path/local.noweights.2016h.txt
 fi 
 (>&2 echo "Using config file $config")
 cp $config local.txt

@@ -33,7 +33,7 @@ if dataset == 'dummy':
 (_, primaryDS, conditions, dataTier) = dataset.split('/')
 if dataTier == 'MINIAOD':
     isMC = 0
-elif dataTier == 'MINIAODSIM':
+elif dataTier == 'MINIAODSIM' or "MINIAOD" in dataset:
     isMC = 1
 else:
     raise Exception("Dataset malformed? Couldn't deduce isMC parameter")
@@ -56,6 +56,7 @@ config.Data.inputDataset = dataset
 config.Data.outputDatasetTag = conditions
 configParams = [
     'isMC=%d' % isMC,
+    'datasetName=%s' % dataset,
     "channels=%s" % localSettings.get("local", "channels"),
     "lheWeights=%s" % (localSettings.get("local", "lheWeights") if isMC else "0"),
     "eCalib=%s" % localSettings.get("local", "eCalib"),
@@ -92,7 +93,7 @@ config.JobType.psetName = '%s/src/UWVV/Ntuplizer/test/ntuplize_cfg.py' % os.envi
 config.JobType.numCores = 1
 config.JobType.inputFiles = ["%s/src/UWVV/data" % os.environ["CMSSW_BASE"]]
 
-config.Data.inputDBS = 'global'
+config.Data.inputDBS = 'global' if 'USER' not in dataset else 'phys03'
 config.Data.useParent = False
 config.Data.publication = False
 outdir = localSettings.get("local", "outLFNDirBase").replace(
