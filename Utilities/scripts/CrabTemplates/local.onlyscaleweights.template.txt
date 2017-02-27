@@ -7,5 +7,5 @@ channels: wz
 eCalib: 1
 muCalib: 1
 lheWeights: 0
-mcGlobalTag: 80X_mcRun2_asymptotic_2016_TrancheIV_v7
-dataGlobalTag: 80X_dataRun2_2016SeptRepro_v6
+mcGlobalTag: 80X_mcRun2_asymptotic_2016_TrancheIV_v8
+dataGlobalTag: 80X_dataRun2_2016SeptRepro_v7
