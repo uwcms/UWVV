@@ -373,6 +373,7 @@ process.metaInfo = cms.EDAnalyzer(
 process.metaTreePath = cms.Path(process.metaInfo)
 process.schedule.append(process.metaTreePath)
 
+is2016H = 'Run2016H' in options.inputFiles[0] or "Run2016H" in options.datasetName
 # Trigger info is only in MC from reHLT campaign
 if 'RunIISpring16' in options.inputFiles[0] and 'reHLT' not in options.inputFiles[0] and 'withHLT' not in options.inputFiles[0] \
         or "RunIISpring16" in options.datasetName:
@@ -403,7 +404,8 @@ for chan in channels:
         branches = makeBranchSet(chan, extraInitialStateBranches,
                                  extraIntermediateStateBranches,
                                  **extraFinalObjectBranches),
-        eventParams = makeEventParams(flow.finalTags()),
+        eventParams = makeEventParams(flow.finalTags(),chan, metSrc='slimmedMETsMuEGClean')
+            if not (options.isMC or is2016H) else makeEventParams(flow.finalTags(), chan),
         triggers = trgBranches,
         )
 
