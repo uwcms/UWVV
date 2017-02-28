@@ -1,7 +1,7 @@
 #!/bin/bash
 cmsRun Ntuplizer/test/ntuplize_cfg.py \
-    inputFiles=/store/data/Run2016B/DoubleMuon/MINIAOD/23Sep2016-v3/00000/00269AA1-479B-E611-A359-0025905A6082.root \
-    outputFile=testMC.root \
+    inputFiles=/store/data/Run2016C/DoubleMuon/MINIAOD/03Feb2017-v1/110000/02292378-59ED-E611-BA0B-0CC47A4D768E.root \
+    outputFile=test_DoubleMu.root \
     channels=wz \
     isMC=0 \
     eCalib=1 \

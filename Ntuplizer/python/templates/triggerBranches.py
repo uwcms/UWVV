@@ -118,3 +118,12 @@ triggerBranches_2016H = cms.PSet(
     checkPrescale = cms.bool(False),
     )
 
+badMuonFilter = cms.PSet(
+    trigNames = cms.vstring('badMuons', 'duplicateMuons'),
+    badMuonsPaths = cms.vstring('Flag_badMuons'),
+    duplicateMuonsPaths = cms.vstring('Flag_duplicateMuons'),
+    trigResultsSrc = cms.InputTag("TriggerResults", "", "PAT"),
+    trigPrescaleSrc = cms.InputTag("patTrigger"),
+    checkPrescale = cms.bool(False),
+    )
+
