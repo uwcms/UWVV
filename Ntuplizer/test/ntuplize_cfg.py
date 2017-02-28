@@ -346,7 +346,6 @@ if zz or wz:
             from UWVV.Ntuplizer.templates.vbsBranches import vbsDerivedSystematicBranches
             extraInitialStateBranches.append(vbsDerivedSystematicBranches)
 
-
 flowOpts = {
     'isMC' : bool(options.isMC),
     'isSync' : bool(options.isMC) and bool(options.isSync),
@@ -374,32 +373,24 @@ process.metaTreePath = cms.Path(process.metaInfo)
 process.schedule.append(process.metaTreePath)
 
 is2016H = 'Run2016H' in options.inputFiles[0] or "Run2016H" in options.datasetName
-# Trigger info is only in MC from reHLT campaign
-if 'RunIISpring16' in options.inputFiles[0] and 'reHLT' not in options.inputFiles[0] and 'withHLT' not in options.inputFiles[0] \
-        or "RunIISpring16" in options.datasetName:
-    trgBranches = cms.PSet(
-        trigNames=cms.vstring(),
-        trigResultsSrc = cms.InputTag("TriggerResults", "", "HLT"),
-        trigPrescaleSrc = cms.InputTag("patTrigger"),
-        )
-elif 'Run2016G' in options.inputFiles[0] or "Run2016G" in options.datasetName:
+is2016G = 'Run2016G' in options.inputFiles[0] or "Run2016G" in options.datasetName
+
+if is2016G:
     from UWVV.Ntuplizer.templates.triggerBranches import triggerBranches_2016G
     trgBranches = triggerBranches_2016G
-    from UWVV.Ntuplizer.templates.triggerBranches import badMuonFilter
-    filterBranches = badMuonFilter 
-elif 'Run2016H' in options.inputFiles[0] or "Run2016H" in options.datasetName:
+elif is2016H:
     from UWVV.Ntuplizer.templates.triggerBranches import triggerBranches_2016H
     trgBranches = triggerBranches_2016H
-    emptyFilter = trgBranches.clone(trigNames=cms.vstring())
-    filterBranches = emptyFilter 
 else:
     from UWVV.Ntuplizer.templates.triggerBranches import triggerBranches
     trgBranches = triggerBranches
-    from UWVV.Ntuplizer.templates.triggerBranches import badMuonFilter
-    filterBranches = badMuonFilter 
-
-    if 'reHLT' in options.inputFiles[0]:
-        trgBranches = trgBranches.clone(trigResultsSrc=cms.InputTag("TriggerResults", "", "HLT2"))
+# Add bad muon filters in addition to met filters for ReMiniAOD
+if options.isMC:
+    from UWVV.Ntuplizer.templates.triggerBranches import metFilters
+    filterBranches = metFilters
+else:
+    from UWVV.Ntuplizer.templates.triggerBranches import metAndBadMuonFilters
+    filterBranches = metAndBadMuonFilters
 
 process.treeSequence = cms.Sequence()
 # then the ntuples
