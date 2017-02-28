@@ -14,8 +14,8 @@ class WZLeptonCounters(AnalysisFlowBase):
         step = super(WZLeptonCounters, self).makeAnalysisStep(stepName, **inputs)
         
         if stepName == 'initialStateEmbedding':
-            muCounters = {"TightMuon" : 'pt() > 10 && userInt("IsTightMuon")',
-                    "MediumMuonICHEP" : 'pt() > 10 && userInt("IsMediumMuonICHEP")',
+            muCounters = {"TightMuon" : 'pt() > 10 && abs(eta) < 2.4 && userInt("IsTightMuon")',
+                    "MediumMuonICHEP" : 'pt() > 10 && abs(eta) < 2.4 && userInt("IsMediumMuonICHEP")',
                     "WZLooseMuon"   : self.getWZLooseMuonID(),
                     "WZMediumMuon"   : self.getWZMediumMuonID(),
             }
@@ -28,15 +28,15 @@ class WZLeptonCounters(AnalysisFlowBase):
                 )
             step.addModule("muCounter", mod)
 
-            eCounters = {"CBVIDTightElec" : 'pt() > 10 && userFloat("IsCBVIDTightwIP")',
-                "CBVIDMediumElec" :  'pt() > 10 && userFloat("IsCBVIDMediumwIP")',
-                "CBVIDLooseElec" :  'pt() > 10 && userFloat("IsCBVIDLoosewIP")',
-                "CBVIDVetoElec" :  'pt() > 10 && userFloat("IsCBVIDVetowIP")',
-                "CBVIDVetoElecNoIP" :  'pt() > 10 && userFloat("IsCBVIDVeto")',
-                "CBVIDHLTSafeElec" :  'pt() > 10 && userFloat("IsCBVIDHLTSafewIP")',
-                "CBVIDHLTSafeElecNoIP" :  'pt() > 10 && userFloat("IsCBVIDHLTSafe")',
-                "WWLooseCBVIDMedElec" :  'pt() > 10 && userInt("IsWWLoose") && userFloat("IsCBVIDMediumwIP")',
-                "WWLooseElec" :  'pt() > 10 && userInt("IsWWLoose")',
+            eCounters = {"CBVIDTightElec" : 'pt() > 10 && abs(eta) < 2.5 && userFloat("IsCBVIDTightwIP")',
+                "CBVIDMediumElec" :  'pt() > 10 && abs(eta) < 2.5 && userFloat("IsCBVIDMediumwIP")',
+                "CBVIDLooseElec" :  'pt() > 10 && abs(eta) < 2.5 && userFloat("IsCBVIDLoosewIP")',
+                "CBVIDVetoElec" :  'pt() > 10 && abs(eta) < 2.5 && userFloat("IsCBVIDVetowIP")',
+                "CBVIDVetoElecNoIP" :  'pt() > 10 && abs(eta) < 2.5 && userFloat("IsCBVIDVeto")',
+                "CBVIDHLTSafeElec" :  'pt() > 10 && abs(eta) < 2.5 && userFloat("IsCBVIDHLTSafewIP")',
+                "CBVIDHLTSafeElecNoIP" :  'pt() > 10 && abs(eta) < 2.5 && userFloat("IsCBVIDHLTSafe")',
+                "WWLooseCBVIDMedElec" :  'pt() > 10 && abs(eta) < 2.5 && userInt("IsWWLoose") && userFloat("IsCBVIDMediumwIP")',
+                "WWLooseElec" :  'pt() > 10 && abs(eta) < 2.5 && userInt("IsWWLoose")',
             }
                          
             mod = cms.EDProducer(

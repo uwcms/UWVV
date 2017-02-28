@@ -13,24 +13,24 @@
 #include "DataFormats/VertexReco/interface/VertexFwd.h"
 
 
-class ElectronWWIdEmbedder : public edm::stream::EDProducer<> {
+class ElectronWZIDEmbedder : public edm::stream::EDProducer<> {
   public:
-    ElectronWWIdEmbedder(const edm::ParameterSet& pset);
-    virtual ~ElectronWWIdEmbedder(){}
+    ElectronWZIDEmbedder(const edm::ParameterSet& pset);
+    virtual ~ElectronWZIDEmbedder(){}
     void produce(edm::Event& evt, const edm::EventSetup& es);
   private:
     edm::EDGetTokenT<edm::View<pat::Electron> > srcToken_;
     edm::EDGetTokenT<edm::View<reco::Vertex> > vertexToken_;
 };
 
-ElectronWWIdEmbedder::ElectronWWIdEmbedder(const edm::ParameterSet& pset):
+ElectronWZIDEmbedder::ElectronWZIDEmbedder(const edm::ParameterSet& pset):
   srcToken_(consumes<edm::View<pat::Electron> >(pset.getParameter<edm::InputTag>("src"))),
   vertexToken_(consumes<edm::View<reco::Vertex> >(pset.getParameter<edm::InputTag>("vertexSrc")))
 {
   produces<pat::ElectronCollection>();
 }
 
-void ElectronWWIdEmbedder::produce(edm::Event& evt, const edm::EventSetup& es) {
+void ElectronWZIDEmbedder::produce(edm::Event& evt, const edm::EventSetup& es) {
   std::auto_ptr<pat::ElectronCollection> output(new pat::ElectronCollection);
   // TODO This should really be passed into the module
   std::vector<std::string> pogIDNames = { "IsCBVIDTight", "IsCBVIDMedium",
@@ -134,4 +134,4 @@ void ElectronWWIdEmbedder::produce(edm::Event& evt, const edm::EventSetup& es) {
 }
 
 #include "FWCore/Framework/interface/MakerMacros.h"
-DEFINE_FWK_MODULE(ElectronWWIdEmbedder);
+DEFINE_FWK_MODULE(ElectronWZIDEmbedder);

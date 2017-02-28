@@ -9,6 +9,14 @@ wzCountBranches = cms.PSet(
                                       'userInt("nCBVIDMediumElec") : 999'),
         nCBVIDLooseElec = cms.string('? hasUserInt("nCBVIDLooseElec") ?'
                                      'userInt("nCBVIDLooseElec") : 999'),
+        nCBVIDHLTSafeElec = cms.string('? hasUserInt("nCBVIDHLTSafeElec") ?'
+                                     'userInt("nCBVIDHLTSafeElec") : 999'),
+        nCBVIDHLTSafeElecNoIP = cms.string('? hasUserInt("nCBVIDHLTSafeElecNoIP") ?'
+                                     'userInt("nCBVIDHLTSafeElecNoIP") : 999'),
+        nCBVIDVetoElec = cms.string('? hasUserInt("nCBVIDVetoElec") ?'
+                                     'userInt("nCBVIDVetoElec") : 999'),
+        nCBVIDVetoElecNoIP = cms.string('? hasUserInt("nCBVIDVetoElecNoIP") ?'
+                                     'userInt("nCBVIDVetoElecNoIP") : 999'),
         nWWLooseElec = cms.string('? hasUserInt("nWWLooseElec") ? '
                                   'userInt("nWWLooseElec") : 999'),
         nWWLooseCBVIDMedElec = cms.string('? hasUserInt("nWWLooseCBVIDMedElec") ? '

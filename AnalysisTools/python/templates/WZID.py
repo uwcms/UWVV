@@ -10,16 +10,16 @@ class WZID(AnalysisFlowBase):
     def makeAnalysisStep(self, stepName, **inputs):
         step = super(WZID, self).makeAnalysisStep(stepName, **inputs)
         if stepName == 'embedding':
-            self.addWWLooseID(step)
+            self.addWZIDs(step)
         return step
 
-    def addWWLooseID(self, step):
+    def addWZIDs(self, step):
         mod = cms.EDProducer(
-            'ElectronWWIdEmbedder',
+            'ElectronWZIDEmbedder',
             src = step.getObjTag('e'),
             vertexSrc = step.getObjTag('v'),
             )
-        step.addModule("ElectronWWIDEmbedder", mod, 'e')
+        step.addModule("ElectronWZIDEmbedder", mod, 'e')
 
     def getWZLooseMuonID(self):
         return 'userInt("IsWZLooseMuon") && ' \
