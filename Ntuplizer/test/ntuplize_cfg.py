@@ -385,12 +385,18 @@ if 'RunIISpring16' in options.inputFiles[0] and 'reHLT' not in options.inputFile
 elif 'Run2016G' in options.inputFiles[0] or "Run2016G" in options.datasetName:
     from UWVV.Ntuplizer.templates.triggerBranches import triggerBranches_2016G
     trgBranches = triggerBranches_2016G
+    from UWVV.Ntuplizer.templates.triggerBranches import badMuonFilter
+    filterBranches = badMuonFilter 
 elif 'Run2016H' in options.inputFiles[0] or "Run2016H" in options.datasetName:
     from UWVV.Ntuplizer.templates.triggerBranches import triggerBranches_2016H
     trgBranches = triggerBranches_2016H
+    emptyFilter = trgBranches.clone(trigNames=cms.vstring())
+    filterBranches = emptyFilter 
 else:
     from UWVV.Ntuplizer.templates.triggerBranches import triggerBranches
     trgBranches = triggerBranches
+    from UWVV.Ntuplizer.templates.triggerBranches import badMuonFilter
+    filterBranches = badMuonFilter 
 
     if 'reHLT' in options.inputFiles[0]:
         trgBranches = trgBranches.clone(trigResultsSrc=cms.InputTag("TriggerResults", "", "HLT2"))
@@ -407,6 +413,7 @@ for chan in channels:
         eventParams = makeEventParams(flow.finalTags(),chan, metSrc='slimmedMETsMuEGClean')
             if not (options.isMC or is2016H) else makeEventParams(flow.finalTags(), chan),
         triggers = trgBranches,
+        filters = filterBranches,
         )
 
     setattr(process, chan, mod)
@@ -465,6 +472,7 @@ if zz and options.isMC and options.genInfo:
             branches = genBranches,
             eventParams = makeGenEventParams(genFlow.finalTags()),
             triggers = genTrg,
+            filters = genTrg,
             )
 
         setattr(process, chan+'Gen', genMod)
