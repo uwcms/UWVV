@@ -25,6 +25,8 @@
 
 // ROOT
 #include "TTree.h"
+#include "TDirectory.h"
+#include "TObjString.h"
 
 // UWVV
 #include "UWVV/Ntuplizer/interface/EventInfo.h"
@@ -51,6 +53,7 @@ class MetaTreeGenerator : public edm::one::EDAnalyzer<edm::one::SharedResources,
 
   TTree* const tree;
   EventInfo evtInfo;
+  const std::string datasetName;
 
   unsigned runBranch;
   unsigned lumiBranch;
@@ -62,12 +65,19 @@ class MetaTreeGenerator : public edm::one::EDAnalyzer<edm::one::SharedResources,
 MetaTreeGenerator::MetaTreeGenerator(const edm::ParameterSet& config) :
   tree(makeTree()),
   evtInfo(consumesCollector(), config.getParameter<edm::ParameterSet>("eventParams")),
+  datasetName(config.exists("datasetName") ?
+             config.getParameter<std::string>("datasetName") : "unknown"),
   runBranch(0),
   lumiBranch(0),
   neventsBranch(0),
   summedWeightsBranch(0.)
 {
   usesResource("TFileService");
+  edm::Service<TFileService> FS;
+  auto dir = FS->mkdir("datasetName");
+  std::cout << "datasetName is " << datasetName << std::endl;
+  dir.make<TObjString>(datasetName.c_str());
+  std::cout << "Here we are" << std::endl;
 }
 
 
@@ -81,7 +91,7 @@ TTree* const MetaTreeGenerator::makeTree()
   t->Branch("lumi", &lumiBranch);
   t->Branch("nevents", &neventsBranch);
   t->Branch("summedWeights", &summedWeightsBranch);
-
+  
   return t;
 }
 
