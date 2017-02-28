@@ -81,6 +81,13 @@ else:
     config.Data.splitting = 'LumiBased'
     config.Data.unitsPerJob = getUnitsPerJob(primaryDS)
 
+# Max requestName is 100 characters
+if len(config.General.requestName) > 100:
+    bits = 5
+    h = hashlib.sha256(config.General.requestName).hexdigest()
+    # Replace last 5 characters with hash in case of duplicates after truncation
+    config.General.requestName = config.General.requestName[:(100-bits)] + h[:bits]
+
 config.JobType.pyCfgParams = configParams
 
 # Things that don't change with dataset
