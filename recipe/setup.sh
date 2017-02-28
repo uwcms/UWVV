@@ -87,6 +87,11 @@ if [ "$HZZ" ]; then
     cp UWVV/AnalysisTools/plugins/ZZDiscriminantEmbedderCode.txt UWVV/AnalysisTools/plugins/ZZDiscriminantEmbedder.cc
     cp UWVV/AnalysisTools/plugins/ZKinematicFitEmbedderCode.txt UWVV/AnalysisTools/plugins/ZKinematicFitEmbedder.cc
 
+if [ ! -d ./RecoMET ]; then
+    echo "\nChecking out MET recipe for Moriond 17"
+    git cms-merge-topic -u cms-met:METRecipe_8020
+fi
+
 fi
 
 if [ ! -d ./KaMuCa ]; then
