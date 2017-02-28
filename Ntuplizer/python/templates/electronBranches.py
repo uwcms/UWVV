@@ -64,16 +64,26 @@ electronBranches = cms.PSet(
     bools = cms.PSet(
         IsGap = cms.string('isGap'),
         IsEB = cms.string('isEB'),
-        IsCBVIDTight = cms.string('? hasUserFloat("IsCBVIDTight") ? '
+        IsCBVIDTightNoIP = cms.string('? hasUserFloat("IsCBVIDTight") ? '
                                   'userFloat("IsCBVIDTight") : 0'),
-        IsCBVIDMedium = cms.string('? hasUserFloat("IsCBVIDMedium") ?'
+        IsCBVIDTight = cms.string('? hasUserFloat("IsCBVIDTightwIP") ? '
+                                  'userFloat("IsCBVIDTightwIP") : 0'),
+        IsCBVIDMediumNoIP = cms.string('? hasUserFloat("IsCBVIDMedium") ?'
                                    'userFloat("IsCBVIDMedium") : 0'),
-        IsCBVIDLoose = cms.string('? hasUserFloat("IsCBVIDLoose") ? '
+        IsCBVIDMedium = cms.string('? hasUserFloat("IsCBVIDMediumwIP") ? '
+                                  'userFloat("IsCBVIDMediumwIP") : 0'),
+        IsCBVIDLooseNoIP = cms.string('? hasUserFloat("IsCBVIDLoose") ? '
                                   'userFloat("IsCBVIDLoose") : 0'),
-        IsCBVIDVeto = cms.string('? hasUserFloat("IsCBVIDVeto") ? '
+        IsCBVIDLoose = cms.string('? hasUserFloat("IsCBVIDLoosewIP") ? '
+                                  'userFloat("IsCBVIDLoosewIP") : 0'),
+        IsCBVIDVetoNoIP = cms.string('? hasUserFloat("IsCBVIDVeto") ? '
                                   'userFloat("IsCBVIDVeto") : 0'),
-        IsCBVIDHLTSafe = cms.string('? hasUserFloat("IsCBVIDHLTSafe") ? '
+        IsCBVIDVeto = cms.string('? hasUserFloat("IsCBVIDVetowIP") ? '
+                                  'userFloat("IsCBVIDVetowIP") : 0'),
+        IsCBVIDHLTSafeNoIP = cms.string('? hasUserFloat("IsCBVIDHLTSafe") ? '
                                   'userFloat("IsCBVIDHLTSafe") : 0'),
+        IsCBVIDHLTSafe = cms.string('? hasUserFloat("IsCBVIDHLTSafewIP") ? '
+                                  'userFloat("IsCBVIDHLTSafewIP") : 0'),
         IsWWLoose = cms.string('? hasUserInt("IsWWLoose") ? '
                                   'userInt("IsWWLoose") : 0'),
         )

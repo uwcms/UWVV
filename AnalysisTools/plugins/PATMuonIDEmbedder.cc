@@ -109,7 +109,7 @@ bool MuonIdEmbedder::isWZLooseMuon(const pat::Muon& patMu)
                             + pfIsoDB04.sumPhotonEt
                             - 0.5*pfIsoDB04.sumPUPt)
                   ) / patMu.pt();
-    return isWZLooseMuonNoIso(patMu) && muIso < 0.25;
+    return isWZLooseMuonNoIso(patMu) && muIso < 0.4;
   }
 bool MuonIdEmbedder::isWZLooseMuonNoIso(const pat::Muon& patMu) 
   {
