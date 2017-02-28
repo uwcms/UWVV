@@ -10,7 +10,7 @@ _defaultEventParams = {
     'gSrc'               : 'slimmedPhotons',
     'jSrc'               : 'slimmedJets',
     'pfCandSrc'          : 'packedPFCandidates',
-    'metSrc'             : 'slimmedMETs',
+    'metSrc'             : 'slimmedMETsMuEGClean',
     'puSrc'              : 'slimmedAddPileupInfo',
     'genEventInfoSrc'    : 'generator',
     'lheEventInfoSrc'    : 'externalLHEProducer',

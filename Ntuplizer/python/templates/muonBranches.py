@@ -40,19 +40,19 @@ muonBranches = cms.PSet(
         IsPFMuon = cms.string('IsPFMuon'),
         IsGlobal = cms.string('IsGlobal'),
         IsTracker = cms.string('IsTracker'),
-        IsLooseMuon = cms.string('isLooseMuon'),
-        IsMediumMuon = cms.string('isMediumMuon'),
-        IsTightMuon = cms.string('? hasUserInt("isTightMuon") ? '
+        IsLoose = cms.string('isLooseMuon'),
+        IsMedium = cms.string('isMediumMuon'),
+        IsTight = cms.string('? hasUserInt("isTightMuon") ? '
                                  'userInt("isTightMuon") : 0'),
-        IsMediumMuonICHEP = cms.string('? hasUserInt("isMediumMuonICHEP") ?'
+        IsMediumICHEP = cms.string('? hasUserInt("isMediumMuonICHEP") ?'
                                        'userInt("isMediumMuonICHEP") : 0'),
-        IsWZMediumMuon = cms.string('? hasUserInt("isWZMediumMuon") ?'
+        IsWZMedium = cms.string('? hasUserInt("isWZMediumMuon") ?'
                                        'userInt("isWZMediumMuon") : 0'),
-        IsWZMediumMuonNoIso = cms.string('? hasUserInt("isWZMediumMuonNoIso") ?'
+        IsWZMediumNoIso = cms.string('? hasUserInt("isWZMediumMuonNoIso") ?'
                                        'userInt("isWZMediumMuonNoIso") : 0'),
-        IsWZLooseMuonNoIso = cms.string('? hasUserInt("isWZLooseMuonNoIso") ?'
+        IsWZLooseNoIso = cms.string('? hasUserInt("isWZLooseMuonNoIso") ?'
                                        'userInt("isWZLooseMuonNoIso") : 0'),
-        IsWZLooseMuon = cms.string('? hasUserInt("isWZLooseMuon") ?'
+        IsWZLoose = cms.string('? hasUserInt("isWZLooseMuon") ?'
                                        'userInt("isWZLooseMuon") : 0'),
 
         HighPtID = cms.string('? hasUserFloat("ZZIDPassHighPt") ? '

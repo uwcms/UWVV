@@ -32,7 +32,9 @@ ElectronWWIdEmbedder::ElectronWWIdEmbedder(const edm::ParameterSet& pset):
 
 void ElectronWWIdEmbedder::produce(edm::Event& evt, const edm::EventSetup& es) {
   std::auto_ptr<pat::ElectronCollection> output(new pat::ElectronCollection);
-
+  // TODO This should really be passed into the module
+  std::vector<std::string> pogIDNames = { "IsCBVIDTight", "IsCBVIDMedium",
+      "IsCBVIDLoose", "IsCBVIDVeto", "IsCBVIDHLTSafe" };
   edm::Handle<edm::View<pat::Electron> > input;
   evt.getByToken(srcToken_, input);
 
@@ -116,7 +118,15 @@ void ElectronWWIdEmbedder::produce(edm::Event& evt, const edm::EventSetup& es) {
       passLoose = false;
     }
 
-    electron.addUserInt("isWWLoose", passLoose);
+    electron.addUserInt("IsWWLoose", passLoose);
+    for (auto& id : pogIDNames) {
+        if (!electron.hasUserFloat(id.c_str()))
+            continue;
+        bool passesDXY = electron.isEB() ? dxy < 0.05 : dxy < 0.1;
+        bool passesDZ = electron.isEB() ? dz < 0.1 : dz < 0.2;
+        bool passesAll = electron.userFloat(id.c_str()) && passesDXY && passesDZ;
+        electron.addUserFloat(id+"wIP", passesAll);
+    }
     output->push_back(electron);
   }
 

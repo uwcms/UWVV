@@ -22,14 +22,18 @@ class WZID(AnalysisFlowBase):
         step.addModule("ElectronWWIDEmbedder", mod, 'e')
 
     def getWZLooseMuonID(self):
-        return 'userInt("isWZLooseMuon") && ' \
+        return 'userInt("IsWZLooseMuon") && ' \
                'pt() > 10 && abs(eta) < 2.4'
     def getWZMediumMuonID(self):
-        return 'userInt("isWZMediumMuon") && ' \
+        return 'userInt("IsWZMediumMuon") && ' \
                'pt() > 10 && abs(eta) < 2.4'
     def getWZTightMuonID(self):
-        return 'userInt("isTightMuon") && ' \
+        return 'userInt("IsTightMuon") && ' \
                'pt() > 10 && abs(eta) < 2.4'
     def getWZLooseElectronID(self):
-        return 'userInt("isWWLoose") && ' \
+        return 'userInt("IsWWLoose") && ' \
                'pt() > 10 && abs(eta) < 2.5'
+    def getPOGElectronIPCut(self):
+        return '(? isEB ? userFloat("dxy") < 0.05 : userFloat("dxy") < 0.1)'#) && ' \
+              # '(? isEB ? userFloat("dz") < 0.1 : userFloat("dz") < 0.2)'
+

@@ -14,8 +14,8 @@ class WZLeptonCounters(AnalysisFlowBase):
         step = super(WZLeptonCounters, self).makeAnalysisStep(stepName, **inputs)
         
         if stepName == 'initialStateEmbedding':
-            muCounters = {"TightMuon" : 'pt() > 10 && userInt("isTightMuon")',
-                    "MediumMuonICHEP" : 'pt() > 10 && userInt("isMediumMuonICHEP")',
+            muCounters = {"TightMuon" : 'pt() > 10 && userInt("IsTightMuon")',
+                    "MediumMuonICHEP" : 'pt() > 10 && userInt("IsMediumMuonICHEP")',
                     "WZLooseMuon"   : self.getWZLooseMuonID(),
                     "WZMediumMuon"   : self.getWZMediumMuonID(),
             }
@@ -28,11 +28,15 @@ class WZLeptonCounters(AnalysisFlowBase):
                 )
             step.addModule("muCounter", mod)
 
-            eCounters = {"CBVIDTightElec" : 'pt() > 10 && userFloat("isCBVIDtight")',
-                "CBVIDMediumElec" :  'pt() > 10 && userFloat("isCBVIDmedium")',
-                "CBVIDLooseElec" :  'pt() > 10 && userFloat("isCBVIDloose")',
-                "WWLooseElec" :  'pt() > 10 && userInt("isWWLoose")',
-                "WWLooseCBVIDMedElec" :  'pt() > 10 && userInt("isWWLoose") && userFloat("isCBVIDmedium")',
+            eCounters = {"CBVIDTightElec" : 'pt() > 10 && userFloat("IsCBVIDTightwIP")',
+                "CBVIDMediumElec" :  'pt() > 10 && userFloat("IsCBVIDMediumwIP")',
+                "CBVIDLooseElec" :  'pt() > 10 && userFloat("IsCBVIDLoosewIP")',
+                "CBVIDVetoElec" :  'pt() > 10 && userFloat("IsCBVIDVetowIP")',
+                "CBVIDVetoElecNoIP" :  'pt() > 10 && userFloat("IsCBVIDVeto")',
+                "CBVIDHLTSafeElec" :  'pt() > 10 && userFloat("IsCBVIDHLTSafewIP")',
+                "CBVIDHLTSafeElecNoIP" :  'pt() > 10 && userFloat("IsCBVIDHLTSafe")',
+                "WWLooseCBVIDMedElec" :  'pt() > 10 && userInt("IsWWLoose") && userFloat("IsCBVIDMediumwIP")',
+                "WWLooseElec" :  'pt() > 10 && userInt("IsWWLoose")',
             }
                          
             mod = cms.EDProducer(
