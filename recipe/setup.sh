@@ -22,6 +22,11 @@ if [ ! -d ./ZZMatrixElement ]; then
     popd
 fi
 
+if [ ! -d ./RecoMET ]; then
+    echo "\nChecking out MET recipe for Moriond 17"
+    git cms-merge-topic -u cms-met:METRecipe_8020
+fi
+
 # copy libraries dowloaded by MELA to lib so they get packaged and used by CONDOR
 cp ZZMatrixElement/MELA/data/"$SCRAM_ARCH"/*.so "$CMSSW_BASE"/lib/"$SCRAM_ARCH"
 

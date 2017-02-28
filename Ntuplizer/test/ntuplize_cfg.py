@@ -228,6 +228,9 @@ FlowSteps.append(MuonScaleFactors)
 from UWVV.AnalysisTools.templates.ElectronScaleFactors import ElectronScaleFactors
 FlowSteps.append(ElectronScaleFactors)
 
+from UWVV.AnalysisTools.templates.AddMetFilters import AddMetFilters 
+FlowSteps.append(AddMetFilters)
+
 # data and MCFM samples never have LHE info
 if not options.isMC or 'mcfm' in options.inputFiles[0].lower() \
         or 'sherpa' in options.inputFiles[0].lower() \
