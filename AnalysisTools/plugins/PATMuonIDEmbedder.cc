@@ -65,17 +65,17 @@ void MuonIdEmbedder::produce(edm::Event& iEvent, const edm::EventSetup& iSetup)
     const auto obj = collection->at(c);
     pat::Muon newObj = obj;
 
-    newObj.addUserInt("isTightMuon", obj.isTightMuon(pv));
-    newObj.addUserInt("isMediumMuonICHEP", isMediumMuonICHEP(obj));
-    newObj.addUserInt("isWZMediumMuon", isWZMediumMuon(obj, pv));
-    newObj.addUserInt("isWZMediumMuonNoIso", isWZMediumMuonNoIso(obj, pv));
-    newObj.addUserInt("isWZLooseMuon", isWZLooseMuon(obj));
-    newObj.addUserInt("isWZLooseMuonNoIso", isWZLooseMuonNoIso(obj));
-    newObj.addUserInt("isSoftMuon", obj.isSoftMuon(pv));
-    newObj.addUserInt("isSoftMuonICHEP", isSoftMuonICHEP(obj,pv));
-    newObj.addUserInt("isHighPtMuon", obj.isHighPtMuon(pv));
+    newObj.addUserInt("IsTightMuon", obj.isTightMuon(pv));
+    newObj.addUserInt("IsMediumMuonICHEP", isMediumMuonICHEP(obj));
+    newObj.addUserInt("IsWZMediumMuon", isWZMediumMuon(obj, pv));
+    newObj.addUserInt("IsWZMediumMuonNoIso", isWZMediumMuonNoIso(obj, pv));
+    newObj.addUserInt("IsWZLooseMuon", isWZLooseMuon(obj));
+    newObj.addUserInt("IsWZLooseMuonNoIso", isWZLooseMuonNoIso(obj));
+    newObj.addUserInt("IsSoftMuon", obj.isSoftMuon(pv));
+    newObj.addUserInt("IsSoftMuonICHEP", isSoftMuonICHEP(obj,pv));
+    newObj.addUserInt("IsHighPtMuon", obj.isHighPtMuon(pv));
     newObj.addUserFloat("segmentCompatibility", muon::segmentCompatibility(obj));
-    newObj.addUserInt("isGoodMuon", muon::isGoodMuon(obj, muon::TMOneStationTight));
+    newObj.addUserInt("IsGoodMuon", muon::isGoodMuon(obj, muon::TMOneStationTight));
     int highPurity = 0;
     if (obj.innerTrack().isNonnull()) {
         highPurity = obj.innerTrack()->quality(reco::TrackBase::highPurity);

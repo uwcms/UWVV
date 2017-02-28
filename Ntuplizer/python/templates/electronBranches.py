@@ -64,13 +64,17 @@ electronBranches = cms.PSet(
     bools = cms.PSet(
         IsGap = cms.string('isGap'),
         IsEB = cms.string('isEB'),
-        IsCBVIDTight = cms.string('? hasUserFloat("isCBVIDtight") ? '
-                                  'userFloat("isCBVIDtight") : 0'),
-        IsCBVIDMedium = cms.string('? hasUserFloat("isCBVIDmedium") ?'
-                                   'userFloat("isCBVIDmedium") : 0'),
-        IsCBVIDLoose = cms.string('? hasUserFloat("isCBVIDloose") ? '
-                                  'userFloat("isCBVIDloose") : 0'),
-        IsWWLoose = cms.string('? hasUserInt("isWWLoose") ? '
-                                  'userInt("isWWLoose") : 0'),
+        IsCBVIDTight = cms.string('? hasUserFloat("IsCBVIDTight") ? '
+                                  'userFloat("IsCBVIDTight") : 0'),
+        IsCBVIDMedium = cms.string('? hasUserFloat("IsCBVIDMedium") ?'
+                                   'userFloat("IsCBVIDMedium") : 0'),
+        IsCBVIDLoose = cms.string('? hasUserFloat("IsCBVIDLoose") ? '
+                                  'userFloat("IsCBVIDLoose") : 0'),
+        IsCBVIDVeto = cms.string('? hasUserFloat("IsCBVIDVeto") ? '
+                                  'userFloat("IsCBVIDVeto") : 0'),
+        IsCBVIDHLTSafe = cms.string('? hasUserFloat("IsCBVIDHLTSafe") ? '
+                                  'userFloat("IsCBVIDHLTSafe") : 0'),
+        IsWWLoose = cms.string('? hasUserInt("IsWWLoose") ? '
+                                  'userInt("IsWWLoose") : 0'),
         )
     )
