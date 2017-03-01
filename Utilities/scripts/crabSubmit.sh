@@ -1,7 +1,12 @@
 # Modified from N. Smith, U. Wisconsin
 # Usage examples:
-# . submit.sh twoLepton-tranche4.txt | grep 'DYJets' | . /dev/stdin
-# . submit.sh twoLepton-data.txt | . /dev/stdin
+# . crabSubmit.sh twoLepton-tranche4.txt | grep 'DYJets' | . /dev/stdin
+# . crabSubmit.sh twoLepton-data.txt | . /dev/stdin
+if [ $# -eq 0 ]; then
+    echo "You need to specify a file containing your list of datasets"
+    echo "    Usage: . crabSubmit.sh datasetList.txt"
+    return 1
+fi
 scripts_path=$CMSSW_BASE/src/UWVV/Utilities/scripts
 config_path=$scripts_path/CrabTemplates
 config=$config_path/local.noweights.txt
@@ -11,7 +16,7 @@ elif [[ $1 == *"NoLHEWeights"* ]]; then
   config=$config_path/local.noweights.txt
 elif [[ $1 == *"LHEScaleWeights"* ]]; then
   config=$config_path/local.onlyscaleweights.txt
-elif [[ $1 == *"Run2016H-PromptReco"* ]]; then
+elif [[ $1 == *"Run2016H"* ]]; then
   config=$config_path/local.noweights.2016h.txt
 fi 
 (>&2 echo "Using config file $config")
