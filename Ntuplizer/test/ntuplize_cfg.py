@@ -405,7 +405,7 @@ for chan in channels:
                                  extraIntermediateStateBranches,
                                  **extraFinalObjectBranches),
         eventParams = makeEventParams(flow.finalTags(),chan, metSrc='slimmedMETsMuEGClean')
-            if not (options.isMC or is2016H) else makeEventParams(flow.finalTags(), chan),
+            if not options.isMC else makeEventParams(flow.finalTags(), chan),
         triggers = trgBranches,
         filters = filterBranches,
         )
