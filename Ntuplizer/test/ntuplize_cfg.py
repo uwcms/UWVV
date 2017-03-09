@@ -225,7 +225,9 @@ from UWVV.AnalysisTools.templates.ElectronScaleFactors import ElectronScaleFacto
 FlowSteps.append(ElectronScaleFactors)
 
 # data and MCFM samples never have LHE info
-if not options.isMC or 'mcfm' in options.inputFiles[0].lower():
+if not options.isMC or 'mcfm' in options.inputFiles[0].lower() \
+        or 'sherpa' in options.inputFiles[0].lower() \
+        or 'phantom' in options.inputFiles[0].lower():
     options.lheWeights = 0
 
 # jet energy corrections and basic preselection
