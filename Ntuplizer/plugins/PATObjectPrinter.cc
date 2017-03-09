@@ -5,6 +5,7 @@
 #include <vector>
 #include <string>
 #include <sstream>
+#include <algorithm>
 
 // CMSSW
 #include "FWCore/Framework/interface/Frameworkfwd.h"
@@ -75,12 +76,6 @@ void PATObjectPrinter<T>::printCandInfo(const T& cand) const
             << " eta: " << cand.eta() << " phi: " << cand.phi();
   anythingElse(cand);
 
-  if(cand.hasUserFloat("idLoose"))
-    std::cout << " Loose ID: " << cand.userFloat("idLoose");
-
-  if(cand.hasUserInt("pileupJetIdUpdated:fullId"))
-    std::cout << " PUID: " << cand.userInt("pileupJetIdUpdated:fullId");
-
   std::cout << std::endl;
 }
 
@@ -109,9 +104,25 @@ std::string PATObjectPrinter<pat::Muon>::getObjectName() const
 template<>
 void PATObjectPrinter<pat::Electron>::anythingElse(const pat::Electron& cand) const
 {
-  std::cout << " SIP3D: " << fabs(cand.dB(pat::Electron::PV3D)) / cand.edB(pat::Electron::PV3D);
+  float dxyz = std::abs(cand.dB(pat::Electron::PV3D));
+  std::cout << " SIP3D: " << dxyz / cand.edB(pat::Electron::PV3D);
+  float dxy = std::abs(cand.dB(pat::Electron::PV2D));
+  std::cout << " PVDXY: " << dxy;
+  std::cout << " PVDZ: " << std::sqrt(dxyz*dxyz - dxy*dxy);
   std::cout << " SCEta: " << cand.superCluster()->eta();
 }
+
+
+template<>
+void PATObjectPrinter<pat::Jet>::anythingElse(const pat::Jet& cand) const
+{
+  if(cand.hasUserFloat("idLoose"))
+    std::cout << " Loose ID: " << cand.userFloat("idLoose");
+
+  if(cand.hasUserInt("pileupJetIdUpdated:fullId"))
+    std::cout << " PUID: " << cand.userInt("pileupJetIdUpdated:fullId");
+}
+
 
 
 typedef PATObjectPrinter<pat::Jet> JetPrinter;
