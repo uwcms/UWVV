@@ -18,6 +18,7 @@
 #include "DataFormats/Common/interface/Ptr.h"
 #include "DataFormats/Math/interface/deltaPhi.h"
 #include "DataFormats/Math/interface/LorentzVector.h"
+#include "DataFormats/JetReco/interface/GenJet.h"
 
 
 namespace
@@ -46,7 +47,10 @@ namespace
                                  std::vector<float> out;
 
                                  for(size_t i = 0; i < evt.jets(option)->size(); ++i)
-                                   out.push_back(evt.jets(option)->at(i).pt());
+                                   {
+                                     if(!uwvv::helpers::overlapWithAnyDaughter(evt.jets(option)->at(i), *obj, 0.4))
+                                       out.push_back(evt.jets(option)->at(i).pt());
+                                   }
 
                                  return out;
                                });
@@ -57,7 +61,10 @@ namespace
                                  std::vector<float> out;
 
                                  for(size_t i = 0; i < evt.jets(option)->size(); ++i)
-                                   out.push_back(evt.jets(option)->at(i).eta());
+                                   {
+                                     if(!uwvv::helpers::overlapWithAnyDaughter(evt.jets(option)->at(i), *obj, 0.4))
+                                       out.push_back(evt.jets(option)->at(i).eta());
+                                   }
 
                                  return out;
                                });
@@ -68,7 +75,10 @@ namespace
                                  std::vector<float> out;
 
                                  for(size_t i = 0; i < evt.jets(option)->size(); ++i)
-                                   out.push_back(evt.jets(option)->at(i).phi());
+                                   {
+                                     if(!uwvv::helpers::overlapWithAnyDaughter(evt.jets(option)->at(i), *obj, 0.4))
+                                       out.push_back(evt.jets(option)->at(i).phi());
+                                   }
 
                                  return out;
                                });
@@ -79,7 +89,26 @@ namespace
                                  std::vector<float> out;
 
                                  for(size_t i = 0; i < evt.jets(option)->size(); ++i)
-                                   out.push_back(evt.jets(option)->at(i).rapidity());
+                                   {
+                                     if(!uwvv::helpers::overlapWithAnyDaughter(evt.jets(option)->at(i), *obj, 0.4))
+                                       out.push_back(evt.jets(option)->at(i).rapidity());
+                                   }
+
+                                 return out;
+                               });
+
+        addTo["jetQGLikelihood"] =
+          std::function<FType>([](const edm::Ptr<T>& obj, uwvv::EventInfo& evt, const std::string& option)
+                               {
+                                 std::vector<float> out;
+
+                                 for(size_t i = 0; i < evt.jets(option)->size(); ++i)
+                                   {
+                                     const pat::Jet& j = evt.jets(option)->at(i);
+                                     if(j.hasUserFloat("qgLikelihood") &&
+                                        !uwvv::helpers::overlapWithAnyDaughter(j, *obj, 0.4))
+                                       out.push_back(j.userFloat("qgLikelihood"));
+                                   }
 
                                  return out;
                                });
@@ -90,7 +119,10 @@ namespace
                                  std::vector<float> out;
 
                                  for(size_t i = 0; i < evt.genJets(option)->size(); ++i)
-                                   out.push_back(evt.genJets(option)->at(i).pt());
+                                   {
+                                     if(!uwvv::helpers::overlapWithAnyDaughter(evt.genJets(option)->at(i), *obj, 0.4))
+                                       out.push_back(evt.genJets(option)->at(i).pt());
+                                   }
 
                                  return out;
                                });
@@ -101,7 +133,10 @@ namespace
                                  std::vector<float> out;
 
                                  for(size_t i = 0; i < evt.genJets(option)->size(); ++i)
-                                   out.push_back(evt.genJets(option)->at(i).eta());
+                                   {
+                                     if(!uwvv::helpers::overlapWithAnyDaughter(evt.genJets(option)->at(i), *obj, 0.4))
+                                       out.push_back(evt.genJets(option)->at(i).eta());
+                                   }
 
                                  return out;
                                });
@@ -112,7 +147,10 @@ namespace
                                  std::vector<float> out;
 
                                  for(size_t i = 0; i < evt.genJets(option)->size(); ++i)
-                                   out.push_back(evt.genJets(option)->at(i).phi());
+                                   {
+                                     if(!uwvv::helpers::overlapWithAnyDaughter(evt.genJets(option)->at(i), *obj, 0.4))
+                                       out.push_back(evt.genJets(option)->at(i).phi());
+                                   }
 
                                  return out;
                                });
@@ -123,7 +161,10 @@ namespace
                                  std::vector<float> out;
 
                                  for(size_t i = 0; i < evt.genJets(option)->size(); ++i)
-                                   out.push_back(evt.genJets(option)->at(i).rapidity());
+                                   {
+                                     if(!uwvv::helpers::overlapWithAnyDaughter(evt.genJets(option)->at(i), *obj, 0.4))
+                                       out.push_back(evt.genJets(option)->at(i).rapidity());
+                                   }
 
                                  return out;
                                });
@@ -203,7 +244,8 @@ namespace
                                      if(evt.jets(option)->at(i).hasUserInt("pileupJetIdUpdated:fullId"))
                                        puID = evt.jets(option)->at(i).userInt("pileupJetIdUpdated:fullId");
 
-                                     out.push_back(puID);
+                                     if(!uwvv::helpers::overlapWithAnyDaughter(evt.jets(option)->at(i), *obj, 0.4))
+                                       out.push_back(puID);
                                    }
 
                                  return out;
@@ -270,41 +312,111 @@ namespace
         addTo["mjj"] =
           std::function<FType>([](const edm::Ptr<T>& obj, uwvv::EventInfo& evt, const std::string& option)
                                {
-                                 return (evt.jets(option)->size() >= 2 ?
-                                         (evt.jets(option)->at(0).p4()+evt.jets(option)->at(1).p4()).mass() :
-                                         -999.);
+                                 if(evt.jets(option)->size() < 2)
+                                   return -999.;
+
+                                 const pat::Jet* j1 = 0;
+                                 for(size_t i = 0; i < evt.jets(option)->size(); ++i)
+                                   {
+                                     const pat::Jet& j = evt.jets(option)->at(i);
+                                     if(!uwvv::helpers::overlapWithAnyDaughter(j, *obj, 0.4))
+                                       {
+                                         if(j1)
+                                           return (j1->p4()+j.p4()).mass();
+                                         else
+                                           j1 = &j;
+                                       }
+                                   }
+
+                                 return -999.;
                                });
 
         addTo["ptjj"] =
           std::function<FType>([](const edm::Ptr<T>& obj, uwvv::EventInfo& evt, const std::string& option)
                                {
-                                 return (evt.jets(option)->size() >= 2 ?
-                                         (evt.jets(option)->at(0).p4()+evt.jets(option)->at(1).p4()).pt() :
-                                         -999.);
+                                 if(evt.jets(option)->size() < 2)
+                                   return -999.;
+
+                                 const pat::Jet* j1 = 0;
+                                 for(size_t i = 0; i < evt.jets(option)->size(); ++i)
+                                   {
+                                     const pat::Jet& j = evt.jets(option)->at(i);
+                                     if(!uwvv::helpers::overlapWithAnyDaughter(j, *obj, 0.4))
+                                       {
+                                         if(j1)
+                                           return (j1->p4()+j.p4()).pt();
+                                         else
+                                           j1 = &j;
+                                       }
+                                   }
+
+                                 return -999.;
                                });
 
         addTo["etajj"] =
           std::function<FType>([](const edm::Ptr<T>& obj, uwvv::EventInfo& evt, const std::string& option)
                                {
-                                 return (evt.jets(option)->size() >= 2 ?
-                                         (evt.jets(option)->at(0).p4()+evt.jets(option)->at(1).p4()).eta() :
-                                         -999.);
+                                 if(evt.jets(option)->size() < 2)
+                                   return -999.;
+
+                                 const pat::Jet* j1 = 0;
+                                 for(size_t i = 0; i < evt.jets(option)->size(); ++i)
+                                   {
+                                     const pat::Jet& j = evt.jets(option)->at(i);
+                                     if(!uwvv::helpers::overlapWithAnyDaughter(j, *obj, 0.4))
+                                       {
+                                         if(j1)
+                                           return (j1->p4()+j.p4()).eta();
+                                         else
+                                           j1 = &j;
+                                       }
+                                   }
+
+                                 return -999.;
                                });
 
         addTo["phijj"] =
           std::function<FType>([](const edm::Ptr<T>& obj, uwvv::EventInfo& evt, const std::string& option)
                                {
-                                 return (evt.jets(option)->size() >= 2 ?
-                                         (evt.jets(option)->at(0).p4()+evt.jets(option)->at(1).p4()).phi() :
-                                         -999.);
+                                 if(evt.jets(option)->size() < 2)
+                                   return -999.;
+
+                                 const pat::Jet* j1 = 0;
+                                 for(size_t i = 0; i < evt.jets(option)->size(); ++i)
+                                   {
+                                     const pat::Jet& j = evt.jets(option)->at(i);
+                                     if(!uwvv::helpers::overlapWithAnyDaughter(j, *obj, 0.4))
+                                       {
+                                         if(j1)
+                                           return (j1->p4()+j.p4()).phi();
+                                         else
+                                           j1 = &j;
+                                       }
+                                   }
+
+                                 return -999.;
                                });
 
         addTo["deltaEtajj"] =
           std::function<FType>([](const edm::Ptr<T>& obj, uwvv::EventInfo& evt, const std::string& option)
                                {
-                                 return (evt.jets(option)->size() >= 2 ?
-                                         fabs(evt.jets(option)->at(0).eta()-evt.jets(option)->at(1).eta()) :
-                                         -999.);
+                                 if(evt.jets(option)->size() < 2)
+                                   return -999.;
+
+                                 const pat::Jet* j1 = 0;
+                                 for(size_t i = 0; i < evt.jets(option)->size(); ++i)
+                                   {
+                                     const pat::Jet& j = evt.jets(option)->at(i);
+                                     if(!uwvv::helpers::overlapWithAnyDaughter(j, *obj, 0.4))
+                                       {
+                                         if(j1)
+                                           return std::abs(j1->eta() - j.eta());
+                                         else
+                                           j1 = &j;
+                                       }
+                                   }
+
+                                 return -999.;
                                });
 
         addTo["zeppenfeld"] =
@@ -313,9 +425,23 @@ namespace
                                  if(evt.jets(option)->size() < 2)
                                    return -999.;
 
-                                 return std::abs(obj->rapidity() -
-                                                 (evt.jets(option)->at(0).rapidity() +
-                                                  evt.jets(option)->at(1).rapidity()) / 2.);
+                                 const pat::Jet* j1 = 0;
+                                 for(size_t i = 0; i < evt.jets(option)->size(); ++i)
+                                   {
+                                     const pat::Jet& j = evt.jets(option)->at(i);
+                                     if(!uwvv::helpers::overlapWithAnyDaughter(j, *obj, 0.4))
+                                       {
+                                         if(j1)
+                                           return std::abs(obj->rapidity() -
+                                                           (j1->rapidity() +
+                                                            j.rapidity()) / 2.
+                                                           );
+                                         else
+                                           j1 = &j;
+                                       }
+                                   }
+
+                                 return -999.;
                                });
 
         addTo["zeppenfeldj3"] =
@@ -324,9 +450,26 @@ namespace
                                  if(evt.jets(option)->size() < 3)
                                    return -999.;
 
-                                 return std::abs(evt.jets(option)->at(2).rapidity() -
-                                                 (evt.jets(option)->at(0).rapidity() +
-                                                  evt.jets(option)->at(1).rapidity()) / 2.);
+                                 const pat::Jet* j1 = 0;
+                                 const pat::Jet* j2 = 0;
+                                 for(size_t i = 0; i < evt.jets(option)->size(); ++i)
+                                   {
+                                     const pat::Jet& j = evt.jets(option)->at(i);
+                                     if(!uwvv::helpers::overlapWithAnyDaughter(j, *obj, 0.4))
+                                       {
+                                         if(j2)
+                                           return std::abs(j.rapidity() -
+                                                           (j1->rapidity() +
+                                                            j2->rapidity()) / 2.
+                                                           );
+                                         else if(j1)
+                                           j2 = &j;
+                                         else
+                                           j1 = &j;
+                                       }
+                                   }
+
+                                 return -999.;
                                });
 
         addTo["deltaPhiTojj"] =
@@ -335,65 +478,133 @@ namespace
                                  if(evt.jets(option)->size() < 2)
                                    return -999.;
 
-                                 float phiJJ = (evt.jets(option)->at(0).p4() + evt.jets(option)->at(1).p4()).phi();
+                                 const pat::Jet* j1 = 0;
+                                 for(size_t i = 0; i < evt.jets(option)->size(); ++i)
+                                   {
+                                     const pat::Jet& j = evt.jets(option)->at(i);
+                                     if(!uwvv::helpers::overlapWithAnyDaughter(j, *obj, 0.4))
+                                       {
+                                         if(j1)
+                                           {
+                                             float phiJJ = (j1->p4() + j.p4()).phi();
+                                             return std::abs(deltaPhi(obj->phi(), phiJJ));
+                                           }
+                                         else
+                                           j1 = &j;
+                                       }
+                                   }
 
-                                 return std::abs(deltaPhi(obj->phi(), phiJJ));
-                               });
-
-        addTo["jet1QGLikelihood"] =
-          std::function<FType>([](const edm::Ptr<T>& obj, uwvv::EventInfo& evt, const std::string& option)
-                               {
-                                 return (evt.jets(option)->size() >= 1 && evt.jets(option)->at(0).hasUserFloat("qgLikelihood") ?
-                                         evt.jets(option)->at(0).userFloat("qgLikelihood") :
-                                         -1.);
-                               });
-
-        addTo["jet2QGLikelihood"] =
-          std::function<FType>([](const edm::Ptr<T>& obj, uwvv::EventInfo& evt, const std::string& option)
-                               {
-                                 return (evt.jets(option)->size() >= 2 && evt.jets(option)->at(1).hasUserFloat("qgLikelihood") ?
-                                         evt.jets(option)->at(1).userFloat("qgLikelihood") :
-                                         -1.);
+                                 return -999.;
                                });
 
         addTo["mjjGen"] =
           std::function<FType>([](const edm::Ptr<T>& obj, uwvv::EventInfo& evt, const std::string& option)
                                {
-                                 return (evt.genJets(option)->size() >= 2 ?
-                                         (evt.genJets(option)->at(0).p4()+evt.genJets(option)->at(1).p4()).mass() :
-                                         -999.);
+                                 if(evt.genJets(option)->size() < 2)
+                                   return -999.;
+
+                                 const reco::GenJet* j1 = 0;
+                                 for(size_t i = 0; i < evt.genJets(option)->size(); ++i)
+                                   {
+                                     const reco::GenJet& j = evt.genJets(option)->at(i);
+                                     if(!uwvv::helpers::overlapWithAnyDaughter(j, *obj, 0.4))
+                                       {
+                                         if(j1)
+                                           return (j1->p4()+j.p4()).mass();
+                                         else
+                                           j1 = &j;
+                                       }
+                                   }
+
+                                 return -999.;
                                });
 
         addTo["ptjjGen"] =
           std::function<FType>([](const edm::Ptr<T>& obj, uwvv::EventInfo& evt, const std::string& option)
                                {
-                                 return (evt.genJets(option)->size() >= 2 ?
-                                         (evt.genJets(option)->at(0).p4()+evt.genJets(option)->at(1).p4()).pt() :
-                                         -999.);
+                                 if(evt.genJets(option)->size() < 2)
+                                   return -999.;
+
+                                 const reco::GenJet* j1 = 0;
+                                 for(size_t i = 0; i < evt.genJets(option)->size(); ++i)
+                                   {
+                                     const reco::GenJet& j = evt.genJets(option)->at(i);
+                                     if(!uwvv::helpers::overlapWithAnyDaughter(j, *obj, 0.4))
+                                       {
+                                         if(j1)
+                                           return (j1->p4()+j.p4()).pt();
+                                         else
+                                           j1 = &j;
+                                       }
+                                   }
+
+                                 return -999.;
                                });
 
         addTo["etajjGen"] =
           std::function<FType>([](const edm::Ptr<T>& obj, uwvv::EventInfo& evt, const std::string& option)
                                {
-                                 return (evt.genJets(option)->size() >= 2 ?
-                                         (evt.genJets(option)->at(0).p4()+evt.genJets(option)->at(1).p4()).eta() :
-                                         -999.);
+                                 if(evt.genJets(option)->size() < 2)
+                                   return -999.;
+
+                                 const reco::GenJet* j1 = 0;
+                                 for(size_t i = 0; i < evt.genJets(option)->size(); ++i)
+                                   {
+                                     const reco::GenJet& j = evt.genJets(option)->at(i);
+                                     if(!uwvv::helpers::overlapWithAnyDaughter(j, *obj, 0.4))
+                                       {
+                                         if(j1)
+                                           return (j1->p4()+j.p4()).eta();
+                                         else
+                                           j1 = &j;
+                                       }
+                                   }
+
+                                 return -999.;
                                });
 
         addTo["phijjGen"] =
           std::function<FType>([](const edm::Ptr<T>& obj, uwvv::EventInfo& evt, const std::string& option)
                                {
-                                 return (evt.genJets(option)->size() >= 2 ?
-                                         (evt.genJets(option)->at(0).p4()+evt.genJets(option)->at(1).p4()).phi() :
-                                         -999.);
+                                 if(evt.genJets(option)->size() < 2)
+                                   return -999.;
+
+                                 const reco::GenJet* j1 = 0;
+                                 for(size_t i = 0; i < evt.genJets(option)->size(); ++i)
+                                   {
+                                     const reco::GenJet& j = evt.genJets(option)->at(i);
+                                     if(!uwvv::helpers::overlapWithAnyDaughter(j, *obj, 0.4))
+                                       {
+                                         if(j1)
+                                           return (j1->p4()+j.p4()).phi();
+                                         else
+                                           j1 = &j;
+                                       }
+                                   }
+
+                                 return -999.;
                                });
 
         addTo["deltaEtajjGen"] =
           std::function<FType>([](const edm::Ptr<T>& obj, uwvv::EventInfo& evt, const std::string& option)
                                {
-                                 return (evt.genJets(option)->size() >= 2 ?
-                                         fabs(evt.genJets(option)->at(0).eta()-evt.genJets(option)->at(1).eta()) :
-                                         -999.);
+                                 if(evt.genJets(option)->size() < 2)
+                                   return -999.;
+
+                                 const reco::GenJet* j1 = 0;
+                                 for(size_t i = 0; i < evt.genJets(option)->size(); ++i)
+                                   {
+                                     const reco::GenJet& j = evt.genJets(option)->at(i);
+                                     if(!uwvv::helpers::overlapWithAnyDaughter(j, *obj, 0.4))
+                                       {
+                                         if(j1)
+                                           return std::abs(j1->eta() - j.eta());
+                                         else
+                                           j1 = &j;
+                                       }
+                                   }
+
+                                 return -999.;
                                });
 
         addTo["zeppenfeldGen"] =
@@ -402,9 +613,23 @@ namespace
                                  if(evt.genJets(option)->size() < 2)
                                    return -999.;
 
-                                 return std::abs(obj->rapidity() -
-                                                 (evt.genJets(option)->at(0).rapidity() +
-                                                  evt.genJets(option)->at(1).rapidity()) / 2.);
+                                 const reco::GenJet* j1 = 0;
+                                 for(size_t i = 0; i < evt.genJets(option)->size(); ++i)
+                                   {
+                                     const reco::GenJet& j = evt.genJets(option)->at(i);
+                                     if(!uwvv::helpers::overlapWithAnyDaughter(j, *obj, 0.4))
+                                       {
+                                         if(j1)
+                                           return std::abs(obj->rapidity() -
+                                                           (j1->rapidity() +
+                                                            j.rapidity()) / 2.
+                                                           );
+                                         else
+                                           j1 = &j;
+                                       }
+                                   }
+
+                                 return -999.;
                                });
 
         addTo["zeppenfeldj3Gen"] =
@@ -413,9 +638,26 @@ namespace
                                  if(evt.genJets(option)->size() < 3)
                                    return -999.;
 
-                                 return std::abs(evt.genJets(option)->at(2).rapidity() -
-                                                 (evt.genJets(option)->at(0).rapidity() +
-                                                  evt.genJets(option)->at(1).rapidity()) / 2.);
+                                 const reco::GenJet* j1 = 0;
+                                 const reco::GenJet* j2 = 0;
+                                 for(size_t i = 0; i < evt.genJets(option)->size(); ++i)
+                                   {
+                                     const reco::GenJet& j = evt.genJets(option)->at(i);
+                                     if(!uwvv::helpers::overlapWithAnyDaughter(j, *obj, 0.4))
+                                       {
+                                         if(j2)
+                                           return std::abs(j.rapidity() -
+                                                           (j1->rapidity() +
+                                                            j2->rapidity()) / 2.
+                                                           );
+                                         else if(j1)
+                                           j2 = &j;
+                                         else
+                                           j1 = &j;
+                                       }
+                                   }
+
+                                 return -999.;
                                });
 
         addTo["deltaPhiTojjGen"] =
@@ -424,9 +666,23 @@ namespace
                                  if(evt.genJets(option)->size() < 2)
                                    return -999.;
 
-                                 float phiJJ = (evt.genJets(option)->at(0).p4() + evt.genJets(option)->at(1).p4()).phi();
+                                 const reco::GenJet* j1 = 0;
+                                 for(size_t i = 0; i < evt.genJets(option)->size(); ++i)
+                                   {
+                                     const reco::GenJet& j = evt.genJets(option)->at(i);
+                                     if(!uwvv::helpers::overlapWithAnyDaughter(j, *obj, 0.4))
+                                       {
+                                         if(j1)
+                                           {
+                                             float phiJJ = (j1->p4() + j.p4()).phi();
+                                             return std::abs(deltaPhi(obj->phi(), phiJJ));
+                                           }
+                                         else
+                                           j1 = &j;
+                                       }
+                                   }
 
-                                 return std::abs(deltaPhi(obj->phi(), phiJJ));
+                                 return -999.;
                                });
 
         addTo["minLHEWeight"] =
@@ -641,11 +897,29 @@ namespace
 
         addTo["nJets"] =
           std::function<FType>([](const edm::Ptr<T>& obj, uwvv::EventInfo& evt, const std::string& option)
-                               {return evt.jets(option)->size();});
+                               {
+                                 unsigned out = 0;
+                                 for(size_t i = 0; i < evt.jets(option)->size(); ++i)
+                                   {
+                                     if(!uwvv::helpers::overlapWithAnyDaughter(evt.jets(option)->at(i), *obj, 0.4))
+                                       out++;
+                                   }
+
+                                 return out;
+                               });
 
         addTo["nGenJets"] =
           std::function<FType>([](const edm::Ptr<T>& obj, uwvv::EventInfo& evt, const std::string& option)
-                               {return evt.genJets(option)->size();});
+                               {
+                                 unsigned out = 0;
+                                 for(size_t i = 0; i < evt.genJets(option)->size(); ++i)
+                                   {
+                                     if(!uwvv::helpers::overlapWithAnyDaughter(evt.genJets(option)->at(i), *obj, 0.4))
+                                       out++;
+                                   }
+
+                                 return out;
+                               });
       }
     };
 

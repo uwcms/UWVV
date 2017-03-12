@@ -9,7 +9,8 @@
 #include "DataFormats/PatCandidates/interface/CompositeCandidate.h"
 #include "DataFormats/Common/interface/Ptr.h"
 #include "DataFormats/Math/interface/LorentzVector.h"
-
+#include "DataFormats/Math/interface/deltaR.h"
+#include "DataFormats/Candidate/interface/Candidate.h"
 
 namespace uwvv
 {
@@ -69,6 +70,23 @@ namespace uwvv
       return std::abs(p4b.mass() - 91.1876) < std::abs(p4a.mass() - 91.1876);
     }
 
+    // Check if any final daughters of mother are within dR of cand.
+    // "final daughters" means it checks the daughters of daughters if
+    // applicable
+    bool overlapWithAnyDaughter(const reco::Candidate& cand,
+                                const reco::Candidate& mother, float dR)
+    {
+      if(!mother.numberOfDaughters()) // end recursion
+        return reco::deltaR(cand.p4(), mother.p4()) < dR;
+
+      for(size_t i = 0; i < mother.numberOfDaughters(); ++i)
+        {
+          if(overlapWithAnyDaughter(cand, *mother.daughter(i), dR))
+            return true;
+        }
+
+      return false;
+    }
   } // namespace helpers
 
 } // namespace uwvv
