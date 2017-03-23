@@ -98,7 +98,7 @@ GT_DATA_H=80X_dataRun2_Prompt_v16
 
 if [ "$ATGC" ]
 then
-    EXTRA_SIGNALS='ZZ*aTGC*'
+    EXTRA_SIGNALS='ZZ*aTGC* ZZTo4L_13TeV-sherpa'
 else
     EXTRA_SIGNALS=""
 fi
@@ -238,8 +238,8 @@ then
     then
         echo Creating submission infrastructure for ZZ MC Ntuples as UWVVZZ_MC_"$JOBID"
 
-        # signal (include gen info -- except MCFM samples, where LHE info is automatically excluded)
-        python Utilities/scripts/submitJobs.py --campaign 'RunIISummer16MiniAODv2-PUMoriond17_80X_mcRun2_asymptotic_2016_TrancheIV_v6*' --samples 'ZZTo4L_13TeV*' 'GluGluHToZZTo4L_M125_13TeV_powheg*' 'GluGlu*ZZ*DefaultShower*' 'GluGluToContinToZZTo2e2tau*' 'GluGluToContinToZZTo2mu2tau*' 'ZZJJTo4L*' 'WZZ*' 'ZZZ*' "$EXTRA_SIGNALS" --filesPerJob 2 -o /data/nawoods/uwvvZZ_mc_"$JOBID".sh UWVVZZ_MC_"$JOBID" Ntuplizer/test/ntuplize_cfg.py channels='zz' isMC=1 eCalib=1 muCalib=1 genInfo=1 globalTag="$GT_MC" genLeptonType=dressedHPFS lheWeights=2
+        # signal (include gen info -- except MCFM and Phantom samples, where LHE info is automatically excluded)
+        python Utilities/scripts/submitJobs.py --campaign 'RunIISummer16MiniAODv2-PUMoriond17*_80X_mcRun2_asymptotic_2016_TrancheIV_v6*' --samples 'ZZTo4L_13TeV*pythia8' 'GluGluHToZZTo4L_M125_13TeV_powheg*' 'GluGlu*ZZ*DefaultShower*' 'GluGluToContinToZZTo2e2tau*' 'GluGluToContinToZZTo2mu2tau*' 'ZZJJTo4L*' 'WZZ*' 'ZZZ*' 'ZZTo4L_*Jets_ZZOnShell_13TeV-amcatnloFXFX-madspin-pythia8' 'VBFToHiggs0PMContinToZZTo*' "$EXTRA_SIGNALS" --filesPerJob 2 -o /data/nawoods/uwvvZZ_mc_"$JOBID".sh UWVVZZ_MC_"$JOBID" Ntuplizer/test/ntuplize_cfg.py channels='zz' isMC=1 eCalib=1 muCalib=1 genInfo=1 globalTag="$GT_MC" genLeptonType=dressedHPFS lheWeights=2
 
         if [ "$NO_SUB" == '' ]
         then
@@ -262,7 +262,7 @@ then
             echo Creating submission infrastructure for ZZ MC Ntuples with Systematic Shifts
 
             # EES+
-            python Utilities/scripts/submitJobs.py --campaign 'RunIISummer16MiniAODv2-PUMoriond17_80X_mcRun2_asymptotic_2016_TrancheIV_v6*' --samples 'ZZTo4L_13TeV*' 'GluGluHToZZTo4L_M125_13TeV_powheg*' 'GluGlu*ZZ*DefaultShower*' 'GluGluToContinToZZTo2e2tau*' 'GluGluToContinToZZTo2mu2tau*' 'ZZJJTo4L*' 'WZZ*' 'ZZZ*' 'WWZ*' 'TTZToLLNuNu_M-10_TuneCUETP8M1_13TeV-amcatnlo-pythia8' "$EXTRA_SIGNALS" --filesPerJob 2 -o /data/nawoods/uwvvZZ_mc_eScaleUp_"$JOBID".sh UWVVZZ_MC_ESCALEUP_"$JOBID" Ntuplizer/test/ntuplize_cfg.py channels='eeee,eemm' isMC=1 eCalib=1 muCalib=1 lheWeights=0 eScaleShift=1 globalTag="$GT_MC" genLeptonType=dressedHPFS
+            python Utilities/scripts/submitJobs.py --campaign 'RunIISummer16MiniAODv2-PUMoriond17*_80X_mcRun2_asymptotic_2016_TrancheIV_v6*' --samples 'ZZTo4L_13TeV*pythia8' 'GluGluHToZZTo4L_M125_13TeV_powheg*' 'GluGlu*ZZ*DefaultShower*' 'GluGluToContinToZZTo2e2tau*' 'GluGluToContinToZZTo2mu2tau*' 'ZZJJTo4L*' 'WZZ*' 'ZZZ*' 'WWZ*' 'TTZToLLNuNu_M-10_TuneCUETP8M1_13TeV-amcatnlo-pythia8' 'ZZTo4L_*Jets_ZZOnShell_13TeV-amcatnloFXFX-madspin-pythia8' 'VBFToHiggs0PMContinToZZTo*' "$EXTRA_SIGNALS" --filesPerJob 2 -o /data/nawoods/uwvvZZ_mc_eScaleUp_"$JOBID".sh UWVVZZ_MC_ESCALEUP_"$JOBID" Ntuplizer/test/ntuplize_cfg.py channels='eeee,eemm' isMC=1 eCalib=1 muCalib=1 lheWeights=0 eScaleShift=1 globalTag="$GT_MC" genLeptonType=dressedHPFS
 
             if [ "$NO_SUB" == '' ]
             then
@@ -271,7 +271,7 @@ then
             fi
 
             # EES-
-            python Utilities/scripts/submitJobs.py --campaign 'RunIISummer16MiniAODv2-PUMoriond17_80X_mcRun2_asymptotic_2016_TrancheIV_v6*' --samples 'ZZTo4L_13TeV*' 'GluGluHToZZTo4L_M125_13TeV_powheg*' 'GluGlu*ZZ*DefaultShower*' 'GluGluToContinToZZTo2e2tau*' 'GluGluToContinToZZTo2mu2tau*' 'ZZJJTo4L*' 'WZZ*' 'ZZZ*' 'WWZ*' 'TTZToLLNuNu_M-10_TuneCUETP8M1_13TeV-amcatnlo-pythia8' "$EXTRA_SIGNALS" --filesPerJob 2 -o /data/nawoods/uwvvZZ_mc_eScaleDn_"$JOBID".sh UWVVZZ_MC_ESCALEDN_"$JOBID" Ntuplizer/test/ntuplize_cfg.py channels='eeee,eemm' isMC=1 eCalib=1 muCalib=1 lheWeights=0 eScaleShift=-1 globalTag="$GT_MC" genLeptonType=dressedHPFS
+            python Utilities/scripts/submitJobs.py --campaign 'RunIISummer16MiniAODv2-PUMoriond17*_80X_mcRun2_asymptotic_2016_TrancheIV_v6*' --samples 'ZZTo4L_13TeV*pythia8' 'GluGluHToZZTo4L_M125_13TeV_powheg*' 'GluGlu*ZZ*DefaultShower*' 'GluGluToContinToZZTo2e2tau*' 'GluGluToContinToZZTo2mu2tau*' 'ZZJJTo4L*' 'WZZ*' 'ZZZ*' 'WWZ*' 'TTZToLLNuNu_M-10_TuneCUETP8M1_13TeV-amcatnlo-pythia8' 'ZZTo4L_*Jets_ZZOnShell_13TeV-amcatnloFXFX-madspin-pythia8' 'VBFToHiggs0PMContinToZZTo*' "$EXTRA_SIGNALS" --filesPerJob 2 -o /data/nawoods/uwvvZZ_mc_eScaleDn_"$JOBID".sh UWVVZZ_MC_ESCALEDN_"$JOBID" Ntuplizer/test/ntuplize_cfg.py channels='eeee,eemm' isMC=1 eCalib=1 muCalib=1 lheWeights=0 eScaleShift=-1 globalTag="$GT_MC" genLeptonType=dressedHPFS
 
             if [ "$NO_SUB" == '' ]
             then
@@ -279,7 +279,7 @@ then
             fi
 
             # EER+ (rho)
-            python Utilities/scripts/submitJobs.py --campaign 'RunIISummer16MiniAODv2-PUMoriond17_80X_mcRun2_asymptotic_2016_TrancheIV_v6*' --samples 'ZZTo4L_13TeV*' 'GluGluHToZZTo4L_M125_13TeV_powheg*' 'GluGlu*ZZ*DefaultShower*' 'GluGluToContinToZZTo2e2tau*' 'GluGluToContinToZZTo2mu2tau*' 'ZZJJTo4L*' 'WZZ*' 'ZZZ*' 'WWZ*' 'TTZToLLNuNu_M-10_TuneCUETP8M1_13TeV-amcatnlo-pythia8' "$EXTRA_SIGNALS" --filesPerJob 2 -o /data/nawoods/uwvvZZ_mc_eRhoResUp_"$JOBID".sh UWVVZZ_MC_ERHORESUP_"$JOBID" Ntuplizer/test/ntuplize_cfg.py channels='eeee,eemm' isMC=1 eCalib=1 muCalib=1 lheWeights=0 eRhoResShift=1 globalTag="$GT_MC" genLeptonType=dressedHPFS
+            python Utilities/scripts/submitJobs.py --campaign 'RunIISummer16MiniAODv2-PUMoriond17*_80X_mcRun2_asymptotic_2016_TrancheIV_v6*' --samples 'ZZTo4L_13TeV*pythia8' 'GluGluHToZZTo4L_M125_13TeV_powheg*' 'GluGlu*ZZ*DefaultShower*' 'GluGluToContinToZZTo2e2tau*' 'GluGluToContinToZZTo2mu2tau*' 'ZZJJTo4L*' 'WZZ*' 'ZZZ*' 'WWZ*' 'TTZToLLNuNu_M-10_TuneCUETP8M1_13TeV-amcatnlo-pythia8' 'ZZTo4L_*Jets_ZZOnShell_13TeV-amcatnloFXFX-madspin-pythia8' 'VBFToHiggs0PMContinToZZTo*' "$EXTRA_SIGNALS" --filesPerJob 2 -o /data/nawoods/uwvvZZ_mc_eRhoResUp_"$JOBID".sh UWVVZZ_MC_ERHORESUP_"$JOBID" Ntuplizer/test/ntuplize_cfg.py channels='eeee,eemm' isMC=1 eCalib=1 muCalib=1 lheWeights=0 eRhoResShift=1 globalTag="$GT_MC" genLeptonType=dressedHPFS
 
             if [ "$NO_SUB" == '' ]
             then
@@ -287,7 +287,7 @@ then
             fi
 
             # EER- (rho)
-            python Utilities/scripts/submitJobs.py --campaign 'RunIISummer16MiniAODv2-PUMoriond17_80X_mcRun2_asymptotic_2016_TrancheIV_v6*' --samples 'ZZTo4L_13TeV*' 'GluGluHToZZTo4L_M125_13TeV_powheg*' 'GluGlu*ZZ*DefaultShower*' 'GluGluToContinToZZTo2e2tau*' 'GluGluToContinToZZTo2mu2tau*' 'ZZJJTo4L*' 'WZZ*' 'ZZZ*' 'WWZ*' 'TTZToLLNuNu_M-10_TuneCUETP8M1_13TeV-amcatnlo-pythia8' "$EXTRA_SIGNALS" --filesPerJob 2 -o /data/nawoods/uwvvZZ_mc_eRhoResDn_"$JOBID".sh UWVVZZ_MC_ERHORESDN_"$JOBID" Ntuplizer/test/ntuplize_cfg.py channels='eeee,eemm' isMC=1 eCalib=1 muCalib=1 lheWeights=0 eRhoResShift=-1 globalTag="$GT_MC" genLeptonType=dressedHPFS
+            python Utilities/scripts/submitJobs.py --campaign 'RunIISummer16MiniAODv2-PUMoriond17*_80X_mcRun2_asymptotic_2016_TrancheIV_v6*' --samples 'ZZTo4L_13TeV*pythia8' 'GluGluHToZZTo4L_M125_13TeV_powheg*' 'GluGlu*ZZ*DefaultShower*' 'GluGluToContinToZZTo2e2tau*' 'GluGluToContinToZZTo2mu2tau*' 'ZZJJTo4L*' 'WZZ*' 'ZZZ*' 'WWZ*' 'TTZToLLNuNu_M-10_TuneCUETP8M1_13TeV-amcatnlo-pythia8' 'ZZTo4L_*Jets_ZZOnShell_13TeV-amcatnloFXFX-madspin-pythia8' 'VBFToHiggs0PMContinToZZTo*' "$EXTRA_SIGNALS" --filesPerJob 2 -o /data/nawoods/uwvvZZ_mc_eRhoResDn_"$JOBID".sh UWVVZZ_MC_ERHORESDN_"$JOBID" Ntuplizer/test/ntuplize_cfg.py channels='eeee,eemm' isMC=1 eCalib=1 muCalib=1 lheWeights=0 eRhoResShift=-1 globalTag="$GT_MC" genLeptonType=dressedHPFS
 
             if [ "$NO_SUB" == '' ]
             then
@@ -295,7 +295,7 @@ then
             fi
 
             # EER+ (phi)
-            python Utilities/scripts/submitJobs.py --campaign 'RunIISummer16MiniAODv2-PUMoriond17_80X_mcRun2_asymptotic_2016_TrancheIV_v6*' --samples 'ZZTo4L_13TeV*' 'GluGluHToZZTo4L_M125_13TeV_powheg*' 'GluGlu*ZZ*DefaultShower*' 'GluGluToContinToZZTo2e2tau*' 'GluGluToContinToZZTo2mu2tau*' 'ZZJJTo4L*' 'WZZ*' 'ZZZ*' 'WWZ*' 'TTZToLLNuNu_M-10_TuneCUETP8M1_13TeV-amcatnlo-pythia8' "$EXTRA_SIGNALS" --filesPerJob 2 -o /data/nawoods/uwvvZZ_mc_ePhiResUp_"$JOBID".sh UWVVZZ_MC_EPHIRESUP_"$JOBID" Ntuplizer/test/ntuplize_cfg.py channels='eeee,eemm' isMC=1 eCalib=1 muCalib=1 lheWeights=0 ePhiResShift=1 globalTag="$GT_MC" genLeptonType=dressedHPFS
+            python Utilities/scripts/submitJobs.py --campaign 'RunIISummer16MiniAODv2-PUMoriond17*_80X_mcRun2_asymptotic_2016_TrancheIV_v6*' --samples 'ZZTo4L_13TeV*pythia8' 'GluGluHToZZTo4L_M125_13TeV_powheg*' 'GluGlu*ZZ*DefaultShower*' 'GluGluToContinToZZTo2e2tau*' 'GluGluToContinToZZTo2mu2tau*' 'ZZJJTo4L*' 'WZZ*' 'ZZZ*' 'WWZ*' 'TTZToLLNuNu_M-10_TuneCUETP8M1_13TeV-amcatnlo-pythia8' 'ZZTo4L_*Jets_ZZOnShell_13TeV-amcatnloFXFX-madspin-pythia8' 'VBFToHiggs0PMContinToZZTo*' "$EXTRA_SIGNALS" --filesPerJob 2 -o /data/nawoods/uwvvZZ_mc_ePhiResUp_"$JOBID".sh UWVVZZ_MC_EPHIRESUP_"$JOBID" Ntuplizer/test/ntuplize_cfg.py channels='eeee,eemm' isMC=1 eCalib=1 muCalib=1 lheWeights=0 ePhiResShift=1 globalTag="$GT_MC" genLeptonType=dressedHPFS
 
             if [ "$NO_SUB" == '' ]
             then
@@ -303,7 +303,7 @@ then
             fi
 
             # MES/MER+
-            python Utilities/scripts/submitJobs.py --campaign 'RunIISummer16MiniAODv2-PUMoriond17_80X_mcRun2_asymptotic_2016_TrancheIV_v6*' --samples 'ZZTo4L_13TeV*' 'GluGluHToZZTo4L_M125_13TeV_powheg*' 'GluGlu*ZZ*DefaultShower*' 'GluGluToContinToZZTo2e2tau*' 'GluGluToContinToZZTo2mu2tau*' 'ZZJJTo4L*' 'WZZ*' 'ZZZ*' 'WWZ*' 'TTZToLLNuNu_M-10_TuneCUETP8M1_13TeV-amcatnlo-pythia8' "$EXTRA_SIGNALS" --filesPerJob 2 -o /data/nawoods/uwvvZZ_mc_mClosureUp_"$JOBID".sh UWVVZZ_MC_MCLOSUREUP_"$JOBID" Ntuplizer/test/ntuplize_cfg.py channels='eemm,mmmm' isMC=1 eCalib=1 muCalib=1 lheWeights=0 mClosureShift=1 globalTag="$GT_MC" genLeptonType=dressedHPFS
+            python Utilities/scripts/submitJobs.py --campaign 'RunIISummer16MiniAODv2-PUMoriond17*_80X_mcRun2_asymptotic_2016_TrancheIV_v6*' --samples 'ZZTo4L_13TeV*pythia8' 'GluGluHToZZTo4L_M125_13TeV_powheg*' 'GluGlu*ZZ*DefaultShower*' 'GluGluToContinToZZTo2e2tau*' 'GluGluToContinToZZTo2mu2tau*' 'ZZJJTo4L*' 'WZZ*' 'ZZZ*' 'WWZ*' 'TTZToLLNuNu_M-10_TuneCUETP8M1_13TeV-amcatnlo-pythia8' 'ZZTo4L_*Jets_ZZOnShell_13TeV-amcatnloFXFX-madspin-pythia8' 'VBFToHiggs0PMContinToZZTo*' "$EXTRA_SIGNALS" --filesPerJob 2 -o /data/nawoods/uwvvZZ_mc_mClosureUp_"$JOBID".sh UWVVZZ_MC_MCLOSUREUP_"$JOBID" Ntuplizer/test/ntuplize_cfg.py channels='eemm,mmmm' isMC=1 eCalib=1 muCalib=1 lheWeights=0 mClosureShift=1 globalTag="$GT_MC" genLeptonType=dressedHPFS
 
             if [ "$NO_SUB" == '' ]
             then
@@ -311,7 +311,7 @@ then
             fi
 
             # MES/MER-
-            python Utilities/scripts/submitJobs.py --campaign 'RunIISummer16MiniAODv2-PUMoriond17_80X_mcRun2_asymptotic_2016_TrancheIV_v6*' --samples 'ZZTo4L_13TeV*' 'GluGluHToZZTo4L_M125_13TeV_powheg*' 'GluGlu*ZZ*DefaultShower*' 'GluGluToContinToZZTo2e2tau*' 'GluGluToContinToZZTo2mu2tau*' 'ZZJJTo4L*' 'WZZ*' 'ZZZ*' 'WWZ*' 'TTZToLLNuNu_M-10_TuneCUETP8M1_13TeV-amcatnlo-pythia8' "$EXTRA_SIGNALS" --filesPerJob 2 -o /data/nawoods/uwvvZZ_mc_mClosureDn_"$JOBID".sh UWVVZZ_MC_MCLOSUREDN_"$JOBID" Ntuplizer/test/ntuplize_cfg.py channels='eemm,mmmm' isMC=1 eCalib=1 muCalib=1 lheWeights=0 mClosureShift=-1 globalTag="$GT_MC" genLeptonType=dressedHPFS
+            python Utilities/scripts/submitJobs.py --campaign 'RunIISummer16MiniAODv2-PUMoriond17*_80X_mcRun2_asymptotic_2016_TrancheIV_v6*' --samples 'ZZTo4L_13TeV*pythia8' 'GluGluHToZZTo4L_M125_13TeV_powheg*' 'GluGlu*ZZ*DefaultShower*' 'GluGluToContinToZZTo2e2tau*' 'GluGluToContinToZZTo2mu2tau*' 'ZZJJTo4L*' 'WZZ*' 'ZZZ*' 'WWZ*' 'TTZToLLNuNu_M-10_TuneCUETP8M1_13TeV-amcatnlo-pythia8' 'ZZTo4L_*Jets_ZZOnShell_13TeV-amcatnloFXFX-madspin-pythia8' 'VBFToHiggs0PMContinToZZTo*' "$EXTRA_SIGNALS" --filesPerJob 2 -o /data/nawoods/uwvvZZ_mc_mClosureDn_"$JOBID".sh UWVVZZ_MC_MCLOSUREDN_"$JOBID" Ntuplizer/test/ntuplize_cfg.py channels='eemm,mmmm' isMC=1 eCalib=1 muCalib=1 lheWeights=0 mClosureShift=-1 globalTag="$GT_MC" genLeptonType=dressedHPFS
 
             if [ "$NO_SUB" == '' ]
             then
