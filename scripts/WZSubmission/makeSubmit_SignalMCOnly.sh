@@ -10,7 +10,7 @@ ${uwvv}/Utilities/scripts/submitJobs.py \
     --campaign "RunIISummer16MiniAODv2-PUMoriond17_80X_mcRun2_asymptotic_2016_TrancheIV_v6-v1" \
     --samples \
         "WZTo3LNu_3Jets_MLL-50_TuneCUETP8M1_13TeV-madgraphMLM-pythia8" \
-   --filesPerJob 3 \
+   --filesPerJob 1 \
     UWVVNtuples_WZSignalMonteCarlo_$DATE \
     $uwvv/Ntuplizer/test/ntuplize_cfg.py \
         channels=wz \
@@ -18,6 +18,6 @@ ${uwvv}/Utilities/scripts/submitJobs.py \
         eCalib=1 
         muCalib=1 \
         lheWeights=3 \
-        globalTag=80X_mcRun2_asymptotic_2016_TrancheIV_v7 \
+        globalTag=80X_mcRun2_asymptotic_2016_TrancheIV_v8 \
 chmod +x $CMSSW_BASE/src/UWVV/scripts/WZSubmission/GeneratedScripts/submitWZSignalMonteCarlo_$DATE.sh
 $CMSSW_BASE/src/UWVV/scripts/WZSubmission/GeneratedScripts/submitWZSignalMonteCarlo_$DATE.sh

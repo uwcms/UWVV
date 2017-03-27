@@ -43,11 +43,13 @@ def getUnitsPerJob(ds):
         # Data is split by lumisection
         # The difference is due to trigger rates
         if 'Double' in ds:
-            return 200
+            return 150
         elif 'MuonEG' in ds:
-            return 400
+            return 300
+        elif 'SingleElectron':
+            return 100
         else:
-            return 200
+            return 150
     else:
         return 10
 
@@ -105,6 +107,8 @@ config.Data.useParent = False
 config.Data.publication = False
 outdir = localSettings.get("local", "outLFNDirBase").replace(
     "$USER", getUsernameFromSiteDB()).replace("$DATE", today)
+# Useful for VBFNLO samples
+#config.Site.whitelist = ['T2_DE_DESY']
 config.Data.outLFNDirBase = outdir 
 config.Data.ignoreLocality = False
 
