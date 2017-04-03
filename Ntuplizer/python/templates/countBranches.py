@@ -21,20 +21,12 @@ wzCountBranches = cms.PSet(
                                   'userInt("nWWLooseElec") : 999'),
         nWWLooseCBVIDMedElec = cms.string('? hasUserInt("nWWLooseCBVIDMedElec") ? '
                                           'userInt("nWWLooseCBVIDMedElec") : 999'),
-        nTightMuon = cms.string('? hasUserInt("nTightMuon") ? '
-                                'userInt("nTightMuon") : 999'),
-        nMediumMuonICHEP = cms.string('? hasUserInt("nMediumMuonICHEP") ? '
-                                      'userInt("nMediumMuonICHEP") : 999'),
+        nWZTightMuon = cms.string('? hasUserInt("nWZTightMuon") ? '
+                                   'userInt("nWZTightMuon") : 999'),
         nWZMediumMuon = cms.string('? hasUserInt("nWZMediumMuon") ? '
                                    'userInt("nWZMediumMuon") : 999'),
         nWZLooseMuon = cms.string('? hasUserInt("nWZLooseMuon") ? '
                                   'userInt("nWZLooseMuon") : 999'),
-        nJetJPL = cms.string('? hasUserInt("nJetJPL") ? '
-                              'userInt("nJetJPL") : 999'),
-        nJetJPM = cms.string('? hasUserInt("nJetJPM") ? ' 
-                              'userInt("nJetJPM") : -999'),
-        nJetJPT = cms.string('? hasUserInt("nJetJPT") ? '
-                              'userInt("nJetJPT") : -999'),
         nJetCSVv2L = cms.string('? hasUserInt("nJetCSVv2L") ? '
                               'userInt("nJetCSVv2L") : -999'),
         nJetCSVv2M = cms.string('? hasUserInt("nJetCSVv2M") ? '

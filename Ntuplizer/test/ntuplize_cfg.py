@@ -371,6 +371,7 @@ flow = FlowClass('flow', process, **flowOpts)
 process.metaInfo = cms.EDAnalyzer(
     'MetaTreeGenerator',
     eventParams = makeEventParams(flow.finalTags()),
+    datasetName = cms.string(options.datasetName),
     )
 process.metaTreePath = cms.Path(process.metaInfo)
 process.schedule.append(process.metaTreePath)

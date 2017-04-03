@@ -28,13 +28,13 @@ class WZID(AnalysisFlowBase):
         return 'userInt("isWZMediumMuon") && ' \
                'pt() > 10 && abs(eta) < 2.4'
     def getWZTightMuonID(self):
-        return 'userInt("isTightMuon") && ' \
+        return 'userInt("isWZTightMuon") && ' \
                'pt() > 10 && abs(eta) < 2.4'
     def getWZLooseElectronID(self):
-        return 'userFloat("IsCBVIDVeto") && ' \
+        return 'userFloat("IsCBVIDVetowIP") && ' \
                'pt() > 10 && abs(eta) < 2.5'
     def getWZTightElectronID(self):
-        return 'userFloat("IsCBVIDTight") && ' \
+        return 'userFloat("IsCBVIDTightwIP") && ' \
                'pt() > 10 && abs(eta) < 2.5'
     def getPOGElectronIPCut(self):
         return '(? isEB ? userFloat("dxy") < 0.05 : userFloat("dxy") < 0.1)'
