@@ -14,10 +14,10 @@ class WZLeptonCounters(AnalysisFlowBase):
         step = super(WZLeptonCounters, self).makeAnalysisStep(stepName, **inputs)
         
         if stepName == 'initialStateEmbedding':
-            muCounters = {"TightMuon" : 'pt() > 10 && abs(eta) < 2.4 && userInt("isTightMuon")',
-                    "MediumMuonICHEP" : 'pt() > 10 && abs(eta) < 2.4 && userInt("isMediumMuonICHEP")',
-                    "WZLooseMuon"   : self.getWZLooseMuonID(),
-                    "WZMediumMuon"   : self.getWZMediumMuonID(),
+            muCounters = {
+                "WZLooseMuon"   : self.getWZLooseMuonID(),
+                "WZMediumMuon"   : self.getWZMediumMuonID(),
+                "WZTightMuon"   : self.getWZTightMuonID(),
             }
                          
             mod = cms.EDProducer(

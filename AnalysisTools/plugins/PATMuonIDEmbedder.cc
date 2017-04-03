@@ -28,6 +28,8 @@ private:
   virtual void produce(edm::Event& iEvent, const edm::EventSetup& iSetup);
   void endJob() {}
 
+  bool isWZTightMuon(const pat::Muon& patMu, const reco::Vertex& pv);
+  bool isWZTightMuonNoIso(const pat::Muon& patMu, const reco::Vertex& pv);
   bool isMediumMuonICHEP(const reco::Muon& recoMu);
   bool isWZMediumMuon(const pat::Muon& patMu, const reco::Vertex& pv);
   bool isWZMediumMuonNoIso(const pat::Muon& patMu, const reco::Vertex& pv);
@@ -69,6 +71,8 @@ void MuonIdEmbedder::produce(edm::Event& iEvent, const edm::EventSetup& iSetup)
     newObj.addUserInt("isMediumMuonICHEP", isMediumMuonICHEP(obj));
     newObj.addUserInt("isWZMediumMuon", isWZMediumMuon(obj, pv));
     newObj.addUserInt("isWZMediumMuonNoIso", isWZMediumMuonNoIso(obj, pv));
+    newObj.addUserInt("isWZTightMuon", isWZTightMuon(obj, pv));
+    newObj.addUserInt("isWZTightMuonNoIso", isWZTightMuonNoIso(obj, pv));
     newObj.addUserInt("isWZLooseMuon", isWZLooseMuon(obj));
     newObj.addUserInt("isWZLooseMuonNoIso", isWZLooseMuonNoIso(obj));
     newObj.addUserInt("isSoftMuon", obj.isSoftMuon(pv));
@@ -118,10 +122,17 @@ bool MuonIdEmbedder::isWZLooseMuonNoIso(const pat::Muon& patMu)
   }
 bool MuonIdEmbedder::isWZMediumMuonNoIso(const pat::Muon& patMu, const reco::Vertex& pv) 
   {
-    double dxy = std::abs(patMu.innerTrack()->dxy(pv.position()));
     return isWZLooseMuonNoIso(patMu) && 
-        ( patMu.pt() > 20. ? dxy < 0.02 : dxy < 0.01 ) &&
+        std::abs(patMu.innerTrack()->dxy(pv.position())) < 0.02 &&
         std::abs(patMu.innerTrack()->dz(pv.position())) < 0.1;
+  }
+bool MuonIdEmbedder::isWZTightMuon(const pat::Muon& patMu, const reco::Vertex& pv) 
+  {
+    return patMu.isTightMuon(pv) && isWZMediumMuon(patMu, pv);
+  }
+bool MuonIdEmbedder::isWZTightMuonNoIso(const pat::Muon& patMu, const reco::Vertex& pv) 
+  {
+    return patMu.isTightMuon(pv) && isWZMediumMuonNoIso(patMu, pv);
   }
 bool MuonIdEmbedder::isWZMediumMuon(const pat::Muon& patMu, const reco::Vertex& pv) 
   {
