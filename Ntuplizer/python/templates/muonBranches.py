@@ -37,13 +37,12 @@ muonBranches = cms.PSet(
         BestTrackType = cms.string('BestTrackType'),
         ),
     bools = cms.PSet(
-        IsPFMuon = cms.string('IsPFMuon'),
-        IsGlobal = cms.string('IsGlobal'),
-        IsTracker = cms.string('IsTracker'),
+        IsPFMuon = cms.string('isPFMuon'),
+        IsGlobal = cms.string('isGlobalMuon'),
+        IsTracker = cms.string('isTrackerMuon'),
         IsLoose = cms.string('isLooseMuon'),
         IsMedium = cms.string('isMediumMuon'),
-        IsTight = cms.string('? hasUserInt("isTightMuon") ? '
-                                 'userInt("isTightMuon") : 0'),
+        IsTight = cms.string('userInt("isTightMuon")'),
         IsMediumICHEP = cms.string('? hasUserInt("isMediumMuonICHEP") ?'
                                        'userInt("isMediumMuonICHEP") : 0'),
         IsWZMedium = cms.string('? hasUserInt("isWZMediumMuon") ?'

@@ -1091,28 +1091,6 @@ namespace
     };
 
   template<>
-    struct ObjectFunctionList<bool, pat::Muon>
-    {
-      // cheating with typedefs for standardization
-      typedef pat::Muon T;
-      typedef bool B;
-      typedef B (FType) (const edm::Ptr<T>&, uwvv::EventInfo&, const std::string&);
-
-      static void
-        addFunctions(std::unordered_map<std::string, std::function<FType> >& addTo)
-      {
-        addTo["IsPFMuon"] =
-          std::function<FType>([](const edm::Ptr<T>& obj, uwvv::EventInfo& evt, const std::string& option){return obj->isPFMuon();});
-
-        addTo["IsGlobal"] =
-          std::function<FType>([](const edm::Ptr<T>& obj, uwvv::EventInfo& evt, const std::string& option){return obj->isGlobalMuon();});
-
-        addTo["IsTracker"] =
-          std::function<FType>([](const edm::Ptr<T>& obj, uwvv::EventInfo& evt, const std::string& option){return obj->isTrackerMuon();});
-      }
-    };
-
-  template<>
     struct ObjectFunctionList<unsigned, pat::Muon>
     {
       // cheating with typedefs for standardization

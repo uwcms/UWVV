@@ -18,11 +18,11 @@ class WZCrossCleaning(AnalysisFlowBase):
                 '', # no further basic selection here
                 e={
                     'deltaR' : 0.4,
-                    'selection' : self.getWZLooseElectronID(),
+                    'selection' : self.getWZTightElectronID(),
                     },
                 m={
                     'deltaR' : 0.4,
-                    'selection' : self.getWZLooseMuonID(),
+                    'selection' : self.getWZTightMuonID(),
                     },
                 )
 
@@ -32,11 +32,11 @@ class WZCrossCleaning(AnalysisFlowBase):
                     '', # no further basic selection here
                     e={
                         'deltaR' : 0.4,
-                        'selection' : self.getWZLooseElectronID(),
+                        'selection' : self.getWZTightElectronID(),
                         },
                     m={
                         'deltaR' : 0.4,
-                        'selection' : self.getWZLooseMuonID(),
+                        'selection' : self.getWZTightMuonID(),
                         },
                     )
                 step.addCrossSelector(
@@ -44,11 +44,11 @@ class WZCrossCleaning(AnalysisFlowBase):
                     '', # no further basic selection here
                     e={
                         'deltaR' : 0.4,
-                        'selection' : self.getWZLooseElectronID(),
+                        'selection' : self.getWZTightElectronID(),
                         },
                     m={
                         'deltaR' : 0.4,
-                        'selection' : self.getWZLooseMuonID(),
+                        'selection' : self.getWZTightMuonID(),
                         },
                     )
                 step.addCrossSelector(
@@ -56,11 +56,11 @@ class WZCrossCleaning(AnalysisFlowBase):
                     '', # no further basic selection here
                     e={
                         'deltaR' : 0.4,
-                        'selection' : self.getWZLooseElectronID(),
+                        'selection' : self.getWZTightElectronID(),
                         },
                     m={
                         'deltaR' : 0.4,
-                        'selection' : self.getWZLooseMuonID(),
+                        'selection' : self.getWZTightMuonID(),
                       },
                     )
                 step.addCrossSelector(
@@ -68,11 +68,11 @@ class WZCrossCleaning(AnalysisFlowBase):
                     '', # no further basic selection here
                     e={
                         'deltaR' : 0.4,
-                        'selection' : self.getWZLooseElectronID(),
+                        'selection' : self.getWZTightElectronID(),
                         },
                     m={
                         'deltaR' : 0.4,
-                        'selection' : self.getWZLooseMuonID(),
+                        'selection' : self.getWZTightMuonID(),
                       },
                     )
 

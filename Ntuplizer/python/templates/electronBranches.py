@@ -55,7 +55,6 @@ electronBranches = cms.PSet(
                                               '(1-isGap) * userFloat("effScaleFactorError") :'
                                               '0.'),
 
-        MtToMET = cms.string('mtToMET'),
         ),
 
     uints = cms.PSet(

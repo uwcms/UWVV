@@ -75,9 +75,7 @@ MetaTreeGenerator::MetaTreeGenerator(const edm::ParameterSet& config) :
   usesResource("TFileService");
   edm::Service<TFileService> FS;
   auto dir = FS->mkdir("datasetName");
-  std::cout << "datasetName is " << datasetName << std::endl;
   dir.make<TObjString>(datasetName.c_str());
-  std::cout << "Here we are" << std::endl;
 }
 
 
