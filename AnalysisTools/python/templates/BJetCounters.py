@@ -20,7 +20,7 @@ class BJetCounters(AnalysisFlowBase):
                 "CSVv2L" : '? bDiscriminator("pfCombinedInclusiveSecondaryVertexV2BJetTags")>0.460 ? 1 : 0',
                 "CSVv2M" : '? bDiscriminator("pfCombinedInclusiveSecondaryVertexV2BJetTags")>0.800 ? 1 : 0',
                 "CSVv2T" : '? bDiscriminator("pfCombinedInclusiveSecondaryVertexV2BJetTags")>0.935 ? 1 : 0',
-                "CMVAv2L" : '? bDiscriminator("pfCombinedMVAV2BJetTags")>-0.715 ? 1 : 0',
+                "CMVAv2L" : '? bDiscriminator("pfCombinedMVAV2BJetTags")>-0.5884 ? 1 : 0',
                 "CMVAv2M" : '? bDiscriminator("pfCombinedMVAV2BJetTags")>0.185 ? 1 : 0',
                 "CMVAv2T" : '? bDiscriminator("pfCombinedMVAV2BJetTags")>0.875 ? 1 : 0',
             }
