@@ -17,9 +17,12 @@ eventBranches = cms.PSet(
         jetPt = cms.vstring('jetPt'),
         jetEta = cms.vstring('jetEta'),
         jetPhi = cms.vstring('jetPhi'),
+        jetCSVv2 = cms.vstring('jetCSVv2'),
+        jetCMVAv2 = cms.vstring('jetCMVAv2'),
         ),
     vInts = cms.PSet(
         jetPUID = cms.vstring('jetPUID'),
+        jetHadronFlavor = cms.vstring('jetHadronFlavor'),
         ),
     bools = cms.PSet(
         pvIsValid = cms.string('pvIsValid'),

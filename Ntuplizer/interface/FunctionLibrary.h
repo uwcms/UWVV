@@ -112,6 +112,34 @@ namespace
 
                                  return out;
                                });
+        
+        addTo["jetCSVv2"] =
+          std::function<FType>([](const edm::Ptr<T>& obj, uwvv::EventInfo& evt, const std::string& option)
+                               {
+                                 std::vector<float> out;
+
+                                 for(size_t i = 0; i < evt.jets(option)->size(); ++i)
+                                   {
+                                     const pat::Jet& j = evt.jets(option)->at(i);
+                                     out.push_back(j.bDiscriminator("pfCombinedInclusiveSecondaryVertexV2BJetTags"));
+                                   }
+
+                                 return out;
+                               });
+
+        addTo["jetCMVAv2"] =
+          std::function<FType>([](const edm::Ptr<T>& obj, uwvv::EventInfo& evt, const std::string& option)
+                               {
+                                 std::vector<float> out;
+
+                                 for(size_t i = 0; i < evt.jets(option)->size(); ++i)
+                                   {
+                                     const pat::Jet& j = evt.jets(option)->at(i);
+                                     out.push_back(j.bDiscriminator("pfCombinedMVAV2BJetTags"));
+                                   }
+
+                                 return out;
+                               });
 
         addTo["genJetPt"] =
           std::function<FType>([](const edm::Ptr<T>& obj, uwvv::EventInfo& evt, const std::string& option)
@@ -232,6 +260,20 @@ namespace
       addFunctions(std::unordered_map<std::string, std::function<std::vector<int>(const edm::Ptr<T>&, uwvv::EventInfo&, const std::string&)> >& addTo)
       {
         typedef std::vector<int> (FType) (const edm::Ptr<T>&, uwvv::EventInfo&, const std::string&);
+
+        addTo["jetHadronFlavor"] =
+          std::function<FType>([](const edm::Ptr<T>& obj, uwvv::EventInfo& evt, const std::string& option)
+                               {
+                                 std::vector<int> out;
+
+                                 for(size_t i = 0; i < evt.jets(option)->size(); ++i)
+                                   {
+                                     const pat::Jet& j = evt.jets(option)->at(i);
+                                     out.push_back(j.hadronFlavour());
+                                   }
+
+                                 return out;
+                               });
 
         addTo["jetPUID"] =
           std::function<FType>([](const edm::Ptr<T>& obj, uwvv::EventInfo& evt, const std::string& option)
