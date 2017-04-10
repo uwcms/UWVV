@@ -18,6 +18,10 @@
 #include "DataFormats/PatCandidates/interface/Electron.h"
 #include "DataFormats/PatCandidates/interface/Muon.h"
 #include "DataFormats/PatCandidates/interface/Jet.h"
+#include "DataFormats/PatCandidates/interface/CompositeCandidate.h"
+
+#include "UWVV/DataFormats/interface/DressedGenParticle.h"
+
 
 
 template<class T>
@@ -124,12 +128,36 @@ void PATObjectPrinter<pat::Jet>::anythingElse(const pat::Jet& cand) const
 }
 
 
+template<>
+void PATObjectPrinter<DressedGenParticle>::anythingElse(const DressedGenParticle& cand) const
+{
+  std::cout << " nPho: " << cand.numAssociated() << " undressedPt: " << cand.undressedPt();
+}
+
+
+template<>
+void PATObjectPrinter<pat::CompositeCandidate>::anythingElse(const pat::CompositeCandidate& cand) const
+{
+  std::cout << " nDau: " << cand.numberOfDaughters();
+
+  for(size_t i = 0; i < cand.numberOfDaughters(); ++i)
+    {
+      std::cout << " dau" << i << " ID: " << cand.daughter(i)->pdgId()
+                << " Pt: " << cand.daughter(i)->pt();
+    }
+}
+
+
 
 typedef PATObjectPrinter<pat::Jet> JetPrinter;
 typedef PATObjectPrinter<pat::Electron> ElectronPrinter;
 typedef PATObjectPrinter<pat::Muon> MuonPrinter;
+typedef PATObjectPrinter<DressedGenParticle> DressedGenParticlePrinter;
+typedef PATObjectPrinter<pat::CompositeCandidate> CompositeCandidatePrinter;
 
 
 DEFINE_FWK_MODULE(JetPrinter);
 DEFINE_FWK_MODULE(ElectronPrinter);
 DEFINE_FWK_MODULE(MuonPrinter);
+DEFINE_FWK_MODULE(DressedGenParticlePrinter);
+DEFINE_FWK_MODULE(CompositeCandidatePrinter);
