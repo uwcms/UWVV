@@ -117,6 +117,7 @@ void GenZZCleaner::produce(edm::Event& iEvent,
         continue;
 
       bestDZ = betterDZ;
+      bestCand = 9999; // don't use previous best even if this one fails
 
       if(mZ1 < z1MassMin || mZ1 > z1MassMax)
         continue;
