@@ -7,6 +7,7 @@ import subprocess
 import sys
 import datetime
 import glob
+import hashlib
 
 settingsFile = "local.txt"
 if not os.path.exists(settingsFile):
