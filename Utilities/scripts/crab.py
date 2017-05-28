@@ -46,9 +46,9 @@ def getUnitsPerJob(ds):
         if 'Double' in ds:
             return 150
         elif 'MuonEG' in ds:
-            return 300
-        elif 'SingleElectron':
-            return 100
+            return 150
+        elif 'Single' in ds:
+            return 80
         else:
             return 150
     else:
@@ -81,6 +81,11 @@ else:
     # Since a PD will have several eras, add conditions to name to differentiate
     config.General.requestName = '_'.join([campaign_name, primaryDS, conditions])
     config.Data.lumiMask ='/afs/cern.ch/cms/CAF/CMSCOMM/COMM_DQM/certification/Collisions16/13TeV/ReReco/Final/Cert_271036-284044_13TeV_23Sep2016ReReco_Collisions16_JSON.txt'
+    # Comment out in the (hopefully very rare) case where resubmit needs to 
+    # be done manually
+    #config.General.requestName = '_'.join([campaign_name, primaryDS, conditions, "resubmit"])
+    #config.Data.lumiMask ='crab_%s/results/notFinishedLumis.json' % config.General.requestName 
+    
     config.Data.splitting = 'LumiBased'
     config.Data.unitsPerJob = getUnitsPerJob(primaryDS)
 
