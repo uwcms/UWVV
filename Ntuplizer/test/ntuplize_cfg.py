@@ -167,6 +167,9 @@ process.source = cms.Source(
     inputCommands = cms.untracked.vstring('keep *', 'drop LHERunInfoProduct_*_*_*'),
     fileNames = cms.untracked.vstring(options.inputFiles),
     skipEvents = cms.untracked.uint32(options.skipEvents),
+    # Example of how to select specific lumi/event
+    #eventsToProcess = cms.untracked.VEventRange('283820:801177218'),
+    #lumisToProcess = cms.untracked.VLuminosityBlockRange('283820:457'),
     )
 
 if options.lumiMask:
