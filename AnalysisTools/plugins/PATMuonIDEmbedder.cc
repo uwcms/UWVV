@@ -29,12 +29,11 @@ private:
   void endJob() {}
 
   bool isWZTightMuon(const pat::Muon& patMu, const reco::Vertex& pv);
-  bool isWZTightMuonNoIso(const pat::Muon& patMu, const reco::Vertex& pv);
   bool isMediumMuonICHEP(const reco::Muon& recoMu);
   bool isWZMediumMuon(const pat::Muon& patMu, const reco::Vertex& pv);
-  bool isWZMediumMuonNoIso(const pat::Muon& patMu, const reco::Vertex& pv);
-  bool isWZLooseMuon(const pat::Muon& patMu);
-  bool isWZLooseMuonNoIso(const pat::Muon& patMu);
+  bool isWZTightMuonNoIso(const pat::Muon& patMu, const reco::Vertex& pv);
+  bool isWZLooseMuon(const pat::Muon& patMu, const reco::Vertex& pv);
+  bool isWZLooseMuonNoIso(const pat::Muon& patMu, const reco::Vertex& pv);
   bool isSoftMuonICHEP(const reco::Muon& recoMu, const reco::Vertex& pv);
 
   // Data
@@ -70,11 +69,10 @@ void MuonIdEmbedder::produce(edm::Event& iEvent, const edm::EventSetup& iSetup)
     newObj.addUserInt("isTightMuon", obj.isTightMuon(pv));
     newObj.addUserInt("isMediumMuonICHEP", isMediumMuonICHEP(obj));
     newObj.addUserInt("isWZMediumMuon", isWZMediumMuon(obj, pv));
-    newObj.addUserInt("isWZMediumMuonNoIso", isWZMediumMuonNoIso(obj, pv));
     newObj.addUserInt("isWZTightMuon", isWZTightMuon(obj, pv));
     newObj.addUserInt("isWZTightMuonNoIso", isWZTightMuonNoIso(obj, pv));
-    newObj.addUserInt("isWZLooseMuon", isWZLooseMuon(obj));
-    newObj.addUserInt("isWZLooseMuonNoIso", isWZLooseMuonNoIso(obj));
+    newObj.addUserInt("isWZLooseMuon", isWZLooseMuon(obj, pv));
+    newObj.addUserInt("isWZLooseMuonNoIso", isWZLooseMuonNoIso(obj, pv));
     newObj.addUserInt("isSoftMuon", obj.isSoftMuon(pv));
     newObj.addUserInt("isSoftMuonICHEP", isSoftMuonICHEP(obj,pv));
     newObj.addUserInt("isHighPtMuon", obj.isHighPtMuon(pv));
@@ -105,7 +103,7 @@ bool MuonIdEmbedder::isMediumMuonICHEP(const reco::Muon & recoMu)
                     muon::segmentCompatibility(recoMu) > (goodGlob ? 0.303 : 0.451); 
     return isMedium; 
   }
-bool MuonIdEmbedder::isWZLooseMuon(const pat::Muon& patMu) 
+bool MuonIdEmbedder::isWZLooseMuon(const pat::Muon& patMu, const reco::Vertex& pv) 
   {
     reco::MuonPFIsolation pfIsoDB04 = patMu.pfIsolationR04();
     float muIso = (pfIsoDB04.sumChargedHadronPt
@@ -113,26 +111,30 @@ bool MuonIdEmbedder::isWZLooseMuon(const pat::Muon& patMu)
                             + pfIsoDB04.sumPhotonEt
                             - 0.5*pfIsoDB04.sumPUPt)
                   ) / patMu.pt();
-    return isWZLooseMuonNoIso(patMu) && muIso < 0.4;
+    return isWZLooseMuonNoIso(patMu, pv) && muIso < 0.4;
   }
-bool MuonIdEmbedder::isWZLooseMuonNoIso(const pat::Muon& patMu) 
+bool MuonIdEmbedder::isWZLooseMuonNoIso(const pat::Muon& patMu, const reco::Vertex& pv) 
   {
     return isMediumMuonICHEP(patMu) && 
-        patMu.trackIso()/patMu.pt() < 0.4;
-  }
-bool MuonIdEmbedder::isWZMediumMuonNoIso(const pat::Muon& patMu, const reco::Vertex& pv) 
-  {
-    return isWZLooseMuonNoIso(patMu) && 
         std::abs(patMu.innerTrack()->dxy(pv.position())) < 0.02 &&
-        std::abs(patMu.innerTrack()->dz(pv.position())) < 0.1;
+        std::abs(patMu.innerTrack()->dz(pv.position())) < 0.1 &&
+        patMu.trackIso()/patMu.pt() < 0.4;
   }
 bool MuonIdEmbedder::isWZTightMuon(const pat::Muon& patMu, const reco::Vertex& pv) 
   {
-    return patMu.isTightMuon(pv) && isWZMediumMuon(patMu, pv);
+    reco::MuonPFIsolation pfIsoDB04 = patMu.pfIsolationR04();
+    float muIso = (pfIsoDB04.sumChargedHadronPt
+                        + std::max(0., pfIsoDB04.sumNeutralHadronEt
+                            + pfIsoDB04.sumPhotonEt
+                            - 0.5*pfIsoDB04.sumPUPt)
+                  ) / patMu.pt();
+    return isWZTightMuonNoIso(patMu, pv) && muIso < 0.15;
   }
 bool MuonIdEmbedder::isWZTightMuonNoIso(const pat::Muon& patMu, const reco::Vertex& pv) 
   {
-    return patMu.isTightMuon(pv) && isWZMediumMuonNoIso(patMu, pv);
+    return patMu.isTightMuon(pv) && 
+        std::abs(patMu.innerTrack()->dxy(pv.position())) < 0.02 &&
+        std::abs(patMu.innerTrack()->dz(pv.position())) < 0.1;
   }
 bool MuonIdEmbedder::isWZMediumMuon(const pat::Muon& patMu, const reco::Vertex& pv) 
   {
@@ -142,7 +144,7 @@ bool MuonIdEmbedder::isWZMediumMuon(const pat::Muon& patMu, const reco::Vertex& 
                             + pfIsoDB04.sumPhotonEt
                             - 0.5*pfIsoDB04.sumPUPt)
                   ) / patMu.pt();
-    return isWZMediumMuonNoIso(patMu, pv) && muIso < 0.15;
+    return isWZTightMuonNoIso(patMu, pv) && muIso < 0.40;
   }
 bool MuonIdEmbedder::isSoftMuonICHEP(const reco::Muon & recoMu, const reco::Vertex& pv) 
   {

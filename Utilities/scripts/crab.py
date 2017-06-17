@@ -58,6 +58,7 @@ config = config()
 config.Data.inputDataset = dataset
 config.Data.outputDatasetTag = conditions
 configParams = [
+    #'isSync=1',
     'isMC=%d' % isMC,
     'datasetName=%s' % dataset,
     "channels=%s" % localSettings.get("local", "channels"),
