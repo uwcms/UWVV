@@ -203,8 +203,11 @@ extraFinalObjectBranches = {'e':[],'m':[]}
 FlowSteps = []
 
 # everybody needs vertex cleaning
-from UWVV.AnalysisTools.templates.VertexCleaning import VertexCleaning
-FlowSteps.append(VertexCleaning)
+# Maybe not?
+
+if not wz:
+    from UWVV.AnalysisTools.templates.VertexCleaning import VertexCleaning
+    FlowSteps.append(VertexCleaning)
 
 # everybody needs basic lepton stuff
 from UWVV.AnalysisTools.templates.ElectronBaseFlow import ElectronBaseFlow

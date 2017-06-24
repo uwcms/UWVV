@@ -7,7 +7,7 @@ cmsRun UWVV/Ntuplizer/test/ntuplize_cfg.py \
     channels=wz \
     isMC=1 \
     eCalib=1 \
-    muCalib=1 \
+    muCalib=0 \
     lheWeights=3 \
     globalTag=80X_mcRun2_asymptotic_2016_TrancheIV_v8 \
     $1
