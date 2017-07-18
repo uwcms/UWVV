@@ -47,24 +47,12 @@ class ElectronCalibration(AnalysisFlowBase):
             self.process.RandomNumberGeneratorService.calibratedPatElectrons = cms.PSet(
                 initialSeed = cms.untracked.uint32(987),
                 )
-
-            correctionFile = 'EgammaAnalysis/ElectronTools/data/ScalesSmearings/Moriond17_23Jan_ele'
-
-            calibratedPatElectrons = cms.EDProducer(
-                "CalibratedPatElectronProducerRun2",
-                electrons = step.getObjTag('e'),
-                gbrForestName = cms.vstring('electron_eb_ECALTRK_lowpt',
-                                            'electron_eb_ECALTRK',
-                                            'electron_ee_ECALTRK_lowpt',
-                                            'electron_ee_ECALTRK',
-                                            'electron_eb_ECALTRK_lowpt_var',
-                                            'electron_eb_ECALTRK_var',
-                                            'electron_ee_ECALTRK_lowpt_var',
-                                            'electron_ee_ECALTRK_var'),
-                isMC = cms.bool(self.isMC),
-                isSynchronization = cms.bool(self.isSync),
-                correctionFile = cms.string(correctionFile),
-                )
+            
+            from EgammaAnalysis.ElectronTools.calibratedPatElectronsRun2_cfi import calibratedPatElectrons
+            calibratedPatElectrons.isMC = cms.bool(self.isMC)
+            calibratedPatElectrons.electrons = step.getObjTag('e') 
+            calibratedPatElectrons.isSynchronization = cms.bool(self.isSync)
+            #self.process.calibratedPatElectrons.correctionFile = cms.string(correctionFile),
 
             step.addModule('calibratedPatElectrons', calibratedPatElectrons, 'e')
 

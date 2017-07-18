@@ -98,18 +98,23 @@ void PATElectronSystematicShifter::produce(edm::Event& iEvent, const edm::EventS
       // float absEta = std::abs(simp.getEta());
       // float et = simp.getNewEnergy() / cosh(absEta);
 
-      bool isEB = ele.isEB();
-      float r9 = ele.r9();
-      float absEta = std::abs(ele.eta());
-      float et = ele.et();
+      //bool isEB = ele.isEB();
+      //float r9 = ele.r9();
+      //float absEta = std::abs(ele.eta());
+      //float et = ele.et();
+      //float et = ele.;
 
       float scale = 1.;
 
       if(scaleShift)
         {
-          float scaleError =
-            correcter.ScaleCorrectionUncertainty(iEvent.id().run(),
-                                                 isEB, r9, absEta, et);
+          // Temporarily undo because I don't 
+          // understand how the gain switch should be passed
+          // For the new version
+          float scaleError = 0;
+            //correcter.ScaleCorrectionUncertainty(iEvent.id().run(),
+            //                                     isEB, r9, absEta, et,
+            //                                     );
 
           // flip sign of shift because we're "undoing" the correction applied
           // to data
@@ -118,9 +123,9 @@ void PATElectronSystematicShifter::produce(edm::Event& iEvent, const edm::EventS
 
       if(rhoResShift != 0. || phiResShift != 0.)
         {
-          float smearSigma =
-            correcter.getSmearingSigma(iEvent.id().run(), isEB, r9, absEta,
-                                       et, rhoResShift, phiResShift);
+          float smearSigma = 0;
+            //correcter.getSmearingSigma(iEvent.id().run(), isEB, r9, absEta,
+            //                           et, rhoResShift, phiResShift);
 
           scale = CLHEP::RandGauss::shoot(&engine, scale, smearSigma);
         }
