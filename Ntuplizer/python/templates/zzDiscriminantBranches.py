@@ -16,15 +16,15 @@ zzDiscriminantBranches = cms.PSet(
         D_VBF1j_QG = cms.string('? hasUserFloat("D_VBF1j_QG") ? userFloat("D_VBF1j_QG") : -999.'),
         D_WHh_QG = cms.string('? hasUserFloat("D_WHh_QG") ? userFloat("D_WHh_QG") : -999.'),
         D_ZHh_QG = cms.string('? hasUserFloat("D_ZHh_QG") ? userFloat("D_ZHh_QG") : -999.'),
-        
-        jet1QGLikelihood = cms.string('jet1QGLikelihood'),
-        jet2QGLikelihood = cms.string('jet2QGLikelihood'),
 
         kFactor = cms.string('? hasUserFloat("kFactor") ? userFloat("kFactor") : 1.'),
         ),
     uints = cms.PSet(
         ZZCategory = cms.string('? hasUserInt("ZZCategory") ? userInt("ZZCategory") : 999'),
         ZZCategoryQG = cms.string('? hasUserInt("ZZCategoryQG") ? userInt("ZZCategoryQG") : 999'),
+        ),
+    vFloats = cms.PSet(
+        jetQGLikelihood = cms.vstring('jetQGLikelihood'),
         ),
     )
 

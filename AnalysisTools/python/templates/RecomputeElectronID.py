@@ -23,10 +23,10 @@ class RecomputeElectronID(AnalysisFlowBase):
         #if not hasattr(self.process, 'egmGsfElectronIDs'):
         switchOnVIDElectronIdProducer(self.process, DataFormat.MiniAOD)
 
-        setupAllVIDIdsInModule(self.process, 
-                               'RecoEgamma.ElectronIdentification.Identification.mvaElectronID_Spring16_V1_cff',
+        setupAllVIDIdsInModule(self.process,
+                               'RecoEgamma.ElectronIdentification.Identification.mvaElectronID_Spring16_HZZ_V1_cff',
                                setupVIDElectronSelection)
-        setupAllVIDIdsInModule(self.process, 
+        setupAllVIDIdsInModule(self.process,
                                'RecoEgamma.ElectronIdentification.Identification.cutBasedElectronID_Spring15_25ns_V1_cff',
                                setupVIDElectronSelection)
 
@@ -34,14 +34,14 @@ class RecomputeElectronID(AnalysisFlowBase):
         self.process.electronMVAValueMapProducer.srcMiniAOD = step.getObjTag('e')
         self.process.electronRegressionValueMapProducer.srcMiniAOD = step.getObjTag('e')
 
-        step.addModule('egmGsfElectronIDSequence', 
+        step.addModule('egmGsfElectronIDSequence',
                        self.process.egmGsfElectronIDSequence)
 
         embedIDs = cms.EDProducer(
             "PATElectronValueMapEmbedder",
             src = step.getObjTag('e'),
             floatLabels = cms.untracked.vstring("MVAIDNonTrig"),
-            floatVals = cms.untracked.VInputTag("electronMVAValueMapProducer:ElectronMVAEstimatorRun2Spring16V1Values"),
+            floatVals = cms.untracked.VInputTag("electronMVAValueMapProducer:ElectronMVAEstimatorRun2Spring16HZZV1Values"),
             boolLabels = cms.untracked.vstring("isCBVIDtight", "isCBVIDmedium", "isCBVIDloose"),
             boolVals = cms.untracked.VInputTag(
                 cms.InputTag("egmGsfElectronIDs:cutBasedElectronID-Spring15-25ns-V1-standalone-tight"),
@@ -52,7 +52,7 @@ class RecomputeElectronID(AnalysisFlowBase):
 
         step.addModule('electronIDEmbedding', embedIDs, 'e')
 
-        
+
 
 
 

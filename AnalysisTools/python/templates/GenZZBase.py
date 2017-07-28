@@ -21,8 +21,8 @@ class GenZZBase(ZPlusXBaseFlowGen):
                     decay = cms.string('{0} {1}'.format(step.getObjTagString(chan[:2]),
                                                         step.getObjTagString(chan[2:]))),
                     roles = cms.vstring(z1Name, z2Name),
-                    cut = cms.string(('4. < daughter("{}").mass < 120. && '
-                                      '4. < daughter("{}").mass < 120.').format(z1Name, z2Name)),
+                    cut = cms.string(('4. < daughter("{}").mass && '
+                                      '4. < daughter("{}").mass').format(z1Name, z2Name)),
                     checkCharge = cms.bool(False),
                     setPdgId = cms.int32(25),
                     )
@@ -38,9 +38,9 @@ class GenZZBase(ZPlusXBaseFlowGen):
                     l4PtCut = cms.double(5.),
                     etaCut = cms.double(2.5),
                     ossfMassCut = cms.double(4.),
-                    z1MassMin = cms.double(60.),
+                    z1MassMin = cms.double(40.),
                     z1MassMax = cms.double(120.),
-                    z2MassMin = cms.double(60.),
+                    z2MassMin = cms.double(4.),
                     z2MassMax = cms.double(120.),
                     )
                 step.addModule(chan+'GenZZCleaner', cleaner, chan)

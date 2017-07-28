@@ -105,11 +105,19 @@ void GenZZCleaner::produce(edm::Event& iEvent,
       float dz2 = std::abs(mZ2 - 91.1876);
       float betterDZ = (dz1 < dz2 ? dz1 : dz2);
 
+      if(dz2 < dz1)
+        {
+          float temp = mZ1;
+          mZ1 = mZ2;
+          mZ2 = temp;
+        }
+
       bool best = betterDZ < bestDZ;
       if(!best)
         continue;
 
       bestDZ = betterDZ;
+      bestCand = 9999; // don't use previous best even if this one fails
 
       if(mZ1 < z1MassMin || mZ1 > z1MassMax)
         continue;

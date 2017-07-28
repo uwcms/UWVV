@@ -1,5 +1,5 @@
 #!/bin/bash
-####    
+####
 ####    Set up a virtual environment with Rootpy, IPython, and Jupyter.
 ####    Installs things the first time it runs, just activates the virtualenv
 ####    thereafter.
@@ -8,19 +8,26 @@
 ####    IPython: Nicer interactive Python (already in CMS software but broken)
 ####    Jupyter: IPython notebooks
 ####    BRIL Work Suite: tools for luminosity (etc.)
-####    
+####
 ####    Author: Nate Woods, U. Wisconsin
-####    
+####
 
 
 if [ "$CMSSW_BASE" == "" ]; then
     echo "Please do this only in a CMSSW environment. Did you cmsenv?"
-    exit 2
+    return 2
 fi
 
-if [ ! -d "$CMSSW_BASE"/src/UWVV/recipe ]; then
+if [ ! -d "$CMSSW_BASE"/src/UWVV/recipe/virtualenv ]; then
     echo "UWVV doesn't look like it's set up in the usual way. Aborting."
-    exit 2
+    return 2
+fi
+
+if [ -z "$(ls -A $CMSSW_BASE/src/UWVV/recipe/virtualenv)" ]; then
+    echo "It looks like the virtualenv package is empty. Did you forget --recursive?"
+    echo "If you did, fix it with "
+    echo "    git submodule update --init --recursive"
+    return 2
 fi
 
 export vpython="$CMSSW_BASE"/src/UWVV/recipe/vpython

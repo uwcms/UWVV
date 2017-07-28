@@ -52,14 +52,14 @@ PATJetEnergyScaleShifter::PATJetEnergyScaleShifter(const edm::ParameterSet& pset
 }
 
 
-void PATJetEnergyScaleShifter::produce(edm::Event& iEvent, 
+void PATJetEnergyScaleShifter::produce(edm::Event& iEvent,
                                        const edm::EventSetup& iSetup)
 {
   edm::Handle<JetView> in;
   iEvent.getByToken(srcToken, in);
 
   edm::ESHandle<JetCorrectorParametersCollection> jecParams;
-  iSetup.get<JetCorrectionsRecord>().get("AK5PF", jecParams);
+  iSetup.get<JetCorrectionsRecord>().get("AK4PF", jecParams);
   const JetCorrectorParameters & param = (*jecParams)["Uncertainty"];
   JetCorrectionUncertainty jecUnc(param);
 
@@ -75,10 +75,10 @@ void PATJetEnergyScaleShifter::produce(edm::Event& iEvent,
       jecUnc.setJetEta(jet.eta());
       jecUnc.setJetPt(jet.pt());
       float unc = jecUnc.getUncertainty(true);
-      
-      outUp->back().setP4(math::PtEtaPhiMLorentzVector(jet.pt()+unc, jet.eta(),
+
+      outUp->back().setP4(math::PtEtaPhiMLorentzVector(jet.pt()*(1.+unc), jet.eta(),
                                                        jet.phi(), jet.mass()));
-      outDn->back().setP4(math::PtEtaPhiMLorentzVector(jet.pt()-unc, jet.eta(),
+      outDn->back().setP4(math::PtEtaPhiMLorentzVector(jet.pt()*(1.-unc), jet.eta(),
                                                        jet.phi(), jet.mass()));
     }
 

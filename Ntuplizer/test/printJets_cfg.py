@@ -31,11 +31,11 @@ options.register('isMC', 1,
                  VarParsing.VarParsing.multiplicity.singleton,
                  VarParsing.VarParsing.varType.int,
                  "1 if simulation, 0 if data")
-options.register('eCalib', 1,
+options.register('eCalib', 0,
                  VarParsing.VarParsing.multiplicity.singleton,
                  VarParsing.VarParsing.varType.int,
                  "1 if electron energy corrections are desired")
-options.register('muCalib', 1,
+options.register('muCalib', 0,
                  VarParsing.VarParsing.multiplicity.singleton,
                  VarParsing.VarParsing.varType.int,
                  "1 if muon momentum corrections are desired")
@@ -200,24 +200,11 @@ FlowSteps.append(VertexCleaning)
 # everybody needs basic lepton stuff
 from UWVV.AnalysisTools.templates.ElectronBaseFlow import ElectronBaseFlow
 FlowSteps.append(ElectronBaseFlow)
+from UWVV.AnalysisTools.templates.RecomputeElectronID import RecomputeElectronID
+FlowSteps.append(RecomputeElectronID)
 
 from UWVV.AnalysisTools.templates.MuonBaseFlow import MuonBaseFlow
 FlowSteps.append(MuonBaseFlow)
-
-# Lepton calibrations
-if options.eCalib:
-    from UWVV.AnalysisTools.templates.ElectronCalibration import ElectronCalibration
-    FlowSteps.append(ElectronCalibration)
-
-if options.muCalib:
-    from UWVV.AnalysisTools.templates.MuonCalibration import MuonCalibration
-    FlowSteps.append(MuonCalibration)
-
-    from UWVV.Ntuplizer.templates.muonBranches import muonCalibrationBranches
-    extraFinalObjectBranches['m'].append(muonCalibrationBranches)
-
-from UWVV.AnalysisTools.templates.RecomputeElectronID import RecomputeElectronID
-FlowSteps.append(RecomputeElectronID)
 
 from UWVV.AnalysisTools.templates.MuonScaleFactors import MuonScaleFactors
 FlowSteps.append(MuonScaleFactors)
@@ -225,9 +212,7 @@ from UWVV.AnalysisTools.templates.ElectronScaleFactors import ElectronScaleFacto
 FlowSteps.append(ElectronScaleFactors)
 
 # data and MCFM samples never have LHE info
-if not options.isMC or 'mcfm' in options.inputFiles[0].lower() \
-        or 'sherpa' in options.inputFiles[0].lower() \
-        or 'phantom' in options.inputFiles[0].lower():
+if not options.isMC or 'mcfm' in options.inputFiles[0].lower():
     options.lheWeights = 0
 
 # jet energy corrections and basic preselection
@@ -321,6 +306,18 @@ if (zz or zl or z) and not "wz" in options.channels:
             from UWVV.Ntuplizer.templates.countBranches import zzCountBranches
             extraInitialStateBranches.append(zzCountBranches)
             break
+
+# Lepton calibrations
+if options.eCalib:
+    from UWVV.AnalysisTools.templates.ElectronCalibration import ElectronCalibration
+    FlowSteps.append(ElectronCalibration)
+
+if options.muCalib:
+    from UWVV.AnalysisTools.templates.MuonCalibration import MuonCalibration
+    FlowSteps.append(MuonCalibration)
+
+    from UWVV.Ntuplizer.templates.muonBranches import muonCalibrationBranches
+    extraFinalObjectBranches['m'].append(muonCalibrationBranches)
 
 
 # VBS variables for ZZ
@@ -438,34 +435,11 @@ FlowClass = createFlow(*FlowSteps)
 flow = FlowClass('flow', process, **flowOpts)
 
 
-
-### Set up tree makers
-
-# meta info tree first
-process.metaInfo = cms.EDAnalyzer(
-    'MetaTreeGenerator',
-    eventParams = makeEventParams(flow.finalTags()),
+process.printJets = cms.EDAnalyzer(
+    'JetPrinter',
+    src = flow.finalObjTag('j'),
     )
-process.treeSequence = cms.Sequence(process.metaInfo)
-
-
-# then the ntuples
-for chan in channels:
-    mod = cms.EDAnalyzer(
-        'TreeGenerator{}'.format(expandChannelName(chan)),
-        src = flow.finalObjTag(chan),
-        branches = makeBranchSet(chan, extraInitialStateBranches,
-                                 extraIntermediateStateBranches,
-                                 **extraFinalObjectBranches),
-        eventParams = makeEventParams(flow.finalTags(),chan),
-        triggers = trgBranches,
-        )
-
-    setattr(process, chan, mod)
-    process.treeSequence += mod
-
-
 p = flow.getPath()
-p += process.treeSequence
-
 process.schedule.append(p)
+process.pPrint = cms.Path(process.printJets)
+process.schedule.append(process.pPrint)

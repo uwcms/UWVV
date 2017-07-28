@@ -19,6 +19,7 @@ import logging
 import fnmatch
 from UWVV.Utilities.dbsinterface import get_das_info
 import datetime
+from re import compile as _compileRE
 
 
 log = logging.getLogger("submitJobs")
@@ -57,7 +58,19 @@ def writeFarmoutCommand(cfg, jobid, dataset, fullDataset,
     dagDir = '/' + os.path.join(*(submitDir.split('/')[:-1]+['dags', 'dag']))
 
     dasFilesCmd = 'file dataset={}'.format(fullDataset)
-    dasFiles = get_das_info(dasFilesCmd)
+
+    # das throws a lot of exceptions, but they're usually transient, so try a
+    # few times if needed
+    for i in range(5):
+        try:
+            dasFiles = get_das_info(dasFilesCmd)
+        except RuntimeError as ex:
+            continue
+        else:
+            break
+    else:
+        raise RuntimeError("Failed to get file list from DAS with exception {}."
+                           " Check connection to client.".format(ex.message))
 
     mkdirCmd = "mkdir -p {}inputs".format(dagDir)
     os.system(mkdirCmd)
@@ -126,28 +139,55 @@ def buildScript(cfg, jobid, scriptFile='',
 
     # mc
     if campaign:
-        assert not dataEra, "You can't specify a data era and a MC campaign tag."
-
+        assert not dataEra, "You can't specify a data era and an MC campaign tag."
         datasetStr = '/*/{}/MINIAODSIM'.format(campaign)
+
+        postfixPattern = _compileRE('(?<=_)(?:(?:backup)|(?:ext\\d))')
+
     # data
     else:
         assert dataEra, "You must specify a data era or an MC campaign tag."
         datasetStr = '/*/{}/MINIAOD'.format(dataEra)
 
-    datasets = get_das_info(datasetStr)
+        postfixPattern = _compileRE('(?<=Run201\\d[B-H]-)[a-zA-Z0-9_-]*')
 
-    for dataset in datasets:
-        name = dataset.split('/')[1]
+    # das throws a lot of exceptions, but they're usually transient, so try a
+    # few times if needed
+    for i in range(5):
+        try:
+            datasets = get_das_info(datasetStr)
+        except RuntimeError as ex:
+            continue
+        else:
+            break
+    else:
+        raise RuntimeError("Failed to get dataset list from DAS with "
+                           "exception {}. Check connection to "
+                           "client.".format(ex.message))
 
-        for pattern in samples:
-            if fnmatch.fnmatchcase(name, pattern):
-                lines.append(writeFarmoutCommand(cfg, jobid, name, dataset,
-                                                 outdir, **args))
-                lines.append("\n") # Separate each command by new line
-                break
+    found = set()
+
+    for s in samples:
+        matches = [d for d in datasets if fnmatch.fnmatchcase(d.split('/')[1], s)]
+
+        if not matches:
+            log.warning("No datasets found matching {}".format(s))
+            continue
+
+        for match in matches:
+            postfix = postfixPattern.findall(match)
+            name = '_'.join([match.split('/')[1]]+postfix)
+
+            if name in found:
+                raise ValueError("Two samples named {}.".format(name))
+            found.add(name)
+
+            lines.append(writeFarmoutCommand(cfg, jobid, name, match,
+                                             outdir, **args))
+            lines.append("\n") # Separate each command by new line
 
     if not lines:
-        log.warning("No datasets found matching {}".format(samples))
+        log.error("No datasets found matching {}, script will be empty!".format(samples))
 
     if not scriptFile:
         for l in lines:
@@ -168,7 +208,8 @@ if __name__ == '__main__':
     parser.add_argument('--applyLumiMask', action='store_true',
                         help='Pass the appropriate lumi-mask JSON (data only).')
     parser.add_argument('--lumiMaskJSON', type=str,
-                        default='Final/Cert_271036-284044_13TeV_PromptReco_Collisions16_JSON.txt', # 36.42
+                        default='ReReco/Final/Cert_271036-284044_13TeV_23Sep2016ReReco_Collisions16_JSON.txt', # 36.814/fb
+                        #default='Final/Cert_271036-284044_13TeV_PromptReco_Collisions16_JSON.txt', # 36.42
                         #default='Cert_271036-277148_13TeV_PromptReco_Collisions16_JSON.txt', # 15.9/fb
                         help=('Lumi mask JSON. Assumed to be in the standard '
                               'certification area unless a full path is given.'))

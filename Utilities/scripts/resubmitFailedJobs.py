@@ -16,12 +16,18 @@ from re import compile as _reCompile
 from glob import glob as _glob
 from argparse import ArgumentParser as _ArgParser
 from socket import gethostname as _hostname
+import logging
+from sys import stdout as _stdout
+
+_log = logging.getLogger("resubmitFailedJobs")
+logging.basicConfig(level=logging.INFO, stream=_stdout,
+                    format='%(message)s')
 
 
-def resubmit(sample, dryrun=False):
+def resubmit(sample, dryrun=False, quiet=False):
     """
-    Check the dag status file of the sample for failed jobs. If any, submit 
-    the rescue dag files to farmoutAnalysisJobs. 
+    Check the dag status file of the sample for failed jobs. If any, submit
+    the rescue dag files to farmoutAnalysisJobs.
     Sample should be a path to the submit directory.
     """
     statusDag = '%s/dags/dag.status' % sample
@@ -29,15 +35,19 @@ def resubmit(sample, dryrun=False):
     pattern = _reCompile(r'Nodes(?P<status>[A-Za-z]+) = (?P<nNodes>\d+)')
 
     results = {}
-    with open(statusDag, 'r') as f:
-        for line in f:
-            # we only care about the summary block, which is first
-            if ']' in line:
-                break
+    try:
+        with open(statusDag, 'r') as f:
+            for line in f:
+                # we only care about the summary block, which is first
+                if ']' in line:
+                    break
 
-            match = pattern.search(line)
-            if match:
-                results[match.group('status')] = int(match.group("nNodes"))
+                match = pattern.search(line)
+                if match:
+                    results[match.group('status')] = int(match.group("nNodes"))
+    except IOError:
+        _log.error("Unable to find DAG status file for {} -- did it get submitted?".format(sample))
+        raise
 
     try:
         total = results['Total']
@@ -47,38 +57,40 @@ def resubmit(sample, dryrun=False):
             results['Ready']
         ignore = results['Unready'] # email job or something
     except KeyError:
-        raise IOError("Something is wrong with {}!".format(statusDag))
+        _log.error("DAG status file {} is broken somehow".format(statusDag))
+        raise
 
-    print '    ' + sample
-    print "        Total: {0} Done: {1} Queued: {2} Failed: {3}".format(total-ignore,succeeded,inProgress,failed)
-    
+    if failed or not quiet:
+        _log.info('    ' + sample)
+        _log.info("        Total: {0} Done: {1} Queued: {2} Failed: {3}".format(total-ignore,succeeded,inProgress,failed))
 
-    if inProgress:
-        print "        Not done, try again later"
+
+    if inProgress and (failed or not quiet):
+        _log.info("        Not done, try again later")
     elif failed:
-        print "        Resubmitting..."
+        _log.info("        Resubmitting...")
         rescue_dag = max(_glob('{}/dags/*dag.rescue[0-9][0-9][0-9]'.format(sample)))
-        print '        Rescue file: {0}'.format(rescue_dag)
+        _log.info('        Rescue file: {0}'.format(rescue_dag))
         if not dryrun:
             cmd = 'farmoutAnalysisJobs --rescue-dag-file={}'.format(rescue_dag)
             _bash(cmd)
-        
+
     return succeeded, failed, inProgress
 
 
 def generate_submit_dirs(jobids):
     '''
-    Make a list of submit directories from an input argument. 
-    If two or more forward slashes ('/') appear in a jobid, it is interpreted 
-    as a path to a submit directory (which is resubmitted) or directory 
+    Make a list of submit directories from an input argument.
+    If two or more forward slashes ('/') appear in a jobid, it is interpreted
+    as a path to a submit directory (which is resubmitted) or directory
     containing submit directories, all of which are resubmitted.
     If there are no forward slashes, it is interpreted as a jobid, and its
     submit directories are found in /<submit_base>/<username>/jobid, where
-    <submit_base> is '/data' on UWLogin and '/nfs_scratch' on login0*, and 
+    <submit_base> is '/data' on uwlogin and '/nfs_scratch' on login0*, and
     all subdirectories are resubmitted.
     If there is exactly one forward slash, it is considered a jobid/sample pair
     and the sample is resubmitted.
-    Either way, UNIX-style wildcards are allowed. 
+    Either way, UNIX-style wildcards are allowed.
     '''
     dirs = []
 
@@ -116,13 +128,15 @@ if __name__ == "__main__":
 
     parser.add_argument('--dry-run', dest='dryrun', action='store_true',
                         help='Show samples to submit without submitting them')
+    parser.add_argument('--quiet', '-q', action='store_true',
+                        help='Only print information about samples with failed jobs')
 
     args = parser.parse_args()
 
     if args.dryrun:
-        print "Pretending to resubmit samples from {}".format(', '.join(args.jobids))
+        _log.info("Pretending to resubmit samples from {}".format(', '.join(args.jobids)))
     else:
-        print "Trying to resubmit samples from {}".format(', '.join(args.jobids))
+        _log.info("Trying to resubmit samples from {}".format(', '.join(args.jobids)))
 
     samples = generate_submit_dirs(args.jobids)
 
@@ -132,21 +146,25 @@ if __name__ == "__main__":
     resubmitted = 0
 
     for s in samples:
-        succ, fail, prog = resubmit(s, args.dryrun)
+        try:
+            succ, fail, prog = resubmit(s, args.dryrun, args.quiet)
+        except (KeyError, IOError):
+            _log.error("Error in sample {} -- skipping!".format(s))
+            continue
         succeeded += succ
         failed += fail
         inProgress += prog
         if not prog:
             resubmitted += fail
 
-    print "Total: {}  Done: {}  In Progress: {}  Failed: {}".format(succeeded+failed+inProgress,
-                                                                    succeeded, inProgress, 
-                                                                    failed)
+    _log.info("Total: {}  Done: {}  In Progress: {}  Failed: {}".format(succeeded+failed+inProgress,
+                                                                        succeeded, inProgress,
+                                                                        failed))
     if resubmitted:
-        print "Resubmitted: {}".format(resubmitted)
+        _log.info("Resubmitted: {}".format(resubmitted))
     if inProgress:
-        print "Still working -- try again later."
+        _log.info("Still working -- try again later.")
     if failed + inProgress == 0:
-        print "Done!"
+        _log.info("Done!")
 
 

@@ -53,9 +53,9 @@ class ZPlusXBaseFlow(AnalysisFlowBase):
     @classmethod
     def getZMMCuts(cls):
         return ('daughter("m1").pt > 5 && '
-                    'daughter("m2").pt > 5 && '
-                    'abs(daughter("m1").eta) < 2.4 && '
-                    'abs(daughter("m2").eta) < 2.4')
+                'daughter("m2").pt > 5 && '
+                'abs(daughter("m1").eta) < 2.4 && '
+                'abs(daughter("m2").eta) < 2.4')
 
 
 class ZPlusXBaseFlowGen(ZPlusXBaseFlow):

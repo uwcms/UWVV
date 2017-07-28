@@ -31,7 +31,7 @@
 #include "CLHEP/Random/RandomEngine.h"
 #include "CLHEP/Random/RandGauss.h"
 
-#include "EgammaAnalysis/ElectronTools/interface/SimpleElectron.h"
+// #include "EgammaAnalysis/ElectronTools/interface/SimpleElectron.h"
 
 class PATElectronSystematicShifter : public edm::stream::EDProducer<>
 {
@@ -65,7 +65,7 @@ PATElectronSystematicShifter::PATElectronSystematicShifter(const edm::ParameterS
 {
   edm::Service<edm::RandomNumberGenerator> rng;
   if(!rng.isAvailable())
-    throw cms::Exception("Configuration") 
+    throw cms::Exception("Configuration")
       << "PATElectronSystematicShifter requires the "
       << "RandomNumberGeneratorService, which is not present in this "
       << "configuration!" << std::endl
@@ -92,29 +92,34 @@ void PATElectronSystematicShifter::produce(edm::Event& iEvent, const edm::EventS
       pat::Electron& ele = out->back();
 
       // using simple electron fixes some problems, not sure why...
-      SimpleElectron simp(ele, 1, true);
-      bool isEB = simp.isEB();
-      float r9 = simp.getR9();
-      float absEta = std::abs(simp.getEta());
-      float et = simp.getNewEnergy() / cosh(absEta);
+      // SimpleElectron simp(ele, 1, true);
+      // bool isEB = simp.isEB();
+      // float r9 = simp.getR9();
+      // float absEta = std::abs(simp.getEta());
+      // float et = simp.getNewEnergy() / cosh(absEta);
+
+      bool isEB = ele.isEB();
+      float r9 = ele.r9();
+      float absEta = std::abs(ele.eta());
+      float et = ele.et();
 
       float scale = 1.;
 
       if(scaleShift)
         {
-          float scaleError = 
-            correcter.ScaleCorrectionUncertainty(iEvent.id().run(), 
+          float scaleError =
+            correcter.ScaleCorrectionUncertainty(iEvent.id().run(),
                                                  isEB, r9, absEta, et);
 
-          // flip sign of shift because we're "undoing" the correction applied 
+          // flip sign of shift because we're "undoing" the correction applied
           // to data
           scale -= scaleShift * scaleError;
         }
 
       if(rhoResShift != 0. || phiResShift != 0.)
         {
-          float smearSigma = 
-            correcter.getSmearingSigma(iEvent.id().run(), isEB, r9, absEta, 
+          float smearSigma =
+            correcter.getSmearingSigma(iEvent.id().run(), isEB, r9, absEta,
                                        et, rhoResShift, phiResShift);
 
           scale = CLHEP::RandGauss::shoot(&engine, scale, smearSigma);
