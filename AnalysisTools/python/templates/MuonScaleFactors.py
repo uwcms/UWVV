@@ -15,7 +15,7 @@ class MuonScaleFactors(AnalysisFlowBase):
         step = super(MuonScaleFactors, self).makeAnalysisStep(stepName, **inputs)
 
         if stepName == 'embedding' and self.isMC:
-
+            
             sfFile = path.join(UWVV_BASE_PATH, 'data', 'LeptonScaleFactors',
                                'muSelectionAndRecoSF_HZZ_Moriond17.root')
             sfName = 'FINAL'

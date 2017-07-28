@@ -14,15 +14,14 @@ class BJetCounters(AnalysisFlowBase):
         step = super(BJetCounters, self).makeAnalysisStep(stepName, **inputs)
         
         if stepName == 'initialStateEmbedding':
-            jetCounters = {'JPL' : '? bDiscriminator("pfJetProbabilityBJetTags")>0.245 ? 1 : 0',
-                "JPM" : '? bDiscriminator("pfJetProbabilityBJetTags")>0.515 ? 1 : 0',
-                "JPT" : '? bDiscriminator("pfJetProbabilityBJetTags")>0.760 ? 1 : 0',
-                "CSVv2L" : '? bDiscriminator("pfCombinedInclusiveSecondaryVertexV2BJetTags")>0.460 ? 1 : 0',
-                "CSVv2M" : '? bDiscriminator("pfCombinedInclusiveSecondaryVertexV2BJetTags")>0.800 ? 1 : 0',
-                "CSVv2T" : '? bDiscriminator("pfCombinedInclusiveSecondaryVertexV2BJetTags")>0.935 ? 1 : 0',
-                "CMVAv2L" : '? bDiscriminator("pfCombinedMVAV2BJetTags")>-0.715 ? 1 : 0',
-                "CMVAv2M" : '? bDiscriminator("pfCombinedMVAV2BJetTags")>0.185 ? 1 : 0',
-                "CMVAv2T" : '? bDiscriminator("pfCombinedMVAV2BJetTags")>0.875 ? 1 : 0',
+            # Recommendations via https://twiki.cern.ch/twiki/bin/viewauth/CMS/BtagRecommendation80XReReco
+            jetCounters = {
+                "CSVv2L" : '? bDiscriminator("pfCombinedInclusiveSecondaryVertexV2BJetTags") > 0.5426 ? 1 : 0',
+                "CSVv2M" : '? bDiscriminator("pfCombinedInclusiveSecondaryVertexV2BJetTags") > 0.8484 ? 1 : 0',
+                "CSVv2T" : '? bDiscriminator("pfCombinedInclusiveSecondaryVertexV2BJetTags") > 0.9535 ? 1 : 0',
+                "CMVAv2L" : '? bDiscriminator("pfCombinedMVAV2BJetTags") > -0.5884 ? 1 : 0',
+                "CMVAv2M" : '? bDiscriminator("pfCombinedMVAV2BJetTags") > 0.4432 ? 1 : 0',
+                "CMVAv2T" : '? bDiscriminator("pfCombinedMVAV2BJetTags") > 0.9432 ? 1 : 0',
             }
             mod = cms.EDProducer(
                 "PATJetCounter",
