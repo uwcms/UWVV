@@ -37,5 +37,5 @@ class WZID(AnalysisFlowBase):
         return 'userFloat("IsCBVIDTightwIP") && ' \
                'pt() > 10 && abs(eta) < 2.5'
     def getPOGElectronIPCut(self):
-        return '(? isEB ? userFloat("dxy") < 0.05 : userFloat("dxy") < 0.1)'
+        return '(? isEB ? abs(userFloat("dxy")) < 0.05 : abs(userFloat("dxy") < 0.1))'
 
