@@ -1,7 +1,3 @@
-#ifndef UWVV_Utilities_helpers_cc
-#define UWVV_Utilities_helpers_cc
-
-
 #include "UWVV/Utilities/interface/helpers.h"
 
 namespace uwvv
@@ -9,33 +5,15 @@ namespace uwvv
 
   namespace helpers
   {
-    // Get an object's four-momentum with FSR included (if any).
-    template<class T>
-      math::XYZTLorentzVector p4WithoutFSR(const T& cand)
-      {
-        // if it's not a composite, FSR isn't included by definition
-        if(cand.numberOfDaughters() == 0)
-          return cand.p4();
-
-        const pat::CompositeCandidate& ccand = dynamic_cast<const pat::CompositeCandidate&>(cand);
-        return p4WithoutFSR(ccand);
-      }
-
     template<>
-      math::XYZTLorentzVector p4WithoutFSR(const pat::CompositeCandidate& cand)
-      {
-        math::XYZTLorentzVector out = p4WithoutFSR(*(cand.daughter(0)->masterClone().get()));
-        if(cand.numberOfDaughters() >= 2)
-          out += p4WithoutFSR(*(cand.daughter(1)->masterClone().get()));
+    math::XYZTLorentzVector p4WithoutFSR(const pat::CompositeCandidate& cand)
+    {
+      math::XYZTLorentzVector out = p4WithoutFSR(*(cand.daughter(0)->masterClone().get()));
+      if(cand.numberOfDaughters() >= 2)
+        out += p4WithoutFSR(*(cand.daughter(1)->masterClone().get()));
 
-        return out;
-      }
-
-    template<class T>
-      math::XYZTLorentzVector p4WithoutFSR(const edm::Ptr<T>& cand)
-      {
-        return p4WithoutFSR(*cand);
-      }
+      return out;
+    }
 
     float zMassDistance(const float m)
     {
@@ -80,7 +58,5 @@ namespace uwvv
       return false;
     }
   } // namespace helpers
-
 } // namespace uwvv
 
-#endif // header guard

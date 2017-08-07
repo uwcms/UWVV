@@ -9,7 +9,7 @@
 
 #include "UWVV/Ntuplizer/interface/EventInfo.h"
 #include "UWVV/Ntuplizer/interface/StringFunctionMaker.h"
-#include "UWVV/Utilities/src/helpers.cc"
+#include "UWVV/Utilities/interface/helpers.h"
 #include "UWVV/DataFormats/interface/DressedGenParticle.h"
 
 #include "DataFormats/PatCandidates/interface/Electron.h"
@@ -112,7 +112,7 @@ namespace
 
                                  return out;
                                });
-        
+
         addTo["jetCSVv2"] =
           std::function<FType>([](const edm::Ptr<T>& obj, uwvv::EventInfo& evt, const std::string& option)
                                {

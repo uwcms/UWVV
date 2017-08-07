@@ -18,14 +18,24 @@ namespace uwvv
   namespace helpers
   {
     // Get an object's four-momentum with FSR included (if any).
+    // Note: p4WithoutFSR<pat::CompositeCandidate> is defined in helpers.cc
     template<class T>
-      math::XYZTLorentzVector p4WithoutFSR(const T& cand);
+    math::XYZTLorentzVector p4WithoutFSR(const T& cand)
+    {
+      // if it's not a composite, FSR isn't included by definition
+      if(cand.numberOfDaughters() == 0)
+        return cand.p4();
 
-    template<>
-      math::XYZTLorentzVector p4WithoutFSR(const pat::CompositeCandidate& cand);
+      const pat::CompositeCandidate& ccand = dynamic_cast<const pat::CompositeCandidate&>(cand);
+      return p4WithoutFSR(ccand);
+    }
 
     template<class T>
-      math::XYZTLorentzVector p4WithoutFSR(const edm::Ptr<T>& cand);
+    math::XYZTLorentzVector p4WithoutFSR(const edm::Ptr<T>& cand)
+    {
+      return p4WithoutFSR(*cand);
+    }
+
 
     float zMassDistance(const float m);
 
