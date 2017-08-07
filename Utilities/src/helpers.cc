@@ -1,12 +1,8 @@
-#include <string>
+#ifndef UWVV_Utilities_helpers_cc
+#define UWVV_Utilities_helpers_cc
 
-#include "TLorentzVector.h"
 
-#include "DataFormats/PatCandidates/interface/CompositeCandidate.h"
-#include "DataFormats/Common/interface/Ptr.h"
-#include "DataFormats/Math/interface/LorentzVector.h"
-#include "DataFormats/Math/interface/deltaR.h"
-#include "DataFormats/Candidate/interface/Candidate.h"
+#include "UWVV/Utilities/interface/helpers.h"
 
 namespace uwvv
 {
@@ -86,3 +82,5 @@ namespace uwvv
   } // namespace helpers
 
 } // namespace uwvv
+
+#endif // header guard
