@@ -938,19 +938,6 @@ namespace
           std::function<FType>([](const edm::Ptr<T>& obj, uwvv::EventInfo& evt, const std::string& option)
                                {return evt.nVertices();});
 
-        addTo["nJets"] =
-          std::function<FType>([](const edm::Ptr<T>& obj, uwvv::EventInfo& evt, const std::string& option)
-                               {
-                                 unsigned out = 0;
-                                 for(size_t i = 0; i < evt.jets(option)->size(); ++i)
-                                   {
-                                     if(!uwvv::helpers::overlapWithAnyDaughter(evt.jets(option)->at(i), *obj, 0.4))
-                                       out++;
-                                   }
-
-                                 return out;
-                               });
-
         addTo["nGenJets"] =
           std::function<FType>([](const edm::Ptr<T>& obj, uwvv::EventInfo& evt, const std::string& option)
                                {
@@ -1175,6 +1162,27 @@ namespace
 
       return out;
     }
+
+  template<>
+    struct ObjectFunctionList<int, pat::CompositeCandidate>
+    {
+      // cheating with typedefs for standardization
+      typedef pat::CompositeCandidate T;
+      typedef int B;
+      typedef B (FType) (const edm::Ptr<T>&, uwvv::EventInfo&, const std::string&);
+
+      static void
+        addFunctions(std::unordered_map<std::string, std::function<FType> >& addTo)
+      {
+        addTo["nJets"] =
+          std::function<FType>([](const edm::Ptr<T>& obj, uwvv::EventInfo& evt, const std::string& option)
+                               {
+                                 if ( obj->hasUserData("cleanedJets") )
+                                    return static_cast<int>(obj->userData<edm::PtrVector<pat::Jet>>("cleanedJets")->size());
+                                 return -1;
+                               });
+      }
+    };
 
   template<>
     struct ObjectFunctionList<float, pat::CompositeCandidate>

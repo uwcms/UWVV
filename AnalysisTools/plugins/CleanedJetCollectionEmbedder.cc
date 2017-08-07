@@ -59,20 +59,19 @@ void CleanedJetCollectionEmbedder::produce(edm::Event& iEvent,
   iEvent.getByToken(srcToken, in);
   iEvent.getByToken(jetSrcToken, uncleanedJets);
 
-  edm::PtrVector<pat::Jet> cleanedJets; 
 
   for(size_t i = 0; i < in->size(); ++i)
     {
+      edm::PtrVector<pat::Jet> cleanedJets; 
       edm::Ptr<CCand> cand = in->ptrAt(i);
 
       out->push_back(*cand);
       
-      for(size_t i = 0; i < uncleanedJets->size(); ++i)
+      for(size_t j = 0; j < uncleanedJets->size(); ++j)
         {
-          //if(!uwvv::helpers::overlapWithAnyDaughter(uncleanedJets->at(i), *cand, 0.4)) 
-          if(true)
+          if(!uwvv::helpers::overlapWithAnyDaughter(uncleanedJets->at(j), *cand, 0.4)) 
             {
-              cleanedJets.push_back(uncleanedJets->ptrAt(i));
+              cleanedJets.push_back(uncleanedJets->ptrAt(j));
             }
         }
       out->back().addUserData<edm::PtrVector<pat::Jet>>("cleanedJets", cleanedJets);
