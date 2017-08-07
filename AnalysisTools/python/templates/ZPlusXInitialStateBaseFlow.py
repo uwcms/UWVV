@@ -16,6 +16,7 @@ class ZPlusXInitialStateBaseFlow(ZPlusXBaseFlow):
 
         if stepName == 'initialStateEmbedding':
             self.addAlternatePairInfo(step)
+            self.embedCleanedJets(step)
 
         return step
 
@@ -50,3 +51,14 @@ class ZPlusXInitialStateBaseFlow(ZPlusXBaseFlow):
                 )
             step.addModule(chan+'AlternatePairs', mod, chan)
 
+    def embedCleanedJets(self, step):
+        '''
+        Add modules to embed alternate lepton pair (e.g. e1+m1) info.
+        '''
+        for chan in parseChannels('zl'):
+            mod = cms.EDProducer(
+                'CleanedJetCollectionEmbedder',
+                src = step.getObjTag(chan),
+                jetSrc = step.getObjTag('j'),
+                )
+            step.addModule(chan+'CleanedJetsEmbed', mod, chan)

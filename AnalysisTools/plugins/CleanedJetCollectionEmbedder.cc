@@ -24,8 +24,6 @@
 
 typedef pat::CompositeCandidate CCand;
 
-
-
 class CleanedJetCollectionEmbedder : public edm::stream::EDProducer<>
 {
 
@@ -71,7 +69,8 @@ void CleanedJetCollectionEmbedder::produce(edm::Event& iEvent,
       
       for(size_t i = 0; i < uncleanedJets->size(); ++i)
         {
-          if(!uwvv::helpers::overlapWithAnyDaughter(uncleanedJets->at(i), *cand, 0.4)) 
+          //if(!uwvv::helpers::overlapWithAnyDaughter(uncleanedJets->at(i), *cand, 0.4)) 
+          if(true)
             {
               cleanedJets.push_back(uncleanedJets->ptrAt(i));
             }
