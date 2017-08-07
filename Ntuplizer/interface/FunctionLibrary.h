@@ -1176,9 +1176,14 @@ namespace
         addTo["nJets"] =
           std::function<FType>([](const edm::Ptr<T>& obj, uwvv::EventInfo& evt, const std::string& option)
                                {
-                                 if ( obj->hasUserData("cleanedJets") )
-                                    return static_cast<int>(obj->userData<edm::PtrVector<pat::Jet>>("cleanedJets")->size());
-                                 return -1;
+                                 std::string jetCollection = "cleanedJets";
+
+                                 if (option != "")
+                                     jetCollection += "_" + option;
+
+                                  if ( obj->hasUserData(jetCollection.c_str()) )
+                                      return static_cast<int>(obj->userData<edm::PtrVector<pat::Jet>>(jetCollection.c_str())->size());
+                                  return -1;
                                });
       }
     };

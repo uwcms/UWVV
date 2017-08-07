@@ -32,8 +32,6 @@ eventBranches = cms.PSet(
         lumi = cms.string('lumi'),
         run = cms.string('run'),
         nvtx = cms.string('nvtx'),
-        #nJets = cms.string('? hasUserData("cleanedJets") ? userData<edm::PtrVector<pat::Jet>>("cleanedJets")->size() : -1'),
-        #nJets = cms.string('nJets'),
         ),
     ints = cms.PSet(
         nJets = cms.string('nJets'),
@@ -120,12 +118,12 @@ jetSystematicBranches = cms.PSet(
         jetPUID_jerUp = cms.vstring('jetPUID::jerUp'),
         jetPUID_jerDown = cms.vstring('jetPUID::jerDown'),
         ),
-    #uints = cms.PSet(
-    #    nJets_jesUp = cms.string('nJets::jesUp'),
-    #    nJets_jesDown = cms.string('nJets::jesDown'),
-    #    nJets_jerUp = cms.string('nJets::jerUp'),
-    #    nJets_jerDown = cms.string('nJets::jerDown'),
-    #    ),
+    ints = cms.PSet(
+        nJets_jesUp = cms.string('nJets::jesUp'),
+        nJets_jesDown = cms.string('nJets::jesDown'),
+        nJets_jerUp = cms.string('nJets::jerUp'),
+        nJets_jerDown = cms.string('nJets::jerDown'),
+        ),
     )
 
 centralJetBranches = cms.PSet(
@@ -134,12 +132,12 @@ centralJetBranches = cms.PSet(
         jetEta_eta2p4 = cms.vstring('jetEta::eta2p4'),
         jetPhi_eta2p4 = cms.vstring('jetPhi::eta2p4'),
         ),
-    #vInts = cms.PSet(
-    #    jetPUID_eta2p4 = cms.vstring('jetPUID::eta2p4'),
-    #    ),
-    #uints = cms.PSet(
-    #    nJets_eta2p4 = cms.string('nJets::eta2p4'),
-    #    ),
+    vInts = cms.PSet(
+        jetPUID_eta2p4 = cms.vstring('jetPUID::eta2p4'),
+        ),
+    uints = cms.PSet(
+        nJets_eta2p4 = cms.string('nJets::eta2p4'),
+        ),
     )
 
 # gen-level initial state info for reco ntuple

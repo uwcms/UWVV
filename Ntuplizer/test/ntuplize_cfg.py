@@ -310,8 +310,6 @@ elif zl or z or wz:
 
         from UWVV.AnalysisTools.templates.WZID import WZID
         FlowSteps.append(WZID)
-        from UWVV.AnalysisTools.templates.WZCrossCleaning import WZCrossCleaning
-        FlowSteps.append(WZCrossCleaning)
         from UWVV.AnalysisTools.templates.WZLeptonCounters import WZLeptonCounters
         FlowSteps.append(WZLeptonCounters)
 

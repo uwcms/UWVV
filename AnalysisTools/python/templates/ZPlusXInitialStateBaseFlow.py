@@ -60,5 +60,9 @@ class ZPlusXInitialStateBaseFlow(ZPlusXBaseFlow):
                 'CleanedJetCollectionEmbedder',
                 src = step.getObjTag(chan),
                 jetSrc = step.getObjTag('j'),
+                jesUpJetSrc = step.getObjTag('j_jesUp'),
+                jesDownJetSrc = step.getObjTag('j_jesDown'),
+                jerUpJetSrc = step.getObjTag('j_jerUp'),
+                jerDownJetSrc = step.getObjTag('j_jerDown'),
                 )
             step.addModule(chan+'CleanedJetsEmbed', mod, chan)
