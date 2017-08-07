@@ -10,6 +10,8 @@
     <class name="edm::Wrapper<edm::OwnVector<DressedGenParticle>>"/>
     <class name="edm::OwnVector<DressedGenParticle, edm::ClonePolicy<DressedGenParticle> >" />
     <class name="edm::Wrapper<edm::OwnVector<DressedGenParticle, edm::ClonePolicy<DressedGenParticle> > >" />
+    <class name="edm::PtrVector<pat::Jet>"/>
+    <class name="pat::UserHolder<edm::PtrVector<pat::Jet> >" />
 </selection>
 <exclusion>
     <class name="edm::OwnVector<DressedGenParticle, edm::ClonePolicy<DressedGenParticle> >">
