@@ -11,6 +11,7 @@
 #include "DataFormats/Math/interface/LorentzVector.h"
 #include "DataFormats/Math/interface/deltaR.h"
 #include "DataFormats/Candidate/interface/Candidate.h"
+#include "DataFormats/PatCandidates/interface/Jet.h"
 
 namespace uwvv
 {
@@ -52,6 +53,11 @@ namespace uwvv
     // applicable
     bool overlapWithAnyDaughter(const reco::Candidate& cand,
                                 const reco::Candidate& mother, float dR);
+    
+    // Return the jet collection cleaned from the initial state objects. 
+    // Collection should be embedded into the initial state as userData.
+    const edm::PtrVector<pat::Jet>* getCleanedJetCollection(const pat::CompositeCandidate& cand, 
+        const std::string& variation);
   } // namespace helpers
 
 } // namespace uwvv

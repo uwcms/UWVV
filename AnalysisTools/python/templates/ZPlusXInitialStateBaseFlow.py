@@ -56,13 +56,20 @@ class ZPlusXInitialStateBaseFlow(ZPlusXBaseFlow):
         Add modules to embed alternate lepton pair (e.g. e1+m1) info.
         '''
         for chan in parseChannels('zl'):
-            mod = cms.EDProducer(
-                'CleanedJetCollectionEmbedder',
-                src = step.getObjTag(chan),
-                jetSrc = step.getObjTag('j'),
-                jesUpJetSrc = step.getObjTag('j_jesUp'),
-                jesDownJetSrc = step.getObjTag('j_jesDown'),
-                jerUpJetSrc = step.getObjTag('j_jerUp'),
-                jerDownJetSrc = step.getObjTag('j_jerDown'),
+            try:
+                mod = cms.EDProducer(
+                    'CleanedJetCollectionEmbedder',
+                    src = step.getObjTag(chan),
+                    jetSrc = step.getObjTag('j'),
+                    jesUpJetSrc = step.getObjTag('j_jesUp'),
+                    jesDownJetSrc = step.getObjTag('j_jesDown'),
+                    jerUpJetSrc = step.getObjTag('j_jerUp'),
+                    jerDownJetSrc = step.getObjTag('j_jerDown'),
+                )
+            except KeyError:
+                mod = cms.EDProducer(
+                    'CleanedJetCollectionEmbedder',
+                    src = step.getObjTag(chan),
+                    jetSrc = step.getObjTag('j'),
                 )
             step.addModule(chan+'CleanedJetsEmbed', mod, chan)

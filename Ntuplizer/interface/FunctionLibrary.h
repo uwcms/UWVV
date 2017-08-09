@@ -41,106 +41,6 @@ namespace
       {
         typedef std::vector<float> (FType) (const edm::Ptr<T>&, uwvv::EventInfo&, const std::string&);
 
-        addTo["jetPt"] =
-          std::function<FType>([](const edm::Ptr<T>& obj, uwvv::EventInfo& evt, const std::string& option)
-                               {
-                                 std::vector<float> out;
-
-                                 for(size_t i = 0; i < evt.jets(option)->size(); ++i)
-                                   {
-                                     if(!uwvv::helpers::overlapWithAnyDaughter(evt.jets(option)->at(i), *obj, 0.4))
-                                       out.push_back(evt.jets(option)->at(i).pt());
-                                   }
-
-                                 return out;
-                               });
-
-        addTo["jetEta"] =
-          std::function<FType>([](const edm::Ptr<T>& obj, uwvv::EventInfo& evt, const std::string& option)
-                               {
-                                 std::vector<float> out;
-
-                                 for(size_t i = 0; i < evt.jets(option)->size(); ++i)
-                                   {
-                                     if(!uwvv::helpers::overlapWithAnyDaughter(evt.jets(option)->at(i), *obj, 0.4))
-                                       out.push_back(evt.jets(option)->at(i).eta());
-                                   }
-
-                                 return out;
-                               });
-
-        addTo["jetPhi"] =
-          std::function<FType>([](const edm::Ptr<T>& obj, uwvv::EventInfo& evt, const std::string& option)
-                               {
-                                 std::vector<float> out;
-
-                                 for(size_t i = 0; i < evt.jets(option)->size(); ++i)
-                                   {
-                                     if(!uwvv::helpers::overlapWithAnyDaughter(evt.jets(option)->at(i), *obj, 0.4))
-                                       out.push_back(evt.jets(option)->at(i).phi());
-                                   }
-
-                                 return out;
-                               });
-
-        addTo["jetRapidity"] =
-          std::function<FType>([](const edm::Ptr<T>& obj, uwvv::EventInfo& evt, const std::string& option)
-                               {
-                                 std::vector<float> out;
-
-                                 for(size_t i = 0; i < evt.jets(option)->size(); ++i)
-                                   {
-                                     if(!uwvv::helpers::overlapWithAnyDaughter(evt.jets(option)->at(i), *obj, 0.4))
-                                       out.push_back(evt.jets(option)->at(i).rapidity());
-                                   }
-
-                                 return out;
-                               });
-
-        addTo["jetQGLikelihood"] =
-          std::function<FType>([](const edm::Ptr<T>& obj, uwvv::EventInfo& evt, const std::string& option)
-                               {
-                                 std::vector<float> out;
-
-                                 for(size_t i = 0; i < evt.jets(option)->size(); ++i)
-                                   {
-                                     const pat::Jet& j = evt.jets(option)->at(i);
-                                     if(j.hasUserFloat("qgLikelihood") &&
-                                        !uwvv::helpers::overlapWithAnyDaughter(j, *obj, 0.4))
-                                       out.push_back(j.userFloat("qgLikelihood"));
-                                   }
-
-                                 return out;
-                               });
-
-        addTo["jetCSVv2"] =
-          std::function<FType>([](const edm::Ptr<T>& obj, uwvv::EventInfo& evt, const std::string& option)
-                               {
-                                 std::vector<float> out;
-
-                                 for(size_t i = 0; i < evt.jets(option)->size(); ++i)
-                                   {
-                                     const pat::Jet& j = evt.jets(option)->at(i);
-                                     out.push_back(j.bDiscriminator("pfCombinedInclusiveSecondaryVertexV2BJetTags"));
-                                   }
-
-                                 return out;
-                               });
-
-        addTo["jetCMVAv2"] =
-          std::function<FType>([](const edm::Ptr<T>& obj, uwvv::EventInfo& evt, const std::string& option)
-                               {
-                                 std::vector<float> out;
-
-                                 for(size_t i = 0; i < evt.jets(option)->size(); ++i)
-                                   {
-                                     const pat::Jet& j = evt.jets(option)->at(i);
-                                     out.push_back(j.bDiscriminator("pfCombinedMVAV2BJetTags"));
-                                   }
-
-                                 return out;
-                               });
-
         addTo["genJetPt"] =
           std::function<FType>([](const edm::Ptr<T>& obj, uwvv::EventInfo& evt, const std::string& option)
                                {
@@ -254,48 +154,6 @@ namespace
     };
 
   template<>
-    struct GeneralFunctionList<std::vector<int> >
-    {
-      template<class T> static void
-      addFunctions(std::unordered_map<std::string, std::function<std::vector<int>(const edm::Ptr<T>&, uwvv::EventInfo&, const std::string&)> >& addTo)
-      {
-        typedef std::vector<int> (FType) (const edm::Ptr<T>&, uwvv::EventInfo&, const std::string&);
-
-        addTo["jetHadronFlavor"] =
-          std::function<FType>([](const edm::Ptr<T>& obj, uwvv::EventInfo& evt, const std::string& option)
-                               {
-                                 std::vector<int> out;
-
-                                 for(size_t i = 0; i < evt.jets(option)->size(); ++i)
-                                   {
-                                     const pat::Jet& j = evt.jets(option)->at(i);
-                                     out.push_back(j.hadronFlavour());
-                                   }
-
-                                 return out;
-                               });
-
-        addTo["jetPUID"] =
-          std::function<FType>([](const edm::Ptr<T>& obj, uwvv::EventInfo& evt, const std::string& option)
-                               {
-                                 std::vector<int> out;
-
-                                 for(size_t i = 0; i < evt.jets(option)->size(); ++i)
-                                   {
-                                     int puID = -999;
-                                     if(evt.jets(option)->at(i).hasUserInt("pileupJetIdUpdated:fullId"))
-                                       puID = evt.jets(option)->at(i).userInt("pileupJetIdUpdated:fullId");
-
-                                     if(!uwvv::helpers::overlapWithAnyDaughter(evt.jets(option)->at(i), *obj, 0.4))
-                                       out.push_back(puID);
-                                   }
-
-                                 return out;
-                               });
-      }
-    };
-
-  template<>
     struct GeneralFunctionList<float>
     {
       template<class T> static void
@@ -349,194 +207,6 @@ namespace
                                  float mtSqr = totalEt * totalEt - totalPt * totalPt;
 
                                  return std::sqrt(mtSqr);
-                               });
-
-        addTo["mjj"] =
-          std::function<FType>([](const edm::Ptr<T>& obj, uwvv::EventInfo& evt, const std::string& option)
-                               {
-                                 if(evt.jets(option)->size() < 2)
-                                   return -999.;
-
-                                 const pat::Jet* j1 = 0;
-                                 for(size_t i = 0; i < evt.jets(option)->size(); ++i)
-                                   {
-                                     const pat::Jet& j = evt.jets(option)->at(i);
-                                     if(!uwvv::helpers::overlapWithAnyDaughter(j, *obj, 0.4))
-                                       {
-                                         if(j1)
-                                           return (j1->p4()+j.p4()).mass();
-                                         else
-                                           j1 = &j;
-                                       }
-                                   }
-
-                                 return -999.;
-                               });
-
-        addTo["ptjj"] =
-          std::function<FType>([](const edm::Ptr<T>& obj, uwvv::EventInfo& evt, const std::string& option)
-                               {
-                                 if(evt.jets(option)->size() < 2)
-                                   return -999.;
-
-                                 const pat::Jet* j1 = 0;
-                                 for(size_t i = 0; i < evt.jets(option)->size(); ++i)
-                                   {
-                                     const pat::Jet& j = evt.jets(option)->at(i);
-                                     if(!uwvv::helpers::overlapWithAnyDaughter(j, *obj, 0.4))
-                                       {
-                                         if(j1)
-                                           return (j1->p4()+j.p4()).pt();
-                                         else
-                                           j1 = &j;
-                                       }
-                                   }
-
-                                 return -999.;
-                               });
-
-        addTo["etajj"] =
-          std::function<FType>([](const edm::Ptr<T>& obj, uwvv::EventInfo& evt, const std::string& option)
-                               {
-                                 if(evt.jets(option)->size() < 2)
-                                   return -999.;
-
-                                 const pat::Jet* j1 = 0;
-                                 for(size_t i = 0; i < evt.jets(option)->size(); ++i)
-                                   {
-                                     const pat::Jet& j = evt.jets(option)->at(i);
-                                     if(!uwvv::helpers::overlapWithAnyDaughter(j, *obj, 0.4))
-                                       {
-                                         if(j1)
-                                           return (j1->p4()+j.p4()).eta();
-                                         else
-                                           j1 = &j;
-                                       }
-                                   }
-
-                                 return -999.;
-                               });
-
-        addTo["phijj"] =
-          std::function<FType>([](const edm::Ptr<T>& obj, uwvv::EventInfo& evt, const std::string& option)
-                               {
-                                 if(evt.jets(option)->size() < 2)
-                                   return -999.;
-
-                                 const pat::Jet* j1 = 0;
-                                 for(size_t i = 0; i < evt.jets(option)->size(); ++i)
-                                   {
-                                     const pat::Jet& j = evt.jets(option)->at(i);
-                                     if(!uwvv::helpers::overlapWithAnyDaughter(j, *obj, 0.4))
-                                       {
-                                         if(j1)
-                                           return (j1->p4()+j.p4()).phi();
-                                         else
-                                           j1 = &j;
-                                       }
-                                   }
-
-                                 return -999.;
-                               });
-
-        addTo["deltaEtajj"] =
-          std::function<FType>([](const edm::Ptr<T>& obj, uwvv::EventInfo& evt, const std::string& option)
-                               {
-                                 if(evt.jets(option)->size() < 2)
-                                   return -999.;
-
-                                 const pat::Jet* j1 = 0;
-                                 for(size_t i = 0; i < evt.jets(option)->size(); ++i)
-                                   {
-                                     const pat::Jet& j = evt.jets(option)->at(i);
-                                     if(!uwvv::helpers::overlapWithAnyDaughter(j, *obj, 0.4))
-                                       {
-                                         if(j1)
-                                           return std::abs(j1->eta() - j.eta());
-                                         else
-                                           j1 = &j;
-                                       }
-                                   }
-
-                                 return -999.;
-                               });
-
-        addTo["zeppenfeld"] =
-          std::function<FType>([](const edm::Ptr<T>& obj, uwvv::EventInfo& evt, const std::string& option)
-                               {
-                                 if(evt.jets(option)->size() < 2)
-                                   return -999.;
-
-                                 const pat::Jet* j1 = 0;
-                                 for(size_t i = 0; i < evt.jets(option)->size(); ++i)
-                                   {
-                                     const pat::Jet& j = evt.jets(option)->at(i);
-                                     if(!uwvv::helpers::overlapWithAnyDaughter(j, *obj, 0.4))
-                                       {
-                                         if(j1)
-                                           return std::abs(obj->rapidity() -
-                                                           (j1->rapidity() +
-                                                            j.rapidity()) / 2.
-                                                           );
-                                         else
-                                           j1 = &j;
-                                       }
-                                   }
-
-                                 return -999.;
-                               });
-
-        addTo["zeppenfeldj3"] =
-          std::function<FType>([](const edm::Ptr<T>& obj, uwvv::EventInfo& evt, const std::string& option)
-                               {
-                                 if(evt.jets(option)->size() < 3)
-                                   return -999.;
-
-                                 const pat::Jet* j1 = 0;
-                                 const pat::Jet* j2 = 0;
-                                 for(size_t i = 0; i < evt.jets(option)->size(); ++i)
-                                   {
-                                     const pat::Jet& j = evt.jets(option)->at(i);
-                                     if(!uwvv::helpers::overlapWithAnyDaughter(j, *obj, 0.4))
-                                       {
-                                         if(j2)
-                                           return std::abs(j.rapidity() -
-                                                           (j1->rapidity() +
-                                                            j2->rapidity()) / 2.
-                                                           );
-                                         else if(j1)
-                                           j2 = &j;
-                                         else
-                                           j1 = &j;
-                                       }
-                                   }
-
-                                 return -999.;
-                               });
-
-        addTo["deltaPhiTojj"] =
-          std::function<FType>([](const edm::Ptr<T>& obj, uwvv::EventInfo& evt, const std::string& option)
-                               {
-                                 if(evt.jets(option)->size() < 2)
-                                   return -999.;
-
-                                 const pat::Jet* j1 = 0;
-                                 for(size_t i = 0; i < evt.jets(option)->size(); ++i)
-                                   {
-                                     const pat::Jet& j = evt.jets(option)->at(i);
-                                     if(!uwvv::helpers::overlapWithAnyDaughter(j, *obj, 0.4))
-                                       {
-                                         if(j1)
-                                           {
-                                             float phiJJ = (j1->p4() + j.p4()).phi();
-                                             return std::abs(deltaPhi(obj->phi(), phiJJ));
-                                           }
-                                         else
-                                           j1 = &j;
-                                       }
-                                   }
-
-                                 return -999.;
                                });
 
         addTo["mjjGen"] =
@@ -1176,14 +846,7 @@ namespace
         addTo["nJets"] =
           std::function<FType>([](const edm::Ptr<T>& obj, uwvv::EventInfo& evt, const std::string& option)
                                {
-                                 std::string jetCollection = "cleanedJets";
-
-                                 if (option != "")
-                                     jetCollection += "_" + option;
-
-                                  if ( obj->hasUserData(jetCollection.c_str()) )
-                                      return static_cast<int>(obj->userData<edm::PtrVector<pat::Jet>>(jetCollection.c_str())->size());
-                                  return -1;
+                                   return static_cast<int>(uwvv::helpers::getCleanedJetCollection(*obj, option)->size());
                                });
       }
     };
@@ -1199,6 +862,93 @@ namespace
       static void
         addFunctions(std::unordered_map<std::string, std::function<FType> >& addTo)
       {
+        addTo["mjj"] =
+          std::function<FType>([](const edm::Ptr<T>& obj, uwvv::EventInfo& evt, const std::string& option)
+                               {
+                                 const edm::PtrVector<pat::Jet>* cleanedJets = uwvv::helpers::getCleanedJetCollection(*obj, option);
+                                 if(cleanedJets->size() < 2)
+                                   return -999.;
+                                    
+                                 return ((*cleanedJets)[0]->p4() + (*cleanedJets)[1]->p4()).mass();
+                               });
+        addTo["ptjj"] =
+          std::function<FType>([](const edm::Ptr<T>& obj, uwvv::EventInfo& evt, const std::string& option)
+                               {
+                                 const edm::PtrVector<pat::Jet>* cleanedJets = uwvv::helpers::getCleanedJetCollection(*obj, option);
+                                 if(cleanedJets->size() < 2)
+                                   return -999.;
+                                    
+                                 return ((*cleanedJets)[0]->p4() + (*cleanedJets)[1]->p4()).pt();
+                               });
+
+        addTo["etajj"] =
+          std::function<FType>([](const edm::Ptr<T>& obj, uwvv::EventInfo& evt, const std::string& option)
+                               {
+                                 const edm::PtrVector<pat::Jet>* cleanedJets = uwvv::helpers::getCleanedJetCollection(*obj, option);
+                                 if(cleanedJets->size() < 2)
+                                   return -999.;
+                                    
+                                 return ((*cleanedJets)[0]->p4() + (*cleanedJets)[1]->p4()).eta();
+                               });
+
+        addTo["phijj"] =
+          std::function<FType>([](const edm::Ptr<T>& obj, uwvv::EventInfo& evt, const std::string& option)
+                               {
+                                 const edm::PtrVector<pat::Jet>* cleanedJets = uwvv::helpers::getCleanedJetCollection(*obj, option);
+                                 if(cleanedJets->size() < 2)
+                                   return -999.;
+                                    
+                                 return ((*cleanedJets)[0]->p4() + (*cleanedJets)[1]->p4()).phi();
+                               });
+
+        addTo["deltaEtajj"] =
+          std::function<FType>([](const edm::Ptr<T>& obj, uwvv::EventInfo& evt, const std::string& option)
+                               {
+                                 const edm::PtrVector<pat::Jet>* cleanedJets = uwvv::helpers::getCleanedJetCollection(*obj, option);
+                                 if(cleanedJets->size() < 2)
+                                   return -999.;
+                                    
+                                 return std::abs((*cleanedJets)[0]->eta() - (*cleanedJets)[1]->eta());
+                               });
+
+        addTo["zeppenfeld"] =
+          std::function<FType>([](const edm::Ptr<T>& obj, uwvv::EventInfo& evt, const std::string& option)
+                               {
+                                 const edm::PtrVector<pat::Jet>* cleanedJets = uwvv::helpers::getCleanedJetCollection(*obj, option);
+                                 if(cleanedJets->size() < 2)
+                                   return -999.;
+                                    
+                                 return std::abs(obj->rapidity() -
+                                                           ((*cleanedJets)[0]->rapidity() +
+                                                            (*cleanedJets)[1]->rapidity()) / 2.
+                                                           );
+                               });
+
+        addTo["zeppenfeldj3"] =
+          std::function<FType>([](const edm::Ptr<T>& obj, uwvv::EventInfo& evt, const std::string& option)
+                               {
+                                 const edm::PtrVector<pat::Jet>* cleanedJets = uwvv::helpers::getCleanedJetCollection(*obj, option);
+                                 if(cleanedJets->size() < 2)
+                                   return -999.;
+                                    
+                                 return std::abs((*cleanedJets)[2]->rapidity() -
+                                                           ((*cleanedJets)[0]->rapidity() +
+                                                            (*cleanedJets)[1]->rapidity()) / 2.
+                                                           );
+                               });
+
+        addTo["deltaPhiTojj"] =
+          std::function<FType>([](const edm::Ptr<T>& obj, uwvv::EventInfo& evt, const std::string& option)
+                               {
+                                 const edm::PtrVector<pat::Jet>* cleanedJets = uwvv::helpers::getCleanedJetCollection(*obj, option);
+                                 if(cleanedJets->size() < 2)
+                                   return -999.;
+                                    
+                                 float phiJJ = ((*cleanedJets)[0]->p4() + (*cleanedJets)[1]->p4()).phi();
+                                 return std::abs(deltaPhi(obj->phi(), phiJJ));
+                               });
+
+
         addTo["DR"] =
           std::function<FType>([](const edm::Ptr<T>& obj, uwvv::EventInfo& evt, const std::string& option)
                                {
@@ -1260,6 +1010,153 @@ namespace
                                  return ::getUndressedP4(obj).phi();
                                });
 
+      }
+    };
+
+  template<>
+    struct ObjectFunctionList<std::vector<int>, pat::CompositeCandidate>
+    {
+      // cheating with typedefs for standardization
+      typedef pat::CompositeCandidate T;
+      typedef std::vector<int> B;
+      typedef B (FType) (const edm::Ptr<T>&, uwvv::EventInfo&, const std::string&);
+
+      static void
+        addFunctions(std::unordered_map<std::string, std::function<FType> >& addTo)
+      {
+
+        addTo["jetHadronFlavor"] =
+          std::function<FType>([](const edm::Ptr<T>& obj, uwvv::EventInfo& evt, const std::string& option)
+                               {
+                                 std::vector<int> out;
+
+                                 for(auto& jet : *uwvv::helpers::getCleanedJetCollection(*obj, option))
+                                   {
+                                     out.push_back(jet->hadronFlavour());
+                                   }
+
+                                 return out;
+                               });
+
+        addTo["jetPUID"] =
+          std::function<FType>([](const edm::Ptr<T>& obj, uwvv::EventInfo& evt, const std::string& option)
+                               {
+                                 std::vector<int> out;
+
+                                 for(auto& jet : *uwvv::helpers::getCleanedJetCollection(*obj, option))
+                                   {
+                                     int puID = -999;
+                                     if(jet->hasUserInt("pileupJetIdUpdated:fullId"))
+                                       puID = jet->userInt("pileupJetIdUpdated:fullId");
+
+                                     out.push_back(puID);
+                                   }
+
+                                 return out;
+                               });
+      }
+    };
+
+  template<>
+    struct ObjectFunctionList<std::vector<float>, pat::CompositeCandidate>
+    {
+      // cheating with typedefs for standardization
+      typedef pat::CompositeCandidate T;
+      typedef std::vector<float> B;
+      typedef B (FType) (const edm::Ptr<T>&, uwvv::EventInfo&, const std::string&);
+
+      static void
+        addFunctions(std::unordered_map<std::string, std::function<FType> >& addTo)
+      {
+        addTo["jetPt"] =
+          std::function<FType>([](const edm::Ptr<T>& obj, uwvv::EventInfo& evt, const std::string& option)
+                               {
+                                 std::vector<float> out;
+
+                                 for(auto& jet : *uwvv::helpers::getCleanedJetCollection(*obj, option))
+                                   {
+                                     out.push_back(jet->pt());
+                                   }
+
+                                 return out;
+                               });
+        addTo["jetEta"] =
+          std::function<FType>([](const edm::Ptr<T>& obj, uwvv::EventInfo& evt, const std::string& option)
+                               {
+                                 std::vector<float> out;
+
+                                 for(auto& jet : *uwvv::helpers::getCleanedJetCollection(*obj, option))
+                                   {
+                                     out.push_back(jet->eta());
+                                   }
+
+                                 return out;
+                               });
+        addTo["jetPhi"] =
+          std::function<FType>([](const edm::Ptr<T>& obj, uwvv::EventInfo& evt, const std::string& option)
+                               {
+                                 std::vector<float> out;
+
+                                 for(auto& jet : *uwvv::helpers::getCleanedJetCollection(*obj, option))
+                                   {
+                                     out.push_back(jet->phi());
+                                   }
+
+                                 return out;
+                               });
+
+        addTo["jetRapidity"] =
+          std::function<FType>([](const edm::Ptr<T>& obj, uwvv::EventInfo& evt, const std::string& option)
+                               {
+                                 std::vector<float> out;
+
+                                 for(auto& jet : *uwvv::helpers::getCleanedJetCollection(*obj, option))
+                                   {
+                                     out.push_back(jet->rapidity());
+                                   }
+
+                                 return out;
+                               });
+
+        addTo["jetQGLikelihood"] =
+          std::function<FType>([](const edm::Ptr<T>& obj, uwvv::EventInfo& evt, const std::string& option)
+                               {
+                                 std::vector<float> out;
+
+                                 for(auto& jet : *uwvv::helpers::getCleanedJetCollection(*obj, option))
+                                   {
+                                     if(jet->hasUserFloat("qgLikelihood"))
+                                       out.push_back(jet->userFloat("qgLikelihood"));
+                                   }
+
+                                 return out;
+                               });
+
+        addTo["jetCSVv2"] =
+          std::function<FType>([](const edm::Ptr<T>& obj, uwvv::EventInfo& evt, const std::string& option)
+                               {
+                                 std::vector<float> out;
+
+                                 for(auto& jet : *uwvv::helpers::getCleanedJetCollection(*obj, option))
+                                   {
+                                     out.push_back(jet->bDiscriminator("pfCombinedInclusiveSecondaryVertexV2BJetTags"));
+                                   }
+
+                                 return out;
+                               });
+
+        addTo["jetCMVAv2"] =
+          std::function<FType>([](const edm::Ptr<T>& obj, uwvv::EventInfo& evt, const std::string& option)
+                               {
+                                 std::vector<float> out;
+
+                                 for(auto& jet : *uwvv::helpers::getCleanedJetCollection(*obj, option))
+                                   {
+                                     out.push_back(jet->bDiscriminator("pfCombinedMVAV2BJetTags"));
+                                   }
+
+                                 return out;
+                               });
       }
     };
 
