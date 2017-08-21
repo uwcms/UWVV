@@ -21,7 +21,8 @@ class AddMetFilters(AnalysisFlowBase):
             BadChargedCandidateFilter.PFCandidates = cms.InputTag("packedPFCandidates")
             step.addModule("BadChargedCandidateFilter", BadChargedCandidateFilter)
 
-            for chan in parseChannels('wz'):
+            channels = inputs.pop('channels', [])
+            for chan in channels:
                 filterEmbedding = cms.EDProducer(
                     'PATCompositeCandidateValueEmbedder',
                     src = step.getObjTag(chan),
@@ -31,5 +32,3 @@ class AddMetFilters(AnalysisFlowBase):
                 step.addModule(chan+'filterEmbedding', filterEmbedding, chan)
 
         return step
-
-

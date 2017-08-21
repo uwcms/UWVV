@@ -928,7 +928,7 @@ namespace
           std::function<FType>([](const edm::Ptr<T>& obj, uwvv::EventInfo& evt, const std::string& option)
                                {
                                  const edm::PtrVector<pat::Jet>* cleanedJets = uwvv::helpers::getCleanedJetCollection(*obj, option);
-                                 if(cleanedJets->size() < 2)
+                                 if(cleanedJets->size() < 3)
                                    return -999.;
                                     
                                  return std::abs((*cleanedJets)[2]->rapidity() -

@@ -202,10 +202,8 @@ extraFinalObjectBranches = {'e':[],'m':[]}
 #############################################################################
 FlowSteps = []
 
-# everybody needs vertex cleaning
-# Maybe not?
-
-if not wz:
+# Vertex cleaning for ZZ
+if zz:
     from UWVV.AnalysisTools.templates.VertexCleaning import VertexCleaning
     FlowSteps.append(VertexCleaning)
 
@@ -215,6 +213,9 @@ FlowSteps.append(ElectronBaseFlow)
 
 from UWVV.AnalysisTools.templates.MuonBaseFlow import MuonBaseFlow
 FlowSteps.append(MuonBaseFlow)
+if zz:
+    from UWVV.AnalysisTools.templates.MuonGhostCleaning import MuonGhostCleaning
+    FlowSteps.append(MuonGhostCleaning)
 
 # Lepton calibrations
 if options.eCalib:
@@ -268,9 +269,9 @@ if options.isMC:
     extraFinalObjectBranches['e'].append(matchedGenLeptonBranches)
     extraFinalObjectBranches['m'].append(matchedGenLeptonBranches)
 
-if any(len(c) == 4 for c in channels):
-    from UWVV.Ntuplizer.templates.eventBranches import centralJetBranches
-    extraInitialStateBranches.append(centralJetBranches)
+#if any(len(c) == 4 for c in channels):
+#    from UWVV.Ntuplizer.templates.eventBranches import centralJetBranches
+#    extraInitialStateBranches.append(centralJetBranches)
 
 if not wz:
     # FSR and ZZ/HZZ stuff
@@ -364,7 +365,7 @@ flowOpts = {
 
 # Turn all these into a single flow class
 FlowClass = createFlow(*FlowSteps)
-flow = FlowClass('flow', process, **flowOpts)
+flow = FlowClass('flow', process, channels=channels, **flowOpts)
 
 
 
