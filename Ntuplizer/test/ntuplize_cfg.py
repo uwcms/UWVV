@@ -5,7 +5,7 @@ import FWCore.ParameterSet.Types as CfgTypes
 
 from UWVV.AnalysisTools.analysisFlowMaker import createFlow
 
-from UWVV.Utilities.helpers import parseChannels, expandChannelName
+from UWVV.Utilities.helpers import parseChannels, expandChannelName, pset2Dict, dict2PSet 
 from UWVV.Ntuplizer.makeBranchSet import makeBranchSet, makeGenBranchSet
 from UWVV.Ntuplizer.eventParams import makeEventParams, makeGenEventParams
 
@@ -390,8 +390,12 @@ elif is2016H:
     from UWVV.Ntuplizer.templates.triggerBranches import triggerBranches_2016H
     trgBranches = triggerBranches_2016H
 else:
-    from UWVV.Ntuplizer.templates.triggerBranches import triggerBranches
-    trgBranches = triggerBranches
+    from UWVV.Ntuplizer.templates.triggerBranches import zzCompositeTriggerBranches
+    from UWVV.Ntuplizer.templates.triggerBranches import verboseTriggerBranches
+    trgBranches = verboseTriggerBranches 
+    #trigDict = pset2Dict(verboseTriggerBranches)
+    #trigDict.update(pset2Dict(zzCompositeTriggerBranches))
+    #trgBranches = dict2PSet(trigDict)
 # Add bad muon filters in addition to met filters for ReMiniAOD
 if options.isMC:
     from UWVV.Ntuplizer.templates.triggerBranches import metFilters
