@@ -16,6 +16,7 @@ TriggerPathInfo::TriggerPathInfo(const std::string& nameExp, bool ignoreMissing)
 
 void TriggerPathInfo::setup(const edm::TriggerNames& names)
 {
+  isValid_ = false;
   std::regex re(nameExp_);
   bit_ = names.size();
   for(size_t i = 0; i < names.size(); ++i)
