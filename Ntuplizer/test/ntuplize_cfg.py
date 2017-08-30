@@ -383,19 +383,19 @@ process.schedule.append(process.metaTreePath)
 is2016H = 'Run2016H' in options.inputFiles[0] or "Run2016H" in options.datasetName
 is2016G = 'Run2016G' in options.inputFiles[0] or "Run2016G" in options.datasetName
 
-if is2016G:
-    from UWVV.Ntuplizer.templates.triggerBranches import triggerBranches_2016G
-    trgBranches = triggerBranches_2016G
-elif is2016H:
-    from UWVV.Ntuplizer.templates.triggerBranches import triggerBranches_2016H
-    trgBranches = triggerBranches_2016H
-else:
-    from UWVV.Ntuplizer.templates.triggerBranches import zzCompositeTriggerBranches
-    from UWVV.Ntuplizer.templates.triggerBranches import verboseTriggerBranches
+if wz:
     trgBranches = verboseTriggerBranches 
-    #trigDict = pset2Dict(verboseTriggerBranches)
-    #trigDict.update(pset2Dict(zzCompositeTriggerBranches))
-    #trgBranches = dict2PSet(trigDict)
+else: 
+    if is2016G:
+        from UWVV.Ntuplizer.templates.triggerBranches import triggerBranches_2016G
+        trgBranches = triggerBranches_2016G
+    elif is2016H:
+        from UWVV.Ntuplizer.templates.triggerBranches import triggerBranches_2016H
+        trgBranches = triggerBranches_2016H
+    else:
+        from UWVV.Ntuplizer.templates.triggerBranches import zzCompositeTriggerBranches
+        from UWVV.Ntuplizer.templates.triggerBranches import verboseTriggerBranches
+
 # Add bad muon filters in addition to met filters for ReMiniAOD
 if options.isMC:
     from UWVV.Ntuplizer.templates.triggerBranches import metFilters
