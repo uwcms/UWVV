@@ -384,6 +384,7 @@ is2016H = 'Run2016H' in options.inputFiles[0] or "Run2016H" in options.datasetNa
 is2016G = 'Run2016G' in options.inputFiles[0] or "Run2016G" in options.datasetName
 
 if wz:
+    from UWVV.Ntuplizer.templates.triggerBranches import verboseTriggerBranches
     trgBranches = verboseTriggerBranches 
 else: 
     if is2016G:
@@ -394,7 +395,7 @@ else:
         trgBranches = triggerBranches_2016H
     else:
         from UWVV.Ntuplizer.templates.triggerBranches import zzCompositeTriggerBranches
-        from UWVV.Ntuplizer.templates.triggerBranches import verboseTriggerBranches
+        trgBranches = zzCompositeTriggerBranches
 
 # Add bad muon filters in addition to met filters for ReMiniAOD
 if options.isMC:
