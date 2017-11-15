@@ -52,7 +52,25 @@ if [ "$HZZ" ]; then
         git clone https://github.com/cms-analysis/HiggsAnalysis-ZZMatrixElement.git ZZMatrixElement
 
         pushd ZZMatrixElement
-        git checkout -b from-v200p5 v2.0.0_patch5
+        git checkout -b from-v205 v2.0.5
+
+        # Fix their bullshit.
+        # We have to authenticate to the CERN server the MCFM library is stored on with a cookie
+        # If something is going wrong with ZZMatrixElement stuff, it's probably
+        # related to this.
+        MCFM_URL=`cat MELA/data/"$SCRAM_ARCH"/download.url`
+        # Make cookie
+        env -i KRB5CCNAME="$KRB5CCNAME" cern-get-sso-cookie -u "$MCFM_URL" -o MELA/data/"$SCRAM_ARCH"/cookie.txt --krb -r
+        if [ ! -e MELA/data/retrieveBkp.csh ]; then
+            # Backup the library retrieve script if necessary
+            cp MELA/data/retrieve.csh MELA/data/retrieveBkp.csh
+        fi
+        # Edit their wget command to use the cookie
+        sed 's/wget/wget --load-cookies=cookie.txt/' MELA/data/retrieveBkp.csh > MELA/data/retrieve.csh
+
+        # They download the library during their build process.
+        # And with our fix, they actually get it instead of the html for the
+        # CERN login page...
         source setup.sh -j "$UWVVNTHREADS"
         popd
     fi
