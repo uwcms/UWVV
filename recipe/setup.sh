@@ -32,6 +32,7 @@ done
 
 if [ ! "$UWVVNTHREADS" ]; then
     UWVVNTHREADS=12
+fi
 
 pushd $CMSSW_BASE/src
 
