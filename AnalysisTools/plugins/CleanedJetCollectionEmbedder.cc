@@ -1,6 +1,11 @@
 ///////////////////////////////////////////////////////////////////////////////
-//                                                                           //
-//                                                                           //
+//      CleanedJetCollectionEmbedder.cc
+//      
+//      Create new jet collection from input collection by removing all
+//      jets which overlap a lepton candidate contained in the initial state.
+//      Overlap is defined as dR(lepton candidate, jet) < DR_input. Default
+//      overlap value is 0.4.Collection is named cleanedJets by default.
+//
 ///////////////////////////////////////////////////////////////////////////////
 
 
@@ -41,6 +46,9 @@ private:
   const edm::EDGetTokenT<edm::View<CCand> > srcToken;
   const edm::EDGetTokenT<edm::View<pat::Jet> > jetSrcToken;
 
+  const std::string collectionName;
+  const double deltaR;
+
   edm::EDGetTokenT<edm::View<pat::Jet> > jesUpJetSrcToken;
   edm::EDGetTokenT<edm::View<pat::Jet> > jesDownJetSrcToken;
   edm::EDGetTokenT<edm::View<pat::Jet> > jerUpJetSrcToken;
@@ -57,6 +65,8 @@ private:
 CleanedJetCollectionEmbedder::CleanedJetCollectionEmbedder(const edm::ParameterSet& iConfig) :
   srcToken(consumes<edm::View<CCand> >(iConfig.getParameter<edm::InputTag>("src"))),
   jetSrcToken(consumes<edm::View<pat::Jet> >(iConfig.getParameter<edm::InputTag>("jetSrc"))),
+  collectionName(iConfig.getUntrackedParameter<std::string>("collectionName", "cleanedJets")),
+  deltaR(iConfig.getUntrackedParameter<double>("deltaR", 0.4)),
   jesUpTagExists(iConfig.existsAs<edm::InputTag>("jesUpJetSrc")),
   jesDownTagExists(iConfig.existsAs<edm::InputTag>("jesDownJetSrc")),
   jerUpTagExists(iConfig.existsAs<edm::InputTag>("jerUpJetSrc")),
@@ -89,27 +99,27 @@ void CleanedJetCollectionEmbedder::produce(edm::Event& iEvent,
 
       out->push_back(*cand);
       edm::PtrVector<pat::Jet> cleanedJets = getCleanedJetCollection(iEvent, jetSrcToken, *cand);
-      out->back().addUserData<edm::PtrVector<pat::Jet>>("cleanedJets", cleanedJets);
+      out->back().addUserData<edm::PtrVector<pat::Jet>>(collectionName, cleanedJets);
       
       if(jesUpTagExists) 
         { 
           edm::PtrVector<pat::Jet> cleanedJesUpJets = getCleanedJetCollection(iEvent, jesUpJetSrcToken, *cand);
-          out->back().addUserData<edm::PtrVector<pat::Jet>>("cleanedJets_jesUp", cleanedJesUpJets);
+          out->back().addUserData<edm::PtrVector<pat::Jet>>(collectionName+"_jesUp", cleanedJesUpJets);
         }
       if(jesDownTagExists) 
         { 
           edm::PtrVector<pat::Jet> cleanedJesDownJets = getCleanedJetCollection(iEvent, jesDownJetSrcToken, *cand);
-          out->back().addUserData<edm::PtrVector<pat::Jet>>("cleanedJets_jesDown", cleanedJesDownJets);
+          out->back().addUserData<edm::PtrVector<pat::Jet>>(collectionName+"_jesDown", cleanedJesDownJets);
         }
       if(jerUpTagExists) 
         { 
           edm::PtrVector<pat::Jet> cleanedJerUpJets = getCleanedJetCollection(iEvent, jerUpJetSrcToken, *cand);
-          out->back().addUserData<edm::PtrVector<pat::Jet>>("cleanedJets_jerUp", cleanedJerUpJets);
+          out->back().addUserData<edm::PtrVector<pat::Jet>>(collectionName+"_jerUp", cleanedJerUpJets);
         }
       if(jerDownTagExists) 
         { 
           edm::PtrVector<pat::Jet> cleanedJerDownJets = getCleanedJetCollection(iEvent, jerDownJetSrcToken, *cand);
-          out->back().addUserData<edm::PtrVector<pat::Jet>>("cleanedJets_jerDown", cleanedJerDownJets);
+          out->back().addUserData<edm::PtrVector<pat::Jet>>(collectionName+"_jerDown", cleanedJerDownJets);
         }
     }
       
@@ -127,7 +137,7 @@ edm::PtrVector<pat::Jet> CleanedJetCollectionEmbedder::getCleanedJetCollection(e
 
   for(size_t j = 0; j < uncleanedJets->size(); ++j)
     {
-      if(!uwvv::helpers::overlapWithAnyDaughter(uncleanedJets->at(j), initialState, 0.4)) 
+      if(!uwvv::helpers::overlapWithAnyDaughter(uncleanedJets->at(j), initialState, deltaR)) 
           cleanedJets.push_back(uncleanedJets->ptrAt(j));
     }
     return cleanedJets;
