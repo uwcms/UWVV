@@ -833,11 +833,11 @@ namespace
     }
 
   template<>
-    struct ObjectFunctionList<int, pat::CompositeCandidate>
+    struct ObjectFunctionList<unsigned int, pat::CompositeCandidate>
     {
       // cheating with typedefs for standardization
       typedef pat::CompositeCandidate T;
-      typedef int B;
+      typedef unsigned int B;
       typedef B (FType) (const edm::Ptr<T>&, uwvv::EventInfo&, const std::string&);
 
       static void
@@ -846,7 +846,7 @@ namespace
         addTo["nJets"] =
           std::function<FType>([](const edm::Ptr<T>& obj, uwvv::EventInfo& evt, const std::string& option)
                                {
-                                   return static_cast<int>(uwvv::helpers::getCleanedJetCollection(*obj, option)->size());
+                                   return uwvv::helpers::getCleanedJetCollection(*obj, option)->size();
                                });
       }
     };

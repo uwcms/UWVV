@@ -57,7 +57,8 @@ class ZZInitialStateBaseFlow(ZPlusXBaseFlow):
 
     def embedCleanedJets(self, step):
         '''
-        Add modules to embed alternate lepton pair (e.g. e1+m1) info.
+        Add modules to embed jet collection cleaned leptons 
+        selected in the initial state object
         '''
         for chan in parseChannels('zz'):
             try:

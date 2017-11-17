@@ -32,10 +32,8 @@ eventBranches = cms.PSet(
         lumi = cms.string('lumi'),
         run = cms.string('run'),
         nvtx = cms.string('nvtx'),
-        ),
-    ints = cms.PSet(
         nJets = cms.string('nJets'),
-    ),
+        ),
     ulls = cms.PSet(
         evt = cms.string('evt'),
         ),
@@ -118,7 +116,7 @@ jetSystematicBranches = cms.PSet(
         jetPUID_jerUp = cms.vstring('jetPUID::jerUp'),
         jetPUID_jerDown = cms.vstring('jetPUID::jerDown'),
         ),
-    ints = cms.PSet(
+    uints = cms.PSet(
         nJets_jesUp = cms.string('nJets::jesUp'),
         nJets_jesDown = cms.string('nJets::jesDown'),
         nJets_jerUp = cms.string('nJets::jerUp'),
