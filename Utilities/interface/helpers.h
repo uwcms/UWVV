@@ -57,7 +57,7 @@ namespace uwvv
     // Return the jet collection cleaned from the initial state objects. 
     // Collection should be embedded into the initial state as userData.
     const edm::PtrVector<pat::Jet>* getCleanedJetCollection(const pat::CompositeCandidate& cand, 
-        const std::string& variation);
+        const std::string& variation, std::string collectionName="cleanedJets");
   } // namespace helpers
 
 } // namespace uwvv

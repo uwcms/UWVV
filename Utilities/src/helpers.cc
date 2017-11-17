@@ -58,20 +58,18 @@ namespace uwvv
       return false;
     }
     const edm::PtrVector<pat::Jet>* getCleanedJetCollection(const pat::CompositeCandidate& cand, 
-        const std::string& variation)
+        const std::string& variation, std::string collectionName/*="cleanedJets"*/)
       {
 
-        std::string jetCollection = "cleanedJets";
-
         if (variation != "")
-            jetCollection += "_" + variation;
+            collectionName += "_" + variation;
 
-        if ( !cand.hasUserData(jetCollection.c_str()) )
+        if ( !cand.hasUserData(collectionName.c_str()) )
             throw cms::Exception("ProductNotFound")
                 << "Cleaned jet collection not found"
                 << "for variation " << variation;
             
-        return cand.userData<edm::PtrVector<pat::Jet>>(jetCollection.c_str());
+        return cand.userData<edm::PtrVector<pat::Jet>>(collectionName.c_str());
       }
   } // namespace helpers
 } // namespace uwvv
