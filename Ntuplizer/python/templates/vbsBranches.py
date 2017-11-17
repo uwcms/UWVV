@@ -85,18 +85,3 @@ vbsDerivedSystematicBranches = cms.PSet(
         deltaEtajj_jerDown = cms.string('deltaEtajj::jerDown'),
         ),
     )
-
-
-
-centralVBSBranches = cms.PSet(
-    floats = cms.PSet(
-        mjj_eta2p4 = cms.string('mjj::eta2p4'),
-        deltaPhiTojj_eta2p4 = cms.string('deltaPhiTojj::eta2p4'),
-        zeppenfeld_eta2p4 = cms.string('zeppenfeld::eta2p4'),
-        zeppenfeldj3_eta2p4 = cms.string('zeppenfeldj3::eta2p4'),
-        deltaEtajj_eta2p4 = cms.string('deltaEtajj::eta2p4'),
-        ),
-    vFloats = cms.PSet(
-        jetRapidity_eta2p4 = cms.vstring('jetRapidity::eta2p4'),
-        ),
-    )

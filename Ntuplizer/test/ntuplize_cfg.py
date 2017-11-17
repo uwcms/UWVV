@@ -202,8 +202,12 @@ extraFinalObjectBranches = {'e':[],'m':[]}
 #############################################################################
 FlowSteps = []
 
-# Vertex cleaning for ZZ
-if zz:
+# Vertex cleaning removed for WZ
+# Note that most analyses seem to prefer not to use this.
+# In addition, a condition is made available in the MET filters,
+# though in this case the event is rejected if a bad primary vertex is found,
+# rather than just filtering out the bad vertex and allowing another to be promoted.
+if not wz:
     from UWVV.AnalysisTools.templates.VertexCleaning import VertexCleaning
     FlowSteps.append(VertexCleaning)
 
@@ -213,7 +217,8 @@ FlowSteps.append(ElectronBaseFlow)
 
 from UWVV.AnalysisTools.templates.MuonBaseFlow import MuonBaseFlow
 FlowSteps.append(MuonBaseFlow)
-if zz:
+
+if not wz:
     from UWVV.AnalysisTools.templates.MuonGhostCleaning import MuonGhostCleaning
     FlowSteps.append(MuonGhostCleaning)
 
@@ -268,10 +273,6 @@ if options.isMC:
     from UWVV.Ntuplizer.templates.leptonBranches import matchedGenLeptonBranches
     extraFinalObjectBranches['e'].append(matchedGenLeptonBranches)
     extraFinalObjectBranches['m'].append(matchedGenLeptonBranches)
-
-#if any(len(c) == 4 for c in channels):
-#    from UWVV.Ntuplizer.templates.eventBranches import centralJetBranches
-#    extraInitialStateBranches.append(centralJetBranches)
 
 if not wz:
     # FSR and ZZ/HZZ stuff

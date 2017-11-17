@@ -124,20 +124,6 @@ jetSystematicBranches = cms.PSet(
         ),
     )
 
-centralJetBranches = cms.PSet(
-    vFloats = cms.PSet(
-        jetPt_eta2p4 = cms.vstring('jetPt::eta2p4'),
-        jetEta_eta2p4 = cms.vstring('jetEta::eta2p4'),
-        jetPhi_eta2p4 = cms.vstring('jetPhi::eta2p4'),
-        ),
-    vInts = cms.PSet(
-        jetPUID_eta2p4 = cms.vstring('jetPUID::eta2p4'),
-        ),
-    uints = cms.PSet(
-        nJets_eta2p4 = cms.string('nJets::eta2p4'),
-        ),
-    )
-
 # gen-level initial state info for reco ntuple
 genInitialStateBranches = cms.PSet(
     floats = cms.PSet(
