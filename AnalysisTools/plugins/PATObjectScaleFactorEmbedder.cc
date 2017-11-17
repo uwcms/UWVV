@@ -75,6 +75,10 @@ PATObjectScaleFactorEmbedder<T>::PATObjectScaleFactorEmbedder(const edm::Paramet
             "pt")
 {
   std::string baseName = iConfig.getParameter<std::string>("fileName");
+
+  // For crab submission, the data directory will be copied over without
+  // the UWVV base directory. In this case we also check in this path
+  // if the original file path isn't found
   std::ifstream checkfile(baseName);
   if (!checkfile.good())
     baseName = baseName.substr(baseName.find("UWVV/")+5);
