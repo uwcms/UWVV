@@ -306,7 +306,7 @@ if zz:
 elif zl or z or wz:
     from UWVV.AnalysisTools.templates.ZPlusXBaseFlow import ZPlusXBaseFlow
     FlowSteps.append(ZPlusXBaseFlow)
-    if wz:
+    if wz or zl:
         from UWVV.AnalysisTools.templates.ZPlusXInitialStateBaseFlow import ZPlusXInitialStateBaseFlow
         FlowSteps.append(ZPlusXInitialStateBaseFlow)
 
@@ -400,10 +400,10 @@ else:
 
 # Add bad muon filters in addition to met filters for ReMiniAOD
 if options.isMC:
-    from UWVV.Ntuplizer.templates.triggerBranches import metFilters
+    from UWVV.Ntuplizer.templates.filterBranches import metFilters
     filterBranches = metFilters
 else:
-    from UWVV.Ntuplizer.templates.triggerBranches import metAndBadMuonFilters
+    from UWVV.Ntuplizer.templates.filterBranches import metAndBadMuonFilters
     filterBranches = metAndBadMuonFilters
 
 process.treeSequence = cms.Sequence()
