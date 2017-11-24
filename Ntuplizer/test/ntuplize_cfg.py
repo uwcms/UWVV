@@ -31,7 +31,7 @@ options.register('isMC', 1,
                  VarParsing.VarParsing.multiplicity.singleton,
                  VarParsing.VarParsing.varType.int,
                  "1 if simulation, 0 if data")
-options.register('eCalib', 1,
+options.register('eCalib', 0,
                  VarParsing.VarParsing.multiplicity.singleton,
                  VarParsing.VarParsing.varType.int,
                  "1 if electron energy corrections are desired")
@@ -468,4 +468,3 @@ for chan in channels:
 p = flow.getPath()
 p += process.treeSequence
 
-process.schedule.append(p)
