@@ -5,7 +5,7 @@ import FWCore.ParameterSet.Types as CfgTypes
 
 from UWVV.AnalysisTools.analysisFlowMaker import createFlow
 
-from UWVV.Utilities.helpers import parseChannels, expandChannelName, pset2Dict, dict2PSet 
+from UWVV.Utilities.helpers import parseChannels, expandChannelName, pset2Dict, dict2PSet
 from UWVV.Ntuplizer.makeBranchSet import makeBranchSet, makeGenBranchSet
 from UWVV.Ntuplizer.eventParams import makeEventParams, makeGenEventParams
 
@@ -31,7 +31,7 @@ options.register('isMC', 1,
                  VarParsing.VarParsing.multiplicity.singleton,
                  VarParsing.VarParsing.varType.int,
                  "1 if simulation, 0 if data")
-options.register('eCalib', 1,
+options.register('eCalib', 0,
                  VarParsing.VarParsing.multiplicity.singleton,
                  VarParsing.VarParsing.varType.int,
                  "1 if electron energy corrections are desired")
@@ -119,7 +119,7 @@ if options.genLeptonType not in genLepChoices:
 channels = parseChannels(options.channels)
 zz = any(len(c) == 4 for c in channels)
 zl = any(len(c) == 3 for c in channels)
-wz = "wz" in options.channels 
+wz = "wz" in options.channels
 z  = any(len(c) == 2 for c in channels)
 l  = any(len(c) == 1 for c in channels)
 
@@ -242,7 +242,7 @@ FlowSteps.append(MuonScaleFactors)
 from UWVV.AnalysisTools.templates.ElectronScaleFactors import ElectronScaleFactors
 FlowSteps.append(ElectronScaleFactors)
 
-from UWVV.AnalysisTools.templates.BadMuonFilters import BadMuonFilters 
+from UWVV.AnalysisTools.templates.BadMuonFilters import BadMuonFilters
 FlowSteps.append(BadMuonFilters)
 
 # data and MCFM samples never have LHE info
@@ -386,8 +386,8 @@ is2016G = 'Run2016G' in options.inputFiles[0] or "Run2016G" in options.datasetNa
 
 if wz:
     from UWVV.Ntuplizer.templates.triggerBranches import verboseTriggerBranches
-    trgBranches = verboseTriggerBranches 
-else: 
+    trgBranches = verboseTriggerBranches
+else:
     if is2016G:
         from UWVV.Ntuplizer.templates.triggerBranches import triggerBranches_2016G
         trgBranches = triggerBranches_2016G
@@ -489,4 +489,3 @@ if zz and options.isMC and options.genInfo:
 
 p = flow.getPath()
 p += process.treeSequence
-process.schedule.append(p)
