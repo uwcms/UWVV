@@ -3,12 +3,12 @@ from UWVV.Utilities.helpers import parseChannels
 import FWCore.ParameterSet.Config as cms
 
 # From https://twiki.cern.ch/twiki/bin/viewauth/CMS/MissingETOptionalFiltersRun2
-class AddMetFilters(AnalysisFlowBase):
+class BadMuonFilters(AnalysisFlowBase):
     def __init__(self, *args, **kwargs):
-        super(AddMetFilters, self).__init__(*args, **kwargs)
+        super(BadMuonFilters, self).__init__(*args, **kwargs)
 
     def makeAnalysisStep(self, stepName, **inputs):
-        step = super(AddMetFilters, self).makeAnalysisStep(stepName, **inputs)
+        step = super(BadMuonFilters, self).makeAnalysisStep(stepName, **inputs)
         
         if stepName == 'initialStateEmbedding':
             from RecoMET.METFilters.BadPFMuonFilter_cfi import BadPFMuonFilter 
@@ -21,7 +21,7 @@ class AddMetFilters(AnalysisFlowBase):
             BadChargedCandidateFilter.PFCandidates = cms.InputTag("packedPFCandidates")
             step.addModule("BadChargedCandidateFilter", BadChargedCandidateFilter)
 
-            channels = inputs.pop('channels', [])
+            channels = inputs.pop('initialstate_chans', [])
             for chan in channels:
                 filterEmbedding = cms.EDProducer(
                     'PATCompositeCandidateValueEmbedder',

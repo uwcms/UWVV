@@ -242,8 +242,8 @@ FlowSteps.append(MuonScaleFactors)
 from UWVV.AnalysisTools.templates.ElectronScaleFactors import ElectronScaleFactors
 FlowSteps.append(ElectronScaleFactors)
 
-from UWVV.AnalysisTools.templates.AddMetFilters import AddMetFilters 
-FlowSteps.append(AddMetFilters)
+from UWVV.AnalysisTools.templates.BadMuonFilters import BadMuonFilters 
+FlowSteps.append(BadMuonFilters)
 
 # data and MCFM samples never have LHE info
 if not options.isMC or 'mcfm' in options.inputFiles[0].lower() \
@@ -366,7 +366,7 @@ flowOpts = {
 
 # Turn all these into a single flow class
 FlowClass = createFlow(*FlowSteps)
-flow = FlowClass('flow', process, channels=channels, **flowOpts)
+flow = FlowClass('flow', process, initialstate_chans=channels, **flowOpts)
 
 
 
