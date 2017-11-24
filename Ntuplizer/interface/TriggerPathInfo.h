@@ -15,7 +15,7 @@ namespace uwvv
   class TriggerPathInfo
   {
    public:
-    TriggerPathInfo(const std::string& nameExp);
+    TriggerPathInfo(const std::string& nameExp, bool ignoreMissing);
     ~TriggerPathInfo() {;}
 
     // Set bit, name
@@ -45,6 +45,8 @@ namespace uwvv
 
     // have we set up the name and bit?
     bool isValid_;
+    // Set a path to false if it is missing from the dataset
+    bool ignoreMissing_;
   };
 
 } // namespace

@@ -18,7 +18,8 @@ muonBranches = cms.PSet(
         PFPhotonIso = cms.string('pfIsolationR03.sumPhotonEt'),
         PFNeutralIso = cms.string('pfIsolationR03.sumNeutralHadronEt'),
         PFPUIso = cms.string('pfIsolationR03.sumPUPt'),
-
+        TrackIso = cms.string('trackIso()'), 
+        
         PtErr = cms.string('? hasUserFloat("kalmanPtError") ? '
                            'userFloat("kalmanPtError") : '
                            'bestTrack.ptError'),
@@ -36,15 +37,27 @@ muonBranches = cms.PSet(
         BestTrackType = cms.string('BestTrackType'),
         ),
     bools = cms.PSet(
-        IsPFMuon = cms.string('IsPFMuon'),
-        IsGlobal = cms.string('IsGlobal'),
-        IsTracker = cms.string('IsTracker'),
-        IsLooseMuon = cms.string('isLooseMuon'),
-        IsMediumMuon = cms.string('isMediumMuon'),
-        IsTightMuon = cms.string('? hasUserInt("isTightMuon") ? '
-                                 'userInt("isTightMuon") : 0'),
-        IsMediumMuonICHEP = cms.string('? hasUserInt("isMediumMuonICHEP") ?'
+        IsPFMuon = cms.string('isPFMuon'),
+        IsGlobal = cms.string('isGlobalMuon'),
+        IsTracker = cms.string('isTrackerMuon'),
+        IsLoose = cms.string('isLooseMuon'),
+        IsMedium = cms.string('isMediumMuon'),
+        IsMediumICHEP = cms.string('? hasUserInt("isMediumMuonICHEP") ?'
                                        'userInt("isMediumMuonICHEP") : 0'),
+        IsTight = cms.string('? hasUserInt("isTightMuon") ? '
+                                'userInt("isTightMuon") : 0'),
+        IsWZMedium = cms.string('? hasUserInt("isWZMediumMuon") ?'
+                                       'userInt("isWZMediumMuon") : 0'),
+        IsWZTightNoIso = cms.string('? hasUserInt("isWZTightMuonNoIso") ?'
+                                       'userInt("isWZTightMuonNoIso") : 0'),
+        IsWZTight = cms.string('? hasUserInt("isWZTightMuon") ?'
+                                       'userInt("isWZTightMuon") : 0'),
+        IsWZMediumNoIso = cms.string('? hasUserInt("isWZMediumMuonNoIso") ?'
+                                       'userInt("isWZMediumMuonNoIso") : 0'),
+        IsWZLooseNoIso = cms.string('? hasUserInt("isWZLooseMuonNoIso") ?'
+                                       'userInt("isWZLooseMuonNoIso") : 0'),
+        IsWZLoose = cms.string('? hasUserInt("isWZLooseMuon") ?'
+                                       'userInt("isWZLooseMuon") : 0'),
 
         HighPtID = cms.string('? hasUserFloat("ZZIDPassHighPt") ? '
                               'userFloat("ZZIDPassHighPt") : 0.'),

@@ -39,7 +39,7 @@
 typedef pat::CompositeCandidate CCand;
 typedef pat::CompositeCandidateRef CCandRef;
 
-// Template arguments should be <Electron,Electron>, <Electron,Muon>, 
+// Template arguments should be <Electron,Electron>, <Electron,Muon>,
 // or <Muon,Muon> for 4e, 2e2mu, and 4mu, respectively
 template<class T12, class T34>
 class ZZDiscriminantEmbedder : public edm::one::EDProducer<>
@@ -59,17 +59,17 @@ private:
   template<class T>
   bool daughterPasses(const T& dau) const;
 
-  // Calculate the matrix element of type me for the final state currently set 
+  // Calculate the matrix element of type me for the final state currently set
   // in mela, under model proc, for production mode prod
   float getP(TVar::Process proc, TVar::MatrixElement me,
              TVar::Production prod);
 
-  // Calculate the matrix element of type me for the final state and jets 
+  // Calculate the matrix element of type me for the final state and jets
   // currently set in mela, under model proc, for production mode prod
   float getProdP(TVar::Process proc, TVar::MatrixElement me,
                  TVar::Production prod);
 
-  // Calculate the probability for matrix element of type me for the final 
+  // Calculate the probability for matrix element of type me for the final
   // state currently set in mela, under model proc, for production mode prod,
   // with systematic syst
   float getPM4l(TVar::Process proc, TVar::MatrixElement me,
@@ -101,16 +101,16 @@ private:
 template<class T12, class T34>
 ZZDiscriminantEmbedder<T12,T34>::ZZDiscriminantEmbedder(const edm::ParameterSet& pset) :
   src(consumes<edm::View<CCand> >(pset.getParameter<edm::InputTag>("src"))),
-  jetSrc(consumes<edm::View<pat::Jet> >(pset.exists("jetSrc") ? 
+  jetSrc(consumes<edm::View<pat::Jet> >(pset.exists("jetSrc") ?
                                         pset.getParameter<edm::InputTag>("jetSrc") :
                                         edm::InputTag("slimmedJets"))),
   mela(new Mela(13, 125, TVar::SILENT)),
-  fsrLabel(pset.exists("fsrLabel") ? 
-           pset.getParameter<std::string>("fsrLabel") : 
+  fsrLabel(pset.exists("fsrLabel") ?
+           pset.getParameter<std::string>("fsrLabel") :
            ""),
   qgDiscriminatorLabel(pset.getParameter<std::string>("qgDiscriminator")),
-  skimDecisionLabels(pset.exists("skimDecisionLabels") ? 
-                     pset.getParameter<std::vector<std::string> >("skimDecisionLabels") : 
+  skimDecisionLabels(pset.exists("skimDecisionLabels") ?
+                     pset.getParameter<std::vector<std::string> >("skimDecisionLabels") :
                      std::vector<std::string>())
 {
   mela->setCandidateDecayMode(TVar::CandidateDecay_ZZ);
@@ -121,7 +121,7 @@ ZZDiscriminantEmbedder<T12,T34>::ZZDiscriminantEmbedder(const edm::ParameterSet&
 
 template<class T12, class T34>
 void
-ZZDiscriminantEmbedder<T12,T34>::produce(edm::Event& iEvent, 
+ZZDiscriminantEmbedder<T12,T34>::produce(edm::Event& iEvent,
                                          const edm::EventSetup& iSetup)
 {
   edm::Handle<edm::View<CCand> > cands;
@@ -170,14 +170,14 @@ ZZDiscriminantEmbedder<T12,T34>::produce(edm::Event& iEvent,
       mela->setInputEvent(&daughters, &simpleJets, 0, 0);
       mela->setCurrentCandidateFromIndex(0);
 
-      float p0plus_VAJHU = getP(TVar::HSMHiggs, TVar::JHUGen, 
+      float p0plus_VAJHU = getP(TVar::HSMHiggs, TVar::JHUGen,
                                    TVar::ZZGG);
-      float p0minus_VAJHU = getP(TVar::H0minus, TVar::JHUGen, 
+      float p0minus_VAJHU = getP(TVar::H0minus, TVar::JHUGen,
                                     TVar::ZZGG);
 
       float pg1g4_VAJHU = -1.;
       mela->setProcess(TVar::SelfDefine_spin0, TVar::JHUGen, TVar::ZZGG);
-      (mela->selfDHggcoupl)[0][0] = 1.;
+      (mela->selfDHggcoupl)[0][0][0] = 1.;
       (mela->selfDHzzcoupl)[0][0][0] = 1.;
       (mela->selfDHzzcoupl)[0][3][0] = 1.;
       mela->computeP(pg1g4_VAJHU, true);
@@ -188,9 +188,9 @@ ZZDiscriminantEmbedder<T12,T34>::produce(edm::Event& iEvent,
       float Dgg10_VAMCFM = -1.;
       mela->computeD_gg(TVar::MCFM, TVar::D_gg10, Dgg10_VAMCFM);
 
-      float p0plus_m4l = getPM4l(TVar::HSMHiggs, TVar::JHUGen, TVar::ZZGG, 
+      float p0plus_m4l = getPM4l(TVar::HSMHiggs, TVar::JHUGen, TVar::ZZGG,
                                  TVar::SMSyst_None);
-      float bkg_m4l = getPM4l(TVar::bkgZZ, TVar::JHUGen, TVar::ZZGG, 
+      float bkg_m4l = getPM4l(TVar::bkgZZ, TVar::JHUGen, TVar::ZZGG,
                               TVar::SMSyst_None);
 
       cand.addUserFloat("p0plus_m4l", p0plus_m4l);
@@ -200,20 +200,20 @@ ZZDiscriminantEmbedder<T12,T34>::produce(edm::Event& iEvent,
       cand.addUserFloat("pg1g4_VAJHU", pg1g4_VAJHU);
       cand.addUserFloat("bkg_VAMCFM", bkg_VAMCFM);
       cand.addUserFloat("Dgg10_VAMCFM", Dgg10_VAMCFM);
-      cand.addUserFloat("D_sel_kin", 
+      cand.addUserFloat("D_sel_kin",
                         p0plus_VAJHU / (p0plus_VAJHU + bkg_VAMCFM));
-      cand.addUserFloat("D_bkg_kin", 
-                        p0plus_VAJHU / (p0plus_VAJHU + 
+      cand.addUserFloat("D_bkg_kin",
+                        p0plus_VAJHU / (p0plus_VAJHU +
                                         this->getDbkgkinConstant(m4l) * bkg_VAMCFM));
-      cand.addUserFloat("D_bkg", 
-                        p0plus_VAJHU * p0plus_m4l / 
-                        (p0plus_VAJHU * p0plus_m4l + 
+      cand.addUserFloat("D_bkg",
+                        p0plus_VAJHU * p0plus_m4l /
+                        (p0plus_VAJHU * p0plus_m4l +
                          this->getDbkgConstant(m4l) * bkg_VAMCFM * bkg_m4l));
-      cand.addUserFloat("D_g4", p0plus_VAJHU / (p0plus_VAJHU + 
+      cand.addUserFloat("D_g4", p0plus_VAJHU / (p0plus_VAJHU +
                                                 (2.521 * 2.521 * // since g4=1
                                                  p0minus_VAJHU)));
       cand.addUserFloat("D_g1g4", (pg1g4_VAJHU * 2.521 / // 2.521 since g1=g4=1
-                                   (p0plus_VAJHU + 
+                                   (p0plus_VAJHU +
                                     2.521 * 2.521 *
                                     p0minus_VAJHU)));
 
@@ -247,12 +247,12 @@ ZZDiscriminantEmbedder<T12,T34>::produce(edm::Event& iEvent,
               D_WHh = pwh_hadronic_VAJHU / (pwh_hadronic_VAJHU + 100000.*phjj_VAJHU);
               D_ZHh = pzh_hadronic_VAJHU / (pzh_hadronic_VAJHU + 10000.*phjj_VAJHU);
 
-              D_VBF2j_QG = 1. / (1. + (1. / D_VBF2j - 1.) * 
-                                 std::pow(pgOverPq.at(0) * 
+              D_VBF2j_QG = 1. / (1. + (1. / D_VBF2j - 1.) *
+                                 std::pow(pgOverPq.at(0) *
                                           pgOverPq.at(1), 1./3.));
-              D_WHh_QG = 1. / (1. + (1. / D_WHh - 1.) * pgOverPq.at(0) * 
+              D_WHh_QG = 1. / (1. + (1. / D_WHh - 1.) * pgOverPq.at(0) *
                                pgOverPq.at(1));
-              D_ZHh_QG = 1. / (1. + (1. / D_ZHh - 1.) * pgOverPq.at(0) * 
+              D_ZHh_QG = 1. / (1. + (1. / D_ZHh - 1.) * pgOverPq.at(0) *
                                pgOverPq.at(1));
             }
           else
@@ -261,11 +261,11 @@ ZZDiscriminantEmbedder<T12,T34>::produce(edm::Event& iEvent,
               pvbf_VAJHU = getProdP(TVar::HSMHiggs, TVar::JHUGen, TVar::JJVBF);
               mela->getPAux(pAux_vbf_VAJHU);
 
-              D_VBF1j = pvbf_VAJHU * pAux_vbf_VAJHU / 
-                (pvbf_VAJHU * pAux_vbf_VAJHU + 
+              D_VBF1j = pvbf_VAJHU * pAux_vbf_VAJHU /
+                (pvbf_VAJHU * pAux_vbf_VAJHU +
                  this->getDVBF1jetConstant(m4l) * phj_VAJHU);
 
-              D_VBF1j_QG = 1. / (1. + (1. / D_VBF1j - 1.) * 
+              D_VBF1j_QG = 1. / (1. + (1. / D_VBF1j - 1.) *
                                  std::pow(pgOverPq.at(0), 1./3.));
             }
         }
@@ -297,7 +297,7 @@ bool
 ZZDiscriminantEmbedder<T12,T34>::candPasses(const CCand& cand) const
 {
   const reco::Candidate* z1 = cand.daughter(0);
-  
+
   const T12* l1 = static_cast<const T12*>(z1->daughter(0)->masterClone().get());
   if(!daughterPasses(*l1))
     return false;
@@ -336,9 +336,9 @@ ZZDiscriminantEmbedder<T12,T34>::daughterPasses(const T& dau) const
 
 
 template<class T12, class T34>
-float 
-ZZDiscriminantEmbedder<T12,T34>::getP(TVar::Process proc, 
-                                      TVar::MatrixElement me, 
+float
+ZZDiscriminantEmbedder<T12,T34>::getP(TVar::Process proc,
+                                      TVar::MatrixElement me,
                                       TVar::Production prod)
 {
   float out;
@@ -350,9 +350,9 @@ ZZDiscriminantEmbedder<T12,T34>::getP(TVar::Process proc,
 
 
 template<class T12, class T34>
-float 
-ZZDiscriminantEmbedder<T12,T34>::getProdP(TVar::Process proc, 
-                                          TVar::MatrixElement me, 
+float
+ZZDiscriminantEmbedder<T12,T34>::getProdP(TVar::Process proc,
+                                          TVar::MatrixElement me,
                                           TVar::Production prod)
 {
   float out;
@@ -365,8 +365,8 @@ ZZDiscriminantEmbedder<T12,T34>::getProdP(TVar::Process proc,
 
 template<class T12, class T34>
 float
-ZZDiscriminantEmbedder<T12,T34>::getPM4l(TVar::Process proc, 
-                                         TVar::MatrixElement me, 
+ZZDiscriminantEmbedder<T12,T34>::getPM4l(TVar::Process proc,
+                                         TVar::MatrixElement me,
                                          TVar::Production prod,
                                          TVar::SuperMelaSyst syst)
 {
@@ -383,10 +383,10 @@ std::vector<TLorentzVector>
 ZZDiscriminantEmbedder<T12,T34>::getLeptonP4s(const CCand& cand) const
 {
   std::vector<TLorentzVector> out;
-  
+
   const CCandRef& z1 = cand.daughter(0)->masterClone().castTo<CCandRef>();
   const CCandRef& z2 = cand.daughter(1)->masterClone().castTo<CCandRef>();
-  
+
   edm::Ptr<T12> l1 = z1->daughter(0)->masterClone().castTo<edm::Ptr<T12> >();
   out.push_back(TLorentzVector(l1->p4().x(), l1->p4().y(), l1->p4().z(), l1->p4().t()));
   if(l1->hasUserCand(fsrLabel))
@@ -428,7 +428,7 @@ std::vector<int>
 ZZDiscriminantEmbedder<T12,T34>::getLeptonIDs(const CCand& cand) const
 {
   std::vector<int> out;
-  
+
   out.push_back(cand.daughter(0)->daughter(0)->pdgId());
   out.push_back(cand.daughter(0)->daughter(1)->pdgId());
   out.push_back(cand.daughter(1)->daughter(0)->pdgId());
@@ -439,11 +439,11 @@ ZZDiscriminantEmbedder<T12,T34>::getLeptonIDs(const CCand& cand) const
 
 
 //////////////////////////////////////////////////////////////////////////////
-//    
+//
 //    Essentially everything that follows is taken from the HZZ twiki
 //    I cleaned it up a little, but not much
 //    https://twiki.cern.ch/twiki/bin/viewauth/CMS/HiggsZZ4l2016#Kinematic_Discriminants
-//    
+//
 //////////////////////////////////////////////////////////////////////////////
 
 template<class T12, class T34>

@@ -58,9 +58,6 @@ class ZZFSR(AnalysisFlowBase):
                 jetFSRCleaner_jerDown = jetFSRCleaner.clone(src = step.getObjTag('j_jerDown'))
                 step.addModule('jetFSRCleanerJERDown', jetFSRCleaner_jerDown, 'j_jerDown')
 
-            jetFSRCleaner_eta2p4 = jetFSRCleaner.clone(src = step.getObjTag('j_eta2p4'))
-            step.addModule('jetFSRCleanerEta2p4', jetFSRCleaner_eta2p4, 'j_eta2p4')
-
         if stepName == 'intermediateStateEmbedding':
             if isinstance(self, ZPlusXBaseFlow):
                 zeFSREmbedder = cms.EDProducer(

@@ -35,7 +35,8 @@ namespace uwvv
     TriggerBranch(const std::string& name, 
                   const std::vector<std::string>& pathExps,
                   TTree* const tree,
-                  bool checkPrescale);
+                  bool checkPrescale,
+                  bool ignoreMissing);
     ~TriggerBranch(){;}
 
     void setup(const edm::TriggerNames& names);
@@ -46,6 +47,7 @@ namespace uwvv
   private:
     const std::string name;
     const bool checkPrescale;
+    const bool ignoreMissing;
 
     bool pass;
     unsigned prescale;

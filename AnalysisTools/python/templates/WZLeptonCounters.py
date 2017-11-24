@@ -14,28 +14,41 @@ class WZLeptonCounters(AnalysisFlowBase):
         step = super(WZLeptonCounters, self).makeAnalysisStep(stepName, **inputs)
         
         if stepName == 'initialStateEmbedding':
-            muCounters = ["TightMuon", "MediumMuonICHEP",]
+            muCounters = {
+                "WZLooseMuon"   : self.getWZLooseMuonID(),
+                "WZMediumMuon"   : self.getWZMediumMuonID(),
+                "WZTightMuon"   : self.getWZTightMuonID(),
+            }
                          
             mod = cms.EDProducer(
                 "PATMuonCounter",
                 src = step.getObjTag('m'),
-                labels = cms.vstring(*[label for label in muCounters]),
-                cuts = cms.vstring(*['userInt("is%s")' % label for label in muCounters]),
+                labels = cms.vstring(*muCounters.keys()),
+                cuts = cms.vstring(*muCounters.values()),
                 )
             step.addModule("muCounter", mod)
 
-            eCounters = ["CBVIDtight", "CBVIDmedium","CBVIDloose",]
+            eCounters = {"CBVIDTightElec" : 'pt() > 10 && abs(eta) < 2.5 && userFloat("IsCBVIDTightwIP")',
+                "CBVIDMediumElec" :  'pt() > 10 && abs(eta) < 2.5 && userFloat("IsCBVIDMediumwIP")',
+                "CBVIDLooseElec" :  'pt() > 10 && abs(eta) < 2.5 && userFloat("IsCBVIDLoosewIP")',
+                "CBVIDVetoElec" :  'pt() > 10 && abs(eta) < 2.5 && userFloat("IsCBVIDVetowIP")',
+                "CBVIDVetoElecNoIP" :  'pt() > 10 && abs(eta) < 2.5 && userFloat("IsCBVIDVeto")',
+                "CBVIDHLTSafeElec" :  'pt() > 10 && abs(eta) < 2.5 && userFloat("IsCBVIDHLTSafewIP")',
+                "CBVIDHLTSafeElecNoIP" :  'pt() > 10 && abs(eta) < 2.5 && userFloat("IsCBVIDHLTSafe")',
+                "WWLooseCBVIDMedElec" :  'pt() > 10 && abs(eta) < 2.5 && userInt("IsWWLoose") && userFloat("IsCBVIDMediumwIP")',
+                "WWLooseElec" :  'pt() > 10 && abs(eta) < 2.5 && userInt("IsWWLoose")',
+            }
                          
             mod = cms.EDProducer(
                 "PATElectronCounter",
                 src = step.getObjTag('e'),
-                labels = cms.vstring(*[label for label in eCounters]),
-                cuts = cms.vstring(*['userFloat("is%s") > 0.5' % label for label in eCounters]),
+                labels = cms.vstring(*eCounters.keys()),
+                cuts = cms.vstring(*eCounters.values()),
                 )
             step.addModule("elecCounter", mod)
 
-            counters = {'n'+label : 'muCounter:'+label for label in muCounters}
-            counters.update({'n'+label+'Elec' : 'elecCounter:'+label for label in eCounters})
+            counters = {'n'+label : 'muCounter:'+label for label in muCounters.keys()}
+            counters.update({'n'+label : 'elecCounter:'+label for label in eCounters.keys()})
 
             labels = list(counters.keys())
             tags = [cms.InputTag(counters[label]) for label in labels]
