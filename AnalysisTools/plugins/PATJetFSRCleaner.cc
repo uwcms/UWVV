@@ -59,7 +59,7 @@ private:
               std::vector<CandPtr>& addTo) const;
   bool selectFSRLep(const ElecPtr& e) const;
   bool selectFSRLep(const MuonPtr& m) const;
-  
+
   //// Data
   edm::EDGetTokenT<JetView> collectionTokenJ;
   edm::EDGetTokenT<ElecView> collectionTokenE;
@@ -78,13 +78,13 @@ private:
 
 
 PATJetFSRCleaner::PATJetFSRCleaner(const edm::ParameterSet& iConfig):
-  collectionTokenJ(consumes<JetView>(iConfig.exists("src") ? 
+  collectionTokenJ(consumes<JetView>(iConfig.exists("src") ?
                                       iConfig.getParameter<edm::InputTag>("src") :
                                       edm::InputTag("slimmedJets"))),
-  collectionTokenE(consumes<ElecView>(iConfig.exists("srcE") ? 
+  collectionTokenE(consumes<ElecView>(iConfig.exists("srcE") ?
                                       iConfig.getParameter<edm::InputTag>("srcE") :
                                       edm::InputTag("slimmedElectrons"))),
-  collectionTokenM(consumes<MuonView>(iConfig.exists("srcMu") ? 
+  collectionTokenM(consumes<MuonView>(iConfig.exists("srcMu") ?
                                       iConfig.getParameter<edm::InputTag>("srcMu") :
                                       edm::InputTag("slimmedMuons"))),
   fsrElecSelection(iConfig.exists("fsrElecSelection") ?
@@ -116,8 +116,8 @@ void PATJetFSRCleaner::produce(edm::Event& iEvent, const edm::EventSetup& iSetup
 
   std::vector<CandPtr> fsr = getFSR(elecsIn, muonsIn);
 
-  std::auto_ptr<std::vector<Jet> > out = 
-    std::auto_ptr<std::vector<Jet> >(new std::vector<Jet>);
+  std::unique_ptr<std::vector<Jet> > out =
+    std::make_unique<std::vector<Jet> >();
 
   for(size_t iJ = 0; iJ < jetsIn->size(); ++iJ)
     {
@@ -133,11 +133,11 @@ void PATJetFSRCleaner::produce(edm::Event& iEvent, const edm::EventSetup& iSetup
         out->push_back(*jet);
     }
 
-  iEvent.put(out);
+  iEvent.put(std::move(out));
 }
-    
 
-std::vector<CandPtr> 
+
+std::vector<CandPtr>
 PATJetFSRCleaner::getFSR(const edm::Handle<ElecView>& elecs,
                          const edm::Handle<MuonView>& muons) const
 {

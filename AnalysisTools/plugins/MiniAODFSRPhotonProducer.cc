@@ -50,7 +50,7 @@ MiniAODFSRPhotonProducer::~MiniAODFSRPhotonProducer()
 }
 void MiniAODFSRPhotonProducer::produce(edm::Event& iEvent, const edm::EventSetup& iSetup)
 {
-  std::auto_ptr<reco::PFCandidateCollection> comp( new reco::PFCandidateCollection );
+  std::unique_ptr<reco::PFCandidateCollection> comp = std::make_unique<reco::PFCandidateCollection>();
   edm::Handle<reco::CandidateView> cands;
   iEvent.getByToken(srcCands_, cands);
   edm::Handle<edm::View<pat::Muon> > muons;
@@ -79,7 +79,7 @@ void MiniAODFSRPhotonProducer::produce(edm::Event& iEvent, const edm::EventSetup
 	    }
 	}
     }
-  iEvent.put( comp );
+  iEvent.put( std::move(comp) );
 }
 //define this as a plug-in
 DEFINE_FWK_MODULE(MiniAODFSRPhotonProducer);

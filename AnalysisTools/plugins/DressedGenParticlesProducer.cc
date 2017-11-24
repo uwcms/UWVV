@@ -20,7 +20,7 @@ class DressedGenParticlesProducer : public edm::EDProducer {
     private:
         edm::EDGetTokenT<reco::GenParticleCollection> baseCollectionToken_;
         edm::EDGetTokenT<reco::GenParticleCollection> associatesToken_;
-        double dRmax_;
+        const double dRmax_;
 };
 
 DressedGenParticlesProducer::DressedGenParticlesProducer(
@@ -34,7 +34,7 @@ DressedGenParticlesProducer::DressedGenParticlesProducer(
 }
 
 void DressedGenParticlesProducer::produce(edm::Event& event, const edm::EventSetup& es) {
-    std::auto_ptr<std::vector<DressedGenParticle> > dressedCollection(new std::vector<DressedGenParticle>);
+    std::unique_ptr<std::vector<DressedGenParticle> > dressedCollection = std::make_unique<std::vector<DressedGenParticle> >();
 
     edm::Handle<reco::GenParticleCollection> baseCollection;
     event.getByToken(baseCollectionToken_, baseCollection);
@@ -54,7 +54,7 @@ void DressedGenParticlesProducer::produce(edm::Event& event, const edm::EventSet
     //        {return part1.pt() > part2.pt();});
         //GreaterByPt<reco::Candidate>());
 
-    event.put(dressedCollection);
+    event.put(std::move(dressedCollection));
 }
 bool DressedGenParticlesProducer::allUniqueAssociates(
         reco::CandidateCollection& dressedParticles) {

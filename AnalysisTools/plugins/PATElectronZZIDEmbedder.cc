@@ -55,7 +55,6 @@ private:
   const std::string isoLabel_;
   const edm::EDGetTokenT<reco::VertexCollection> vtxSrcToken_; // primary vertex (for veto PV and SIP cuts)
   edm::Handle<reco::VertexCollection> vertices;
-  std::auto_ptr<std::vector<pat::Electron> > out; // Collection we'll output at the end
 
   const double ptCut;
   const double etaCut;
@@ -74,7 +73,7 @@ private:
   const std::string bdtLabel;
   const int missingHitsCut;
   const bool checkMVAID;
-  
+
   StringCutObjectSelector<pat::Electron> selector;
 };
 
@@ -82,7 +81,7 @@ private:
 // Constructors and destructors
 
 PATElectronZZIDEmbedder::PATElectronZZIDEmbedder(const edm::ParameterSet& iConfig):
-  electronCollectionToken_(consumes<edm::View<pat::Electron> >(iConfig.exists("src") ? 
+  electronCollectionToken_(consumes<edm::View<pat::Electron> >(iConfig.exists("src") ?
                                                                iConfig.getParameter<edm::InputTag>("src") :
                                                                edm::InputTag("slimmedElectrons"))),
   idLabel_(iConfig.exists("idLabel") ?
@@ -119,7 +118,7 @@ PATElectronZZIDEmbedder::PATElectronZZIDEmbedder(const edm::ParameterSet& iConfi
 
 void PATElectronZZIDEmbedder::produce(edm::Event& iEvent, const edm::EventSetup& iSetup)
 {
-  out = std::auto_ptr<std::vector<pat::Electron> >(new std::vector<pat::Electron>);
+  std::unique_ptr<std::vector<pat::Electron> >out = std::make_unique<std::vector<pat::Electron> >();
 
   edm::Handle<edm::View<pat::Electron> > electronsIn;
   iEvent.getByToken(vtxSrcToken_,vertices);
@@ -146,7 +145,7 @@ void PATElectronZZIDEmbedder::produce(edm::Event& iEvent, const edm::EventSetup&
       out->back().addUserFloat(idLabel_+"Tight", float(idResult && passBDT(eptr))); // 1 for true, 0 for false
     }
 
-  iEvent.put(out);
+  iEvent.put(std::move(out));
 }
 
 
@@ -164,7 +163,7 @@ bool PATElectronZZIDEmbedder::passVertex(const edm::Ptr<pat::Electron>& elec) co
   if(!vertices->size())
     return false;
 
-  return (fabs(elec->dB(pat::Electron::PV3D))/elec->edB(pat::Electron::PV3D) < sipCut && 
+  return (fabs(elec->dB(pat::Electron::PV3D))/elec->edB(pat::Electron::PV3D) < sipCut &&
           fabs(elec->gsfTrack()->dxy(vertices->at(0).position())) < pvDXYCut &&
           fabs(elec->gsfTrack()->dz(vertices->at(0).position())) < pvDZCut);
 }
@@ -204,7 +203,7 @@ bool PATElectronZZIDEmbedder::passBDT(const edm::Ptr<pat::Electron>& elec) const
 
 bool PATElectronZZIDEmbedder::passMissingHits(const edm::Ptr<pat::Electron>& elec) const
 {
-  return (elec->gsfTrack()->hitPattern().numberOfHits(reco::HitPattern::MISSING_INNER_HITS) <= missingHitsCut);
+  return (elec->gsfTrack()->hitPattern().numberOfAllHits(reco::HitPattern::MISSING_INNER_HITS) <= missingHitsCut);
 }
 
 

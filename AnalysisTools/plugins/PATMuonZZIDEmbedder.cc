@@ -49,17 +49,16 @@ private:
 
   // Data
   edm::EDGetTokenT<edm::View<pat::Muon> > muonCollectionToken_;
-  std::string idLabel_; // label for the decision userfloat
-  std::string isoLabel_;
+  const std::string idLabel_; // label for the decision userfloat
+  const std::string isoLabel_;
   const edm::EDGetTokenT<reco::VertexCollection> vtxSrcToken_; // primary vertex (for veto PV and SIP cuts)
   edm::Handle<reco::VertexCollection> vertices;
-  std::auto_ptr<std::vector<pat::Muon> > out; // Collection we'll output at the end
 
-  double ptCut;
-  double etaCut;
-  double sipCut;
-  double pvDXYCut;
-  double pvDZCut;
+  const double ptCut;
+  const double etaCut;
+  const double sipCut;
+  const double pvDXYCut;
+  const double pvDZCut;
 
 };
 
@@ -67,7 +66,7 @@ private:
 // Constructors and destructors
 
 PATMuonZZIDEmbedder::PATMuonZZIDEmbedder(const edm::ParameterSet& iConfig):
-  muonCollectionToken_(consumes<edm::View<pat::Muon> >(iConfig.exists("src") ? 
+  muonCollectionToken_(consumes<edm::View<pat::Muon> >(iConfig.exists("src") ?
 						       iConfig.getParameter<edm::InputTag>("src") :
 						       edm::InputTag("slimmedMuons"))),
   idLabel_(iConfig.exists("idLabel") ?
@@ -76,8 +75,8 @@ PATMuonZZIDEmbedder::PATMuonZZIDEmbedder(const edm::ParameterSet& iConfig):
   isoLabel_(iConfig.exists("isoLabel") ?
 	   iConfig.getParameter<std::string>("isoLabel") :
 	   std::string("HZZ4lIsoPass")),
-  vtxSrcToken_(consumes<reco::VertexCollection>(iConfig.exists("vtxSrc") ? 
-                                                iConfig.getParameter<edm::InputTag>("vtxSrc") : 
+  vtxSrcToken_(consumes<reco::VertexCollection>(iConfig.exists("vtxSrc") ?
+                                                iConfig.getParameter<edm::InputTag>("vtxSrc") :
                                                 edm::InputTag("selectedPrimaryVertex"))),
   ptCut(iConfig.exists("ptCut") ? iConfig.getParameter<double>("ptCut") : 5.),
   etaCut(iConfig.exists("etaCut") ? iConfig.getParameter<double>("etaCut") : 2.4),
@@ -91,7 +90,7 @@ PATMuonZZIDEmbedder::PATMuonZZIDEmbedder(const edm::ParameterSet& iConfig):
 
 void PATMuonZZIDEmbedder::produce(edm::Event& iEvent, const edm::EventSetup& iSetup)
 {
-  out = std::auto_ptr<std::vector<pat::Muon> >(new std::vector<pat::Muon>);
+  std::unique_ptr<std::vector<pat::Muon> > out = std::make_unique<std::vector<pat::Muon> >();
 
   edm::Handle<edm::View<pat::Muon> > muonsIn;
   iEvent.getByToken(muonCollectionToken_, muonsIn);
@@ -125,7 +124,7 @@ void PATMuonZZIDEmbedder::produce(edm::Event& iEvent, const edm::EventSetup& iSe
       out->back().addUserFloat(idLabel_+"TightNoVtx", float(idResultNoVtx && (mi->isPFMuon() || trackerHighPtID)));
     }
 
-  iEvent.put(out);
+  iEvent.put(std::move(out));
 }
 
 
@@ -142,7 +141,7 @@ bool PATMuonZZIDEmbedder::passVertex(const edm::Ptr<pat::Muon>& mu) const
   if(!vertices->size())
     return false;
 
-  return (fabs(mu->dB(pat::Muon::PV3D))/mu->edB(pat::Muon::PV3D) < sipCut && 
+  return (fabs(mu->dB(pat::Muon::PV3D))/mu->edB(pat::Muon::PV3D) < sipCut &&
 	  fabs(mu->muonBestTrack()->dxy(vertices->at(0).position())) < pvDXYCut &&
 	  fabs(mu->muonBestTrack()->dz(vertices->at(0).position())) < pvDZCut);
 }
