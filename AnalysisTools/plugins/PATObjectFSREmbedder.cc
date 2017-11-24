@@ -60,11 +60,11 @@ public:
 
 private:
   virtual void produce(edm::Event&, const edm::EventSetup&);
-  
+
   // check if pho is in PF supercluster of any passing electron
-  bool candInSuperCluster(const PCandRef& pho, 
+  bool candInSuperCluster(const PCandRef& pho,
                           const edm::Handle<edm::View<Elec> >& elecs) const;
-  
+
   // Compute relative isolation for pho from the cands in nIsoCands and chIsoCands
   // If those vectors are empty, they are filled from allCands
   bool passIso(const PCandRef& pho,
@@ -75,7 +75,7 @@ private:
   edm::EDGetTokenT<PCandView> cands_;
   edm::EDGetTokenT<ElecView> electrons_;
   edm::EDGetTokenT<MuonView> muons_;
-  
+
 
   StringCutObjectSelector<PCand> phoSelection_;
   StringCutObjectSelector<PCand> nIsoSelection_;
@@ -84,7 +84,7 @@ private:
   StringCutObjectSelector<Muon> mSelection_;
 
   std::string fsrLabel_;
-  
+
   const float cut_; // the actual cut on deltaR/eT^n
 
   const float etPower_;
@@ -104,24 +104,24 @@ PATObjectFSREmbedder::PATObjectFSREmbedder(const edm::ParameterSet& iConfig):
   electrons_(consumes<ElecView>(iConfig.getParameter<edm::InputTag>("eSrc"))),
   muons_(consumes<MuonView>(iConfig.getParameter<edm::InputTag>("muSrc"))),
   phoSelection_("pdgId == 22 " +
-                ((iConfig.exists("phoSelection") && 
-                  !iConfig.getParameter<std::string>("phoSelection").empty()) ? 
+                ((iConfig.exists("phoSelection") &&
+                  !iConfig.getParameter<std::string>("phoSelection").empty()) ?
                  " && " + iConfig.getParameter<std::string>("phoSelection") :
                  "")),
   nIsoSelection_("(pdgId == 22 || pdgId == 130)" +
-                 ((iConfig.exists("nIsoSelection") && 
-                   !iConfig.getParameter<std::string>("nIsoSelection").empty()) ? 
+                 ((iConfig.exists("nIsoSelection") &&
+                   !iConfig.getParameter<std::string>("nIsoSelection").empty()) ?
                   " && " + iConfig.getParameter<std::string>("nIsoSelection") :
                   "")),
   chIsoSelection_("abs(pdgId) == 211" +
-                  ((iConfig.exists("chIsoSelection") && 
-                    !iConfig.getParameter<std::string>("chIsoSelection").empty()) ? 
+                  ((iConfig.exists("chIsoSelection") &&
+                    !iConfig.getParameter<std::string>("chIsoSelection").empty()) ?
                    " && " + iConfig.getParameter<std::string>("chIsoSelection") :
                    "")),
   eSelection_(iConfig.exists("eSelection") ?
 	      iConfig.getParameter<std::string>("eSelection") :
 	      ""),
-  mSelection_(iConfig.exists("muSelection") ? 
+  mSelection_(iConfig.exists("muSelection") ?
 	      iConfig.getParameter<std::string>("muSelection") :
 	      ""),
   fsrLabel_(iConfig.exists("fsrLabel") ?
@@ -136,16 +136,16 @@ PATObjectFSREmbedder::PATObjectFSREmbedder(const edm::ParameterSet& iConfig):
   maxDR_(iConfig.exists("maxDR") ?
          float(iConfig.getParameter<double>("maxDR")) :
          0.5),
-  isoDR_(iConfig.exists("isoDR") ? 
+  isoDR_(iConfig.exists("isoDR") ?
          float(iConfig.getParameter<double>("isoDR")) :
          0.3),
-  nIsoVetoDR_(iConfig.exists("nIsoVetoDR") ? 
+  nIsoVetoDR_(iConfig.exists("nIsoVetoDR") ?
               float(iConfig.getParameter<double>("nIsoVetoDR")) :
               0.01),
-  chIsoVetoDR_(iConfig.exists("chIsoVetoDR") ? 
+  chIsoVetoDR_(iConfig.exists("chIsoVetoDR") ?
                float(iConfig.getParameter<double>("chIsoVetoDR")) :
                0.0001),
-  relIsoCut_(iConfig.exists("relIsoCut") ? 
+  relIsoCut_(iConfig.exists("relIsoCut") ?
              float(iConfig.getParameter<double>("relIsoCut")) :
              1.8),
   eMuCrossCleaningDR_(iConfig.exists("eMuCrossCleaningDR") ?
@@ -162,12 +162,12 @@ PATObjectFSREmbedder::~PATObjectFSREmbedder()
 }
 
 
-// Some cuts, especially isolation, are very slow, so do the steps in 
+// Some cuts, especially isolation, are very slow, so do the steps in
 // a sensible order
 void PATObjectFSREmbedder::produce(edm::Event& iEvent, const edm::EventSetup& iSetup)
 {
-  std::auto_ptr<std::vector<Muon> > mOut( new std::vector<Muon> );
-  std::auto_ptr<std::vector<Elec> > eOut( new std::vector<Elec> );
+  std::unique_ptr<std::vector<Muon> > mOut = std::make_unique<std::vector<Muon> > ();
+  std::unique_ptr<std::vector<Elec> > eOut = std::make_unique<std::vector<Elec> > ();
   edm::Handle<PCandView> cands;
   iEvent.getByToken(cands_, cands);
   edm::Handle<edm::View<Elec> > elecs;
@@ -175,7 +175,7 @@ void PATObjectFSREmbedder::produce(edm::Event& iEvent, const edm::EventSetup& iS
   edm::Handle<edm::View<Muon> > mus;
   iEvent.getByToken(muons_, mus);
 
-  
+
   // associate photons to their closest leptons
   std::vector<std::vector<PCandRef> > phosByEle = std::vector<std::vector<PCandRef> >(elecs->size());
   std::vector<std::vector<PCandRef> > phosByMu = std::vector<std::vector<PCandRef> >(mus->size());
@@ -183,7 +183,7 @@ void PATObjectFSREmbedder::produce(edm::Event& iEvent, const edm::EventSetup& iS
   for( size_t iPho = 0; iPho != cands->size(); ++iPho )
     {
       PCandRef pho = cands->refAt(iPho).castTo<PCandRef>();
-      
+
       // basic selection
       if (!phoSelection_(*pho))
         continue;
@@ -204,7 +204,7 @@ void PATObjectFSREmbedder::produce(edm::Event& iEvent, const edm::EventSetup& iS
             }
           else
             {
-              // we almost never need the second one, so don't waste time 
+              // we almost never need the second one, so don't waste time
               // sorting the rest
               closeEles.emplace_back(std::pair<size_t, float>(iE, deltaR));
             }
@@ -223,15 +223,15 @@ void PATObjectFSREmbedder::produce(edm::Event& iEvent, const edm::EventSetup& iS
             }
           else
             {
-              // we almost never need the second one, so don't waste time 
+              // we almost never need the second one, so don't waste time
               // sorting the rest
               closeMus.emplace_back(std::pair<size_t, float>(iM, deltaR));
             }
         }
 
 
-      if(closeEles.size() && 
-         (closeMus.empty() || 
+      if(closeEles.size() &&
+         (closeMus.empty() ||
           closeEles.front().second < closeMus.front().second)
          )
         {
@@ -261,7 +261,7 @@ void PATObjectFSREmbedder::produce(edm::Event& iEvent, const edm::EventSetup& iS
               // function for sorting these things
               std::function<bool(const std::pair<size_t,float>&,
                                  const std::pair<size_t,float>&)>
-                f([](const std::pair<size_t,float>& a, 
+                f([](const std::pair<size_t,float>& a,
                      const std::pair<size_t,float>& b)
                   {return a.second < b.second;});
 
@@ -312,7 +312,7 @@ void PATObjectFSREmbedder::produce(edm::Event& iEvent, const edm::EventSetup& iS
         phosByMu.at(closeMus.front().first).push_back(pho);
     }
 
-  
+
   // Will be filled in isolation calculation function if needed
   std::vector<PCandRef> nIsoCands;
   std::vector<PCandRef> chIsoCands;
@@ -320,10 +320,10 @@ void PATObjectFSREmbedder::produce(edm::Event& iEvent, const edm::EventSetup& iS
   for(size_t iE = 0; iE < elecs->size(); ++iE)
     {
       Elec e = elecs->at(iE);
-      
+
       PCandRef bestPho;
       float dREtBestPho = 9999.;
-      
+
       for(size_t iPho = 0; iPho < phosByEle[iE].size(); ++iPho)
         {
           PCandRef pho = phosByEle[iE][iPho];
@@ -352,10 +352,10 @@ void PATObjectFSREmbedder::produce(edm::Event& iEvent, const edm::EventSetup& iS
   for(size_t iM = 0; iM < mus->size(); ++iM)
     {
       Muon m = mus->at(iM);
-      
+
       PCandRef bestPho;
       float dREtBestPho = 9999.;
-      
+
       for(size_t iPho = 0; iPho < phosByMu[iM].size(); ++iPho)
         {
           PCandRef pho = phosByMu[iM][iPho];
@@ -381,12 +381,12 @@ void PATObjectFSREmbedder::produce(edm::Event& iEvent, const edm::EventSetup& iS
       mOut->push_back(m);
     }
 
-  iEvent.put( eOut );
-  iEvent.put( mOut );
+  iEvent.put(std::move(eOut));
+  iEvent.put(std::move(mOut));
 }
 
 
-bool PATObjectFSREmbedder::candInSuperCluster(const PCandRef& pho, 
+bool PATObjectFSREmbedder::candInSuperCluster(const PCandRef& pho,
                                               const edm::Handle<edm::View<Elec> >& elecs) const
 {
   for(size_t iE = 0; iE < elecs->size(); ++iE)

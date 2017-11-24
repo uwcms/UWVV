@@ -33,7 +33,6 @@ private:
   // Data
   edm::EDGetTokenT<edm::View<pat::Muon> > collectionToken_; // input collection
   edm::EDGetTokenT<reco::VertexCollection> vertexToken_;  // vertices
-  std::auto_ptr<std::vector<pat::Muon> > out;             // Collection we'll output at the end
 };
 
 // Constructors and destructors
@@ -46,7 +45,7 @@ MuonIdEmbedder::MuonIdEmbedder(const edm::ParameterSet& iConfig):
 
 void MuonIdEmbedder::produce(edm::Event& iEvent, const edm::EventSetup& iSetup)
 {
-  out = std::auto_ptr<std::vector<pat::Muon> >(new std::vector<pat::Muon>);
+  std::unique_ptr<std::vector<pat::Muon> > out = std::make_unique<std::vector<pat::Muon> >();
 
   edm::Handle<edm::View<pat::Muon> > collection;
   iEvent.getByToken(collectionToken_, collection);
@@ -72,29 +71,29 @@ void MuonIdEmbedder::produce(edm::Event& iEvent, const edm::EventSetup& iSetup)
         highPurity = obj.innerTrack()->quality(reco::TrackBase::highPurity);
     }
     newObj.addUserInt("highPurityTrack",highPurity);
-    
+
     out->push_back(newObj);
   }
 
-  iEvent.put(out);
+  iEvent.put(std::move(out));
 }
 
 // ICHEP short term IDs
 // https://twiki.cern.ch/twiki/bin/viewauth/CMS/SWGuideMuonIdRun2#Short_Term_Instructions_for_ICHE
-bool MuonIdEmbedder::isMediumMuonICHEP(const reco::Muon & recoMu) 
+bool MuonIdEmbedder::isMediumMuonICHEP(const reco::Muon & recoMu)
   {
-    bool goodGlob = recoMu.isGlobalMuon() && 
-                    recoMu.globalTrack()->normalizedChi2() < 3 && 
-                    recoMu.combinedQuality().chi2LocalPosition < 12 && 
-                    recoMu.combinedQuality().trkKink < 20; 
-    bool isMedium = muon::isLooseMuon(recoMu) && 
-                    recoMu.innerTrack()->validFraction() > 0.49 && 
-                    muon::segmentCompatibility(recoMu) > (goodGlob ? 0.303 : 0.451); 
-    return isMedium; 
+    bool goodGlob = recoMu.isGlobalMuon() &&
+                    recoMu.globalTrack()->normalizedChi2() < 3 &&
+                    recoMu.combinedQuality().chi2LocalPosition < 12 &&
+                    recoMu.combinedQuality().trkKink < 20;
+    bool isMedium = muon::isLooseMuon(recoMu) &&
+                    recoMu.innerTrack()->validFraction() > 0.49 &&
+                    muon::segmentCompatibility(recoMu) > (goodGlob ? 0.303 : 0.451);
+    return isMedium;
   }
 
 
-bool MuonIdEmbedder::isSoftMuonICHEP(const reco::Muon & recoMu, const reco::Vertex& pv) 
+bool MuonIdEmbedder::isSoftMuonICHEP(const reco::Muon & recoMu, const reco::Vertex& pv)
   {
     bool soft = muon::isGoodMuon(recoMu, muon::TMOneStationTight) &&
                 recoMu.innerTrack()->hitPattern().trackerLayersWithMeasurement() > 5 &&
