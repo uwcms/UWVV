@@ -40,14 +40,14 @@ fi
 
 pushd $CMSSW_BASE/src
 
-if [ ! -d ./EgammaAnalysis ]; then
-    echo "Setting up electron energy scale corrections"
-    git cms-merge-topic cms-egamma:EGM_gain_v1
-
-    pushd EgammaAnalysis/ElectronTools/data
-    git clone -b Moriond17_gainSwitch_unc https://github.com/ECALELFS/ScalesSmearings.git
-    popd
-fi
+# if [ ! -d ./EgammaAnalysis ]; then
+#     echo "Setting up electron energy scale corrections"
+#     git cms-merge-topic rafaellopesdesa:EgammaAnalysis80_EGMSmearer_Moriond17_23Jan
+#
+#     pushd EgammaAnalysis/ElectronTools/data
+#     git clone https://github.com/ECALELFS/ScalesSmearings.git
+#     popd
+# fi
 
 if [ "$HZZ" ]; then
 
