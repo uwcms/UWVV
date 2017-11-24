@@ -3,11 +3,11 @@ import FWCore.ParameterSet.Config as cms
 
 
 triggerBranches = cms.PSet(
-    trigNames = cms.vstring('doubleMu', 'doubleMuDZ', 'doubleE',
-                            'singleESingleMu', 'singleMuSingleE',
-                            'tripleE', 'doubleESingleMu', 'doubleMuSingleE',
-                            'tripleMu', 'singleE', 'singleIsoMu',
-                            'singleIsoMu20', 'singleMu',),
+    trigNames = cms.vstring(),# 'doubleMu', 'doubleMuDZ', 'doubleE',
+                              # 'singleESingleMu', 'singleMuSingleE',
+                              # 'tripleE', 'doubleESingleMu', 'doubleMuSingleE',
+                              # 'tripleMu', 'singleE', 'singleIsoMu',
+                              # 'singleIsoMu20', 'singleMu',),
     doubleMuPaths = cms.vstring('HLT_Mu17_TrkIsoVVL_Mu8_TrkIsoVVL_v[0-9]+',
                                 'HLT_Mu17_TrkIsoVVL_TkMu8_TrkIsoVVL_v[0-9]+'),
     doubleMuDZPaths = cms.vstring('HLT_Mu17_TrkIsoVVL_Mu8_TrkIsoVVL_DZ_v[0-9]+',
