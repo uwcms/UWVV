@@ -21,7 +21,7 @@ class AnalysisStep(object):
         self.outputs = initialInputTags.copy()
 
         self.modules = OrderedDict()
-    
+
 
     def getObjTag(self, obj):
         '''
@@ -40,20 +40,28 @@ class AnalysisStep(object):
         '''
         Add a module, give it this name, and update the tags of the collections
         listed in objectsOutput.
-        If the module is a sequence, the name of the last module is assumed to 
+        If the module is a sequence, the name of the last module is assumed to
         be the desired tag.
         If the module puts a suffix on the collection names (e.g. a module that
-        outputs both someMod:muons and someMod:electrons), the suffixes for the 
+        outputs both someMod:muons and someMod:electrons), the suffixes for the
         appropriate objects can be indicated with the keyword arguments,
         e.g. addModule(name, module, 'e', 'm', e='electrons', m='muons')
         '''
         assert name not in self.modules, "Module {} already exists.".format(name)
         self.modules[name] = module
 
-        if isinstance(module, _ModuleSequenceType):
-            newTag = module._seq._collection[-1].__str__()
-        else:
-            newTag = name + self.suffix
+        if objectsOutput:
+            if isinstance(module, _ModuleSequenceType):
+                try:
+                    newTag = module._seq._collection[-1].__str__()
+                except AttributeError:
+                    if module._seq is None or module._seq._collection is None:
+                        raise AttributeError(("I don't know how to extract an "
+                                              "input tag from the sequence in "
+                                              )+name)
+                    raise
+            else:
+                newTag = name + self.suffix
 
         for obj in objectsOutput:
             self.outputs[obj] = newTag
@@ -78,17 +86,17 @@ class AnalysisStep(object):
         return seq
 
 
-    def addBasicSelector(self, obj, selection, name='', objectType='', 
+    def addBasicSelector(self, obj, selection, name='', objectType='',
                          newCollection=''):
         '''
         Add a basic, no-frills string cut selector module for objects
-        of collection obj ('e', 'm' etc.). 
-        objectType should be 'e' or "Electron" or whatever. If it is not 
+        of collection obj ('e', 'm' etc.).
+        objectType should be 'e' or "Electron" or whatever. If it is not
         specified, the name is inferred from the name up to the first '_', e.g.
-        'j_jesUp' is interpreted as a jet collection. If this is more than one 
+        'j_jesUp' is interpreted as a jet collection. If this is more than one
         letter, the type is assumed to be pat::CompositeCandidate.
         If 'name' is empty, the module is called <obj>cleaning<stepName>.
-        If newCollection is non-empty, a new collection called 
+        If newCollection is non-empty, a new collection called
         [obj]_[newCollection] is made instead of replacing the collection
         that's already there.
         '''
@@ -102,7 +110,7 @@ class AnalysisStep(object):
         else:
             typeName = inferTypeFrom
         modName = 'PAT{}RefSelector'.format(typeName)
-            
+
         mod = cms.EDFilter(
             modName,
             src = self.getObjTag(obj),
@@ -114,18 +122,18 @@ class AnalysisStep(object):
         if newCollection:
             collection += '_'+newCollection
 
-        self.addModule(''.join([obj, newCollection, name if name else 'cleaning', 
+        self.addModule(''.join([obj, newCollection, name if name else 'cleaning',
                                 self.name]).replace('_',''),
                        mod, collection)
 
-    
+
     def addCrossSelector(self, obj, selection, name='', **otherObjects):
         '''
         Add a module to do a string cut and to do delta R cross-cleaning on
-        objects of type obj, and any other object collections. The keyword 
+        objects of type obj, and any other object collections. The keyword
         arguments specify the other collections to clean with respect to, and
         should be of the form obj:{'selection':'someSelection','deltaR':distance}.
-        So to clean objects that have pt<5 GeV or are within 0.4 of any 30+ GeV 
+        So to clean objects that have pt<5 GeV or are within 0.4 of any 30+ GeV
         slimmed jet, one would call this funtion like:
             crossSelector('pt > 5.', j={'deltaR':0.4, 'selection':'pt>30','tag':'slimmedJets'})
         If 'name' is empty, the module is called <obj>crossCleaning<stepName>.
@@ -151,5 +159,5 @@ class AnalysisStep(object):
             finalCut = cms.string(''),
             )
 
-        self.addModule(''.join([obj, name if name else 'crossCleaning', 
+        self.addModule(''.join([obj, name if name else 'crossCleaning',
                                 self.name]).replace('_',''), mod, obj)
