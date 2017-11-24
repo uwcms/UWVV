@@ -1,10 +1,10 @@
 import FWCore.ParameterSet.Config as cms
 
 from UWVV.AnalysisTools.analysisFlowMaker import createFlow
-from UWVV.AnalysisTools.templates.ElectronBaseFlow import ElectronBaseFlow 
+from UWVV.AnalysisTools.templates.ElectronBaseFlow import ElectronBaseFlow
 from UWVV.AnalysisTools.templates.MuonBaseFlow import MuonBaseFlow
 from UWVV.AnalysisTools.templates.ZZInitialStateBaseFlow import ZZInitialStateBaseFlow
-    
+
 
 process = cms.Process("PrintZZ")
 
@@ -21,7 +21,7 @@ process.MessageLogger.cerr.FwkReport.reportEvery = 100
 
 process.source = cms.Source(
     "PoolSource",
-    fileNames = cms.untracked.vstring('/store/mc/RunIIFall15MiniAODv2/GluGluHToZZTo4L_M2500_13TeV_powheg2_JHUgenV6_pythia8/MINIAODSIM/PU25nsData2015v1_76X_mcRun2_asymptotic_v12-v1/60000/02C0EC1D-F3E4-E511-ADCA-AC162DA603B4.root'),
+    fileNames = cms.untracked.vstring('/store/data/Run2017C/MuonEG/MINIAOD/PromptReco-v3/000/300/742/00000/0A1C877F-617E-E711-A3F8-02163E01A332.root'),
     )
 
 process.maxEvents = cms.untracked.PSet(input=cms.untracked.int32(100))
@@ -35,17 +35,17 @@ initialStateFlow = InitialStateFlowClass('initialStateFlow', process,
 
 process.print4ECands = cms.EDAnalyzer(
     'CandidatePrinter',
-    src = cms.InputTag(initialStateFlow.finalObjTag('zz4e')),
+    src = initialStateFlow.finalObjTag('eeee'),
     )
 
 process.print2E2MuCands = cms.EDAnalyzer(
     'CandidatePrinter',
-    src = cms.InputTag(initialStateFlow.finalObjTag('zz2e2m')),
+    src = initialStateFlow.finalObjTag('eemm'),
     )
 
 process.print4MuCands = cms.EDAnalyzer(
     'CandidatePrinter',
-    src = cms.InputTag(initialStateFlow.finalObjTag('zz4m')),
+    src = initialStateFlow.finalObjTag('mmmm'),
     )
 
 process.printCands = cms.EndPath(
