@@ -399,12 +399,14 @@ else:
         trgBranches = zzCompositeTriggerBranches
 
 # Add bad muon filters in addition to met filters for ReMiniAOD
-if options.isMC:
-    from UWVV.Ntuplizer.templates.filterBranches import metFilters
-    filterBranches = metFilters
-else:
-    from UWVV.Ntuplizer.templates.filterBranches import metAndBadMuonFilters
-    filterBranches = metAndBadMuonFilters
+# Removed for now because they don't seem to be ready in 2017 yet
+# if options.isMC:
+#     from UWVV.Ntuplizer.templates.filterBranches import metFilters
+#     filterBranches = metFilters
+# else:
+#     from UWVV.Ntuplizer.templates.filterBranches import metAndBadMuonFilters
+#     filterBranches = metAndBadMuonFilters
+filterBranches = trgBranches.clone(trigNames=cms.vstring())
 
 process.treeSequence = cms.Sequence()
 # then the ntuples
@@ -415,7 +417,7 @@ for chan in channels:
         branches = makeBranchSet(chan, extraInitialStateBranches,
                                  extraIntermediateStateBranches,
                                  **extraFinalObjectBranches),
-        eventParams = makeEventParams(flow.finalTags(),chan, metSrc='slimmedMETsMuEGClean')
+        eventParams = makeEventParams(flow.finalTags(),chan)
             if not options.isMC else makeEventParams(flow.finalTags(), chan),
         triggers = trgBranches,
         filters = filterBranches,
