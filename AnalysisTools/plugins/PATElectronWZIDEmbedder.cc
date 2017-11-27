@@ -31,7 +31,7 @@ ElectronWZIDEmbedder::ElectronWZIDEmbedder(const edm::ParameterSet& pset):
 }
 
 void ElectronWZIDEmbedder::produce(edm::Event& evt, const edm::EventSetup& es) {
-  std::auto_ptr<pat::ElectronCollection> output(new pat::ElectronCollection);
+  std::unique_ptr<pat::ElectronCollection> output = std::make_unique<pat::ElectronCollection>();
   // TODO This should really be passed into the module
   std::vector<std::string> pogIDNames = { "IsCBVIDTight", "IsCBVIDMedium",
       "IsCBVIDLoose", "IsCBVIDVeto", "IsCBVIDHLTSafe" };
@@ -56,7 +56,7 @@ void ElectronWZIDEmbedder::produce(edm::Event& evt, const edm::EventSetup& es) {
     double ecalPFClusterIso = electron.ecalPFClusterIso();
     double hcalPFClusterIso = electron.hcalPFClusterIso();
     double trackIso = electron.dr03TkSumPt();
-    int missingHits = electron.gsfTrack()->hitPattern().numberOfHits(reco::HitPattern::MISSING_INNER_HITS);
+    int missingHits = electron.gsfTrack()->hitPattern().numberOfAllHits(reco::HitPattern::MISSING_INNER_HITS);
     double dxy = std::abs(electron.gsfTrack()->dxy(thePV.position()));
     double dz = std::abs(electron.gsfTrack()->dz(thePV.position()));
     bool passConversionVeto = electron.passConversionVeto();
@@ -130,7 +130,7 @@ void ElectronWZIDEmbedder::produce(edm::Event& evt, const edm::EventSetup& es) {
     output->push_back(electron);
   }
 
-  evt.put(output);
+  evt.put(std::move(output));
 }
 
 #include "FWCore/Framework/interface/MakerMacros.h"
