@@ -167,8 +167,11 @@ The event info for library functions is held in a `uwvv::EventInfo` object. For 
 | Missing energy   | `pat::METCollection` <br> `pat::MET` | `met`           | `mets()` (collection) <br> `met()` (first) |
 | Pileup           | `PileupSummaryInfo`    | `pu`                          | `puInfo()`            |
 | Generator information  | `GenEventInfoProduct`  | `genEventInfo`          | `genEventInfo()`      |
+| LHE information  | `LHEEventProduct`      |                               | `lheEventInfo()`      |
 | Generator-level jets  | `reco::GenJet`         | `genJet`                 | `genJets()`           |
 | Pruned gen particles  | `reco::GenParticle`    | `genParticle`            | `genParticles()`      |
+| Initial states   | `pat::CompositeCandidate`   | `initialState`           | `initialStates()`     |
+| Generated initial states  | `pat::CompositeCandidate`  | `genInitialState` | `genInitialStates()` |
 
 So the parameter definitions would look something like
 ```python
