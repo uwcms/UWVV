@@ -13,7 +13,7 @@ scram pro -n uwvv CMSSW CMSSW_8_0_[current version]
 cd uwvv/src
 cmsenv
 git cms-init # do before anything else
-git clone --recursive https://github.com/nwoods/UWVV.git # or git@github.com:nwoods/UWVV.git if you prefer that
+git clone --recursive https://github.com/uwcms/UWVV.git # or git@github.com:uwcms/UWVV.git if you prefer that
 cd UWVV
 source recipe/setup.sh # install necessary packages
 pushd ..
