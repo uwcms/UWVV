@@ -5,7 +5,7 @@ UWVV analysis flows are intended to be as modular as possible, to allow multiple
 
 ## Building and executing a flow
 
-A Flow class for an analysis is built from multiple base classes with the `createFlow` method. The constructor for this class takes a name and the `cms.Process` it should add modules to as positional arguments. Extra arguments needed by the base classes, and input tags for any nonstandard collections, are passed as constructor keyword arguments. 
+A Flow class for an analysis is built from multiple base classes with the `createFlow` method. The constructor for this class takes a name and the `cms.Process` it should add modules to as positional arguments. Extra arguments needed by the base classes, and input tags for any nonstandard collections, are passed as constructor keyword arguments.
 
 The following snippet makes a Flow that makes a few simple modifications to the electrons in the event, and schedules the resulting `cms.Path`.
 
@@ -27,14 +27,12 @@ Flow = createFlow(ElectronBaseFlow, ElectronCalibration, ElectronScaleFactors)
 
 # ElectronCalibration base class needs extra argument isMC
 # Electrons are a standard collection, so no extra input tags are needed
-flow = Flow('flow', process, isMC=True) 
+flow = Flow('flow', process, isMC=True)
 
 # Path contains all actions from all base classes
 p = flow.getPath()
 
 # Could add something else here, like an ntuplizer module or an output module
-
-process.schedule.append(p)
 ```
 
 
@@ -93,7 +91,7 @@ The `objectsOutput` argument tells the Step which collections, if any, are repla
 step.addModule('twoOutputModule', twoOutputModule, 'e', 'm', e='electrons', m='muons')
 ```
 
-If the module creates a new collection that doesn't replace any existing one, the step will start tracking the new collection. 
+If the module creates a new collection that doesn't replace any existing one, the step will start tracking the new collection.
 
 #### Auto-generated selectors
 
@@ -115,16 +113,16 @@ where each `otherObjects` argument is a dictionary specifying the distance for c
 step.addCrossSelector('j', 'pt>30.', m={'deltaR':0.4,'selection':'pt>10.'})
 ```
 
-If `addBasicSelector()` and `addCrossSelector` receive a collection with a longer name, if an underscore is the second character, it will assume this is a secondary collection of a type given by the first character. For example, `j_jesUp` will be interpreted as a second jet collection used for energy scale systematics estimates. Any other multi-character collection will be assumed to be `CompositeCandidates`. 
+If `addBasicSelector()` and `addCrossSelector` receive a collection with a longer name, if an underscore is the second character, it will assume this is a secondary collection of a type given by the first character. For example, `j_jesUp` will be interpreted as a second jet collection used for energy scale systematics estimates. Any other multi-character collection will be assumed to be `CompositeCandidates`.
 
 ### Order of modules within a step
 
-The order of modules within a step is determined by the order in which the Flow base classes that embed them are passed into `createFlow`. The first Flow class's modules will be first, the last Flow class's modules will be last. In general, this should not matter, but it comes up on occasion, e.g. when an `edm::ValueMap` is keyed to a specific particle collection and not a copy of the collection. 
+The order of modules within a step is determined by the order in which the Flow base classes that embed them are passed into `createFlow`. The first Flow class's modules will be first, the last Flow class's modules will be last. In general, this should not matter, but it comes up on occasion, e.g. when an `edm::ValueMap` is keyed to a specific particle collection and not a copy of the collection.
 
 
 ## Flow base classes
 
-Each action in the analysis flow is represented by a class which derives from `AnalysisFlowBase`. 
+Each action in the analysis flow is represented by a class which derives from `AnalysisFlowBase`.
 
 ### Adding modules
 
@@ -133,13 +131,13 @@ The class sets up its modules in a method called `makeAnalysisStep` which should
   * This method is called once for every step, so use `stepName` to ensure the action is only done at the appropriate step. See above for the list of standard step names.
   * The `inputs` keyword arguments represent the initial collection input tags for the step. Unless your module happens to be the first one in its step, they will be wrong, so don't use them. The correct input tags for the modules should be retrieved from the AnalysisStep (see above).
 * The AnalysisStep to modify is obtained from `super(ThisClass, self).makeAnalysisStep(stepName, **inputs)`.
-* Necessary EDM modules are created and added to the step. 
+* Necessary EDM modules are created and added to the step.
   * They do not need to be added to the `Process` here.
 * Return the step.
 
 ### Extra arguments and initial input tags
 
-Any extra parameters can be passed into the final `Flow` class constructor and retrieved in the base class constructor. The `__init__()` method must call `super().__init__()`. Extra arguments should be removed from the constructor keyword arguments before passing them on to super, as any arguments not removed will be interpreted as input tags for collections in the event stream. 
+Any extra parameters can be passed into the final `Flow` class constructor and retrieved in the base class constructor. The `__init__()` method must call `super().__init__()`. Extra arguments should be removed from the constructor keyword arguments before passing them on to super, as any arguments not removed will be interpreted as input tags for collections in the event stream.
 
 ### Example
 
@@ -157,7 +155,7 @@ class JetID(AnalysisFlowBase):
         '''
         if not hasattr(self, 'isMC'):
             self.isMC = kwargs.pop('isMC') # remove from kwargs
-        
+
         super(JetID, self).__init__(*args, **kwargs)
 
 
@@ -169,7 +167,7 @@ class JetID(AnalysisFlowBase):
         step = super(JetID, self).makeAnalysisStep(stepName, **inputs)
 
         # IDs are used in preselection, so they should be embedded in the preliminary step
-        if stepName == 'preliminary': 
+        if stepName == 'preliminary':
 
             # Make the module
             jetIDEmbedding = cms.EDProducer(
@@ -196,7 +194,7 @@ tagStringDict = flow.finalTags() # all final tags, as strings
 
 ## Composite states
 
-Intermediate and inital states are represented by `pat::CompositeCandidate` objects made of shallow clones of the daughters. 
+Intermediate and inital states are represented by `pat::CompositeCandidate` objects made of shallow clones of the daughters.
 
 ### Building composite candidates
 
@@ -231,7 +229,7 @@ for chan in parseChannels('zz'):
         checkCharge = cms.bool(False),
         setPdgId = cms.int32(25),
         )
-            
+
 step.addModule('eeeeProducer', eeeeMod, 'eeee') # Step now tracks this collection as 'eeee'
 ```
 
@@ -249,7 +247,7 @@ float pt = cand->daughter(0)->pt();
 If you need a pointer to the original object
 ```c++
 // if you don't care about type, this works
-const reco::Candidate* e1Base = cand->daughter(0)->masterClone().get(); 
+const reco::Candidate* e1Base = cand->daughter(0)->masterClone().get();
 // to get the typed pointer, do this
 const pat::Electron* e1 = static_cast<const pat::Electron*>(e1Base); // or dynamic_cast where appropriate
 ```
