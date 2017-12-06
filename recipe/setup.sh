@@ -7,7 +7,7 @@ then
     echo "    --hzzExtras: Get and compile HZZ matrix element and kinematic fit stuff, and generate the UWVV plugins that use them."
     echo "               This is not the default because most people do not need them and one of the packages' authors frequently make changes that break everything without intervention on our side."
     echo "               NB if you use this option and later use scram b clean, you should rerun this script with this option or your CONDOR jobs may fail."
-    echo "    --met: Download updated MET correction recipes (needed for MET filters and uncertainties)"
+    echo "    --noMet: Skip download of updated MET correction recipes (needed for MET filters and uncertainties)"
     echo "    -j NTHREADS: [with --hzzExtras] Compile ZZMatrixElement package with NTHREADS threads (default 12)."
     exit 1
 fi
@@ -18,7 +18,7 @@ do
         --hzzExtras)
             HZZ=1
             ;;
-        --met)
+        --noMet)
             MET=1
             ;;
         -j)
