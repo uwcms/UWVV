@@ -92,7 +92,7 @@ if [ "$HZZ" ]; then
     cp UWVV/AnalysisTools/plugins/ZKinematicFitEmbedderCode.txt UWVV/AnalysisTools/plugins/ZKinematicFitEmbedder.cc
 fi
 
-if [ $MET -ne 0 ] && [ ! -d ./RecoMET ]; then
+if [ $MET -eq 0 ] && [ ! -d ./RecoMET ]; then
     echo -e "\nChecking out MET recipe for Moriond 17"
     git cms-merge-topic -u cms-met:METRecipe_8020
 fi
