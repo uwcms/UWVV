@@ -2,7 +2,7 @@ import FWCore.ParameterSet.Config as cms
 
 
 
-triggerBranches = cms.PSet(
+zzCompositeTriggerBranches = cms.PSet(
     trigNames = cms.vstring(),# 'doubleMu', 'doubleMuDZ', 'doubleE',
                               # 'singleESingleMu', 'singleMuSingleE',
                               # 'tripleE', 'doubleESingleMu', 'doubleMuSingleE',
