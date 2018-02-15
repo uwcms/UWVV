@@ -15,8 +15,8 @@ process = cms.Process("Ntuple")
 
 options = VarParsing.VarParsing('analysis')
 
-options.inputFiles = '/store/mc/RunIIFall15MiniAODv2/GluGluHToZZTo4L_M2500_13TeV_powheg2_JHUgenV6_pythia8/MINIAODSIM/PU25nsData2015v1_76X_mcRun2_asymptotic_v12-v1/60000/02C0EC1D-F3E4-E511-ADCA-AC162DA603B4.root'
-options.outputFile = 'ntuplize.root'
+options.inputFiles = ' /store/mc/RunIIFall17MiniAOD/ZZTo4L_13TeV_powheg_pythia8/MINIAODSIM/94X_mc2017_realistic_v10_ext1-v1/00000/005E8ACC-A60A-E811-825F-A0369FC522F0.root'
+options.outputFile = 'ZZTo4L_2017_v1.root'
 options.maxEvents = -1
 
 options.register('channels', "zz",
@@ -159,7 +159,7 @@ process.GlobalTag = GlobalTag(process.GlobalTag, gt)
 process.load("FWCore.MessageLogger.MessageLogger_cfi")
 process.schedule = cms.Schedule()
 
-process.MessageLogger.cerr.FwkReport.reportEvery = 100
+process.MessageLogger.cerr.FwkReport.reportEvery = 1
 
 process.source = cms.Source(
     "PoolSource",
