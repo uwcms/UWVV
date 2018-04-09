@@ -26,8 +26,12 @@ class ZZIso(AnalysisFlowBase):
                 isoCutE = cms.double(0.35),
                 isoCutMu = cms.double(0.35),
                 )
+            #step.addModule('leptonIsoEmbedding', leptonIsoEmbedding,
+            #               'e', 'm', e='electrons', m='muons')
+            #The isolation cut is applied after recovered FSR photons are subtracted 
+            #from the isolation cone (see below) only for muons since electron isolation variables are now included in the MVA!.
             step.addModule('leptonIsoEmbedding', leptonIsoEmbedding,
-                           'e', 'm', e='electrons', m='muons')
+                           'e', e='electrons')
 
         return step
 
