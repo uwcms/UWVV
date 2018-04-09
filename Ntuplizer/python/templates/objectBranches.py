@@ -8,6 +8,7 @@ objectBranches = cms.PSet(
         Phi = cms.string('phi'),
         Mass = cms.string('mass'),
         Energy = cms.string('energy'),
+        MtToMET = cms.string('mtToMET'),
         ),
     ints = cms.PSet(
         Charge = cms.string('charge'),

@@ -80,10 +80,13 @@ process.DAT
 ffwarn.dat
 
 # Generated WZ submissions scripts
-scripts/WZSubmission/GeneratedScripts
+scripts/WZSubmission/GeneratedScripts/*
 
 # Plugins that are stored as text files unless they're actually used
 AnalysisTools/plugins/ZZDiscriminantEmbedder.cc
 AnalysisTools/plugins/ZKinematicFitEmbedder.cc
 # But don't ignore the .txt files they're now stored in
 !AnalysisTools/plugins/*Code.txt
+
+# Crab submit directories 
+crab_*

@@ -63,6 +63,7 @@ class TreeGenerator : public edm::one::EDAnalyzer<edm::one::SharedResources>
   EventInfo evtInfo;
 
   std::unique_ptr<BranchManager<T> > branches;
+  std::unique_ptr<TriggerBranches> filterBranches;
   std::unique_ptr<TriggerBranches> triggerBranches;
 };
 
@@ -84,6 +85,9 @@ TreeGenerator<T>::TreeGenerator(const edm::ParameterSet& config) :
   const edm::ParameterSet& triggers = config.getParameter<edm::ParameterSet>("triggers");
   triggerBranches = std::unique_ptr<TriggerBranches>(new TriggerBranches(consumesCollector(),
                                                                          triggers, tree));
+  const edm::ParameterSet& filters = config.getParameter<edm::ParameterSet>("filters");
+  filterBranches = std::unique_ptr<TriggerBranches>(new TriggerBranches(consumesCollector(),
+                                                                         filters, tree));
 }
 
 
@@ -105,11 +109,13 @@ TreeGenerator<T>::analyze(const edm::Event &event,
 
   evtInfo.setEvent(event);
   triggerBranches->setEvent(event);
+  filterBranches->setEvent(event);
 
   for(size_t i = 0; i < cands->size(); ++i)
     {
       branches->fill(cands->ptrAt(i), evtInfo);
       triggerBranches->fill();
+      filterBranches->fill();
 
       tree->Fill();
     }

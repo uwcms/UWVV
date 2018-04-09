@@ -7,6 +7,7 @@ then
     echo "    --hzzExtras: Get and compile HZZ matrix element and kinematic fit stuff, and generate the UWVV plugins that use them."
     echo "               This is not the default because most people do not need them and one of the packages' authors frequently make changes that break everything without intervention on our side."
     echo "               NB if you use this option and later use scram b clean, you should rerun this script with this option or your CONDOR jobs may fail."
+    echo "    --met: Download updated MET correction recipes (needed for MET filters and uncertainties)"
     echo "    -j NTHREADS: [with --hzzExtras] Compile ZZMatrixElement package with NTHREADS threads (default 12)."
     exit 1
 fi
@@ -16,6 +17,9 @@ do
     case "$1" in
         --hzzExtras)
             HZZ=1
+            ;;
+        --met)
+            MET=1
             ;;
         -j)
             shift
@@ -48,7 +52,7 @@ pushd $CMSSW_BASE/src
 if [ "$HZZ" ]; then
 
     if [ ! -d ./ZZMatrixElement ]; then
-        echo "\nSetting up ZZ matrix element stuff"
+        echo -e "\nSetting up ZZ matrix element stuff"
         git clone https://github.com/cms-analysis/HiggsAnalysis-ZZMatrixElement.git ZZMatrixElement
 
         pushd ZZMatrixElement
@@ -79,15 +83,20 @@ if [ "$HZZ" ]; then
     cp ZZMatrixElement/MELA/data/"$SCRAM_ARCH"/*.so "$CMSSW_BASE"/lib/"$SCRAM_ARCH"
 
     if [ ! -d ./KinZfitter ]; then
-        echo "\nSetting up Z kinematic fit stuff"
+        echo -e "\nSetting up Z kinematic fit stuff"
         git clone https://github.com/VBF-HZZ/KinZfitter.git
     fi
 
     # generate UWVV's MELA plugin
     cp UWVV/AnalysisTools/plugins/ZZDiscriminantEmbedderCode.txt UWVV/AnalysisTools/plugins/ZZDiscriminantEmbedder.cc
     cp UWVV/AnalysisTools/plugins/ZKinematicFitEmbedderCode.txt UWVV/AnalysisTools/plugins/ZKinematicFitEmbedder.cc
-
 fi
+
+if [ $MET -ne 0 ] && [ ! -d ./RecoMET ]; then
+    echo -e "\nChecking out MET recipe for Moriond 17"
+    git cms-merge-topic -u cms-met:METRecipe_8020
+fi
+
 
 if [ ! -d ./KaMuCa ]; then
     echo "Setting up muon calibration"

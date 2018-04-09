@@ -106,8 +106,6 @@ class ZZCrossCleaning(AnalysisFlowBase):
                         },
                     )
 
-            step.addBasicSelector('j', 'abs(eta) < 2.4', newCollection="eta2p4")
-
         return step
 
 

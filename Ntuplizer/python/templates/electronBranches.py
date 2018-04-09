@@ -55,7 +55,6 @@ electronBranches = cms.PSet(
                                               '(1-isGap) * userFloat("effScaleFactorError") :'
                                               '0.'),
 
-        MtToMET = cms.string('mtToMET'),
         ),
 
     uints = cms.PSet(
@@ -63,11 +62,28 @@ electronBranches = cms.PSet(
         ),
     bools = cms.PSet(
         IsGap = cms.string('isGap'),
-        IsCBVIDtight = cms.string('? hasUserFloat("isCBVIDtight") ? '
-                                  'userFloat("isCBVIDtight") : 0'),
-        IsCBVIDmedium = cms.string('? hasUserFloat("isCBVIDmedium") ?'
-                                   'userFloat("isCBVIDmedium") : 0'),
-        IsCBVIDloose = cms.string('? hasUserFloat("isCBVIDloose") ? '
-                                  'userFloat("isCBVIDloose") : 0'),
+        IsEB = cms.string('isEB'),
+        IsCBVIDTightNoIP = cms.string('? hasUserFloat("IsCBVIDTight") ? '
+                                  'userFloat("IsCBVIDTight") : 0'),
+        IsCBVIDTight = cms.string('? hasUserFloat("IsCBVIDTightwIP") ? '
+                                  'userFloat("IsCBVIDTightwIP") : 0'),
+        IsCBVIDMediumNoIP = cms.string('? hasUserFloat("IsCBVIDMedium") ?'
+                                   'userFloat("IsCBVIDMedium") : 0'),
+        IsCBVIDMedium = cms.string('? hasUserFloat("IsCBVIDMediumwIP") ? '
+                                  'userFloat("IsCBVIDMediumwIP") : 0'),
+        IsCBVIDLooseNoIP = cms.string('? hasUserFloat("IsCBVIDLoose") ? '
+                                  'userFloat("IsCBVIDLoose") : 0'),
+        IsCBVIDLoose = cms.string('? hasUserFloat("IsCBVIDLoosewIP") ? '
+                                  'userFloat("IsCBVIDLoosewIP") : 0'),
+        IsCBVIDVetoNoIP = cms.string('? hasUserFloat("IsCBVIDVeto") ? '
+                                  'userFloat("IsCBVIDVeto") : 0'),
+        IsCBVIDVeto = cms.string('? hasUserFloat("IsCBVIDVetowIP") ? '
+                                  'userFloat("IsCBVIDVetowIP") : 0'),
+        IsCBVIDHLTSafeNoIP = cms.string('? hasUserFloat("IsCBVIDHLTSafe") ? '
+                                  'userFloat("IsCBVIDHLTSafe") : 0'),
+        IsCBVIDHLTSafe = cms.string('? hasUserFloat("IsCBVIDHLTSafewIP") ? '
+                                  'userFloat("IsCBVIDHLTSafewIP") : 0'),
+        IsWWLoose = cms.string('? hasUserInt("IsWWLoose") ? '
+                                  'userInt("IsWWLoose") : 0'),
         )
     )

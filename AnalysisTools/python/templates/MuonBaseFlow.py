@@ -11,25 +11,11 @@ class MuonBaseFlow(AnalysisFlowBase):
         step = super(MuonBaseFlow, self).makeAnalysisStep(stepName, **inputs)
         
         if stepName == 'preselection':
-            self.addGhostCleaning(step)
             step.addBasicSelector('m', 'pt > 5 && (isGlobalMuon || isTrackerMuon)')
         elif stepName == 'embedding':
             self.addMuonPOGIDs(step)
 
         return step
-
-
-    def addGhostCleaning(self, step):
-        '''
-        Add modules to resolve track ambiguities.
-        '''
-        mod = cms.EDProducer("PATMuonCleanerBySegments",
-                             src = step.getObjTag('m'),
-                             preselection = cms.string("track.isNonnull"),
-                             passthrough = cms.string("isGlobalMuon && numberOfMatches >= 2"),
-                             fractionOfSharedSegments = cms.double(0.499))
-
-        step.addModule("muonGhostCleaning", mod, 'm')
 
     def addMuonPOGIDs(self, step):
         '''

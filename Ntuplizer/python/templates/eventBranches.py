@@ -8,14 +8,21 @@ eventBranches = cms.PSet(
         pvRho = cms.string('pvRho'),
         type1_pfMETEt = cms.string('type1_pfMETEt'),
         type1_pfMETPhi = cms.string('type1_pfMETPhi'),
+        Flag_BadPFMuonFilterPass = cms.string('? hasUserFloat("Flag_BadPFMuonFilterPass") ? '
+                'userFloat("Flag_BadPFMuonFilterPass") : 100'),
+        Flag_BadChargedCandidateFilterPass = cms.string('? hasUserFloat("Flag_BadChargedCandidateFilterPass") ? '
+                'userFloat("Flag_BadChargedCandidateFilterPass") : 100'),
         ),
     vFloats = cms.PSet(
         jetPt = cms.vstring('jetPt'),
         jetEta = cms.vstring('jetEta'),
         jetPhi = cms.vstring('jetPhi'),
+        jetCSVv2 = cms.vstring('jetCSVv2'),
+        jetCMVAv2 = cms.vstring('jetCMVAv2'),
         ),
     vInts = cms.PSet(
         jetPUID = cms.vstring('jetPUID'),
+        jetHadronFlavor = cms.vstring('jetHadronFlavor'),
         ),
     bools = cms.PSet(
         pvIsValid = cms.string('pvIsValid'),
@@ -114,20 +121,6 @@ jetSystematicBranches = cms.PSet(
         nJets_jesDown = cms.string('nJets::jesDown'),
         nJets_jerUp = cms.string('nJets::jerUp'),
         nJets_jerDown = cms.string('nJets::jerDown'),
-        ),
-    )
-
-centralJetBranches = cms.PSet(
-    vFloats = cms.PSet(
-        jetPt_eta2p4 = cms.vstring('jetPt::eta2p4'),
-        jetEta_eta2p4 = cms.vstring('jetEta::eta2p4'),
-        jetPhi_eta2p4 = cms.vstring('jetPhi::eta2p4'),
-        ),
-    #vInts = cms.PSet(
-    #    jetPUID_eta2p4 = cms.vstring('jetPUID::eta2p4'),
-    #    ),
-    uints = cms.PSet(
-        nJets_eta2p4 = cms.string('nJets::eta2p4'),
         ),
     )
 

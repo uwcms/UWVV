@@ -27,7 +27,10 @@ class RecomputeElectronID(AnalysisFlowBase):
                                'RecoEgamma.ElectronIdentification.Identification.mvaElectronID_Spring16_HZZ_V1_cff',
                                setupVIDElectronSelection)
         setupAllVIDIdsInModule(self.process,
-                               'RecoEgamma.ElectronIdentification.Identification.cutBasedElectronID_Spring15_25ns_V1_cff',
+                               'RecoEgamma.ElectronIdentification.Identification.cutBasedElectronID_Summer16_80X_V1_cff',
+                               setupVIDElectronSelection)
+        setupAllVIDIdsInModule(self.process,
+                               'RecoEgamma.ElectronIdentification.Identification.cutBasedElectronHLTPreselecition_Summer16_V1_cff',
                                setupVIDElectronSelection)
 
         self.process.egmGsfElectronIDs.physicsObjectSrc = step.getObjTag('e')
@@ -42,11 +45,13 @@ class RecomputeElectronID(AnalysisFlowBase):
             src = step.getObjTag('e'),
             floatLabels = cms.untracked.vstring("MVAIDNonTrig"),
             floatVals = cms.untracked.VInputTag("electronMVAValueMapProducer:ElectronMVAEstimatorRun2Spring16HZZV1Values"),
-            boolLabels = cms.untracked.vstring("isCBVIDtight", "isCBVIDmedium", "isCBVIDloose"),
+            boolLabels = cms.untracked.vstring("IsCBVIDTight", "IsCBVIDMedium", "IsCBVIDLoose", "IsCBVIDVeto", "IsCBVIDHLTSafe"),
             boolVals = cms.untracked.VInputTag(
-                cms.InputTag("egmGsfElectronIDs:cutBasedElectronID-Spring15-25ns-V1-standalone-tight"),
-                cms.InputTag("egmGsfElectronIDs:cutBasedElectronID-Spring15-25ns-V1-standalone-medium"),
-                cms.InputTag("egmGsfElectronIDs:cutBasedElectronID-Spring15-25ns-V1-standalone-loose")
+                cms.InputTag("egmGsfElectronIDs:cutBasedElectronID-Summer16-80X-V1-tight"),
+                cms.InputTag("egmGsfElectronIDs:cutBasedElectronID-Summer16-80X-V1-medium"),
+                cms.InputTag("egmGsfElectronIDs:cutBasedElectronID-Summer16-80X-V1-loose"),
+                cms.InputTag("egmGsfElectronIDs:cutBasedElectronID-Summer16-80X-V1-veto"),
+                cms.InputTag("egmGsfElectronIDs:cutBasedElectronHLTPreselection-Summer16-V1"),
                 )
             )
 

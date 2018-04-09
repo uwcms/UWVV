@@ -17,6 +17,7 @@
 <use name="JetMETCorrections/Objects"/>
 <use name="UWVV/DataFormats"/>
 <use name="EgammaAnalysis/ElectronTools"/>
+<use name="UWVV/Utilities"/>
 
 <library file="*.cc" name="UWVVAnalysisToolsPlugins">
   <flags EDM_PLUGIN="1"/>
