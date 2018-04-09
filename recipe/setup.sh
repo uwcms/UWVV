@@ -7,7 +7,7 @@ then
     echo "    --hzzExtras: Get and compile HZZ matrix element and kinematic fit stuff, and generate the UWVV plugins that use them."
     echo "               This is not the default because most people do not need them and one of the packages' authors frequently make changes that break everything without intervention on our side."
     echo "               NB if you use this option and later use scram b clean, you should rerun this script with this option or your CONDOR jobs may fail."
-    echo "    --noMet: Skip download of updated MET correction recipes (needed for MET filters and uncertainties)"
+    echo "    --met: Download updated MET correction recipes (needed for MET filters and uncertainties)"
     echo "    -j NTHREADS: [with --hzzExtras] Compile ZZMatrixElement package with NTHREADS threads (default 12)."
     exit 1
 fi
@@ -18,7 +18,7 @@ do
         --hzzExtras)
             HZZ=1
             ;;
-        --noMet)
+        --met)
             MET=1
             ;;
         -j)
@@ -92,7 +92,7 @@ if [ "$HZZ" ]; then
     cp UWVV/AnalysisTools/plugins/ZKinematicFitEmbedderCode.txt UWVV/AnalysisTools/plugins/ZKinematicFitEmbedder.cc
 fi
 
-if [ $MET -eq 0 ] && [ ! -d ./RecoMET ]; then
+if [ $MET -ne 0 ] && [ ! -d ./RecoMET ]; then
     echo -e "\nChecking out MET recipe for Moriond 17"
     git cms-merge-topic -u cms-met:METRecipe_8020
 fi
