@@ -146,6 +146,7 @@ bool MuonIdEmbedder::isWZMediumMuon(const pat::Muon& patMu, const reco::Vertex& 
                   ) / patMu.pt();
     return isWZTightMuonNoIso(patMu, pv) && muIso < 0.40;
   }
+
 bool MuonIdEmbedder::isSoftMuonICHEP(const reco::Muon & recoMu, const reco::Vertex& pv)
   {
     bool soft = muon::isGoodMuon(recoMu, muon::TMOneStationTight) &&
