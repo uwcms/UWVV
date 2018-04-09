@@ -109,17 +109,6 @@ bool PATJetIDEmbedder::passTight(const Jet& jet) const
 
   float absEta = std::abs(jet.eta());
 
-  if(absEta > 3.)
-    {
-      return (jet.neutralEmEnergyFraction() < 0.90 && jet.neutralHadronEnergyFraction() > 0.02 && jet.neutralMultiplicity() > 10);
-    }
-
-  if(absEta > 2.7)
-    {
-      return jet.neutralEmEnergyFraction() > 0.02 &&
-        jet.neutralEmEnergyFraction() < 0.99 &&
-        jet.neutralMultiplicity() > 2;
-    }
   if(absEta > 2.7)
       return loose;
 
@@ -141,9 +130,8 @@ bool PATJetIDEmbedder::passTightLepVeto(const Jet& jet) const
   bool result = tight && jet.muonEnergyFraction() < 0.8;
 
   if(absEta < 2.4)
-    result &= (jet.chargedEmEnergyFraction() < 0.80 && jet.chargedHadronEnergyFraction() > 0. &&
-               jet.chargedMultiplicity() > 0);        
-  
+    result &= jet.chargedEmEnergyFraction() < 0.90;
+
   return result;
 }
 
