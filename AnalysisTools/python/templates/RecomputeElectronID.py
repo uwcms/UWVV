@@ -35,7 +35,7 @@ class RecomputeElectronID(AnalysisFlowBase):
 
         self.process.egmGsfElectronIDs.physicsObjectSrc = step.getObjTag('e')
         self.process.electronMVAValueMapProducer.srcMiniAOD = step.getObjTag('e')
-        self.process.electronRegressionValueMapProducer.srcMiniAOD = step.getObjTag('e')
+        #self.process.electronRegressionValueMapProducer.srcMiniAOD = step.getObjTag('e')
 
         step.addModule('egmGsfElectronIDSequence',
                        self.process.egmGsfElectronIDSequence)
