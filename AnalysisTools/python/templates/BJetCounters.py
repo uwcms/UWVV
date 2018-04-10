@@ -22,6 +22,10 @@ class BJetCounters(AnalysisFlowBase):
                 "CMVAv2L" : '? bDiscriminator("pfCombinedMVAV2BJetTags") > -0.5884 ? 1 : 0',
                 "CMVAv2M" : '? bDiscriminator("pfCombinedMVAV2BJetTags") > 0.4432 ? 1 : 0',
                 "CMVAv2T" : '? bDiscriminator("pfCombinedMVAV2BJetTags") > 0.9432 ? 1 : 0',
+                #https://twiki.cern.ch/twiki/bin/viewauth/CMS/BtagRecommendation94X
+                "DeepCSV_loose" : '? bDiscriminator("pfDeepCSVDiscriminatorsJetTags:BvsAll") > 0.1522 ? 1 : 0',  #loose
+                "DeepCSV_med" : '? bDiscriminator("pfDeepCSVDiscriminatorsJetTags:BvsAll") > 0.4941 ? 1 : 0',  #medium
+                "DeepCSV_tight" : '? bDiscriminator("pfDeepCSVDiscriminatorsJetTags:BvsAll") > 0.8001 ? 1 : 0',  #tight
             }
             mod = cms.EDProducer(
                 "PATJetCounter",

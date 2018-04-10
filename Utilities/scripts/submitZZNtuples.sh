@@ -1,7 +1,7 @@
 #!/bin/bash
 
-### Little script to submit all necessary ntuplization jobs for the 2016 ZZ analysis
-###     Specify an identifier for the jobs (e.g. 18JAN2016_0) and, optionally,
+### Little script to submit all necessary ntuplization jobs for the 2017 ZZ analysis
+###     Specify an identifier for the jobs (e.g. 18JAN2017_0) and, optionally,
 ###     which types of ntuples to submit. Options are --data, --mc, --zz, --zl, and --z,
 ###     or a combination, for running data, monte carlo, 4l final states, 3l final states,
 ###     and 2l final states; e.g., --data --zz --zl would run only 4l and 3l final states
@@ -92,9 +92,9 @@ then
 fi
 
 # global tags
-GT_MC=80X_mcRun2_asymptotic_2016_TrancheIV_v8
-GT_DATA=80X_dataRun2_2016SeptRepro_v7
-GT_DATA_H=80X_dataRun2_Prompt_v16
+GT_MC=94X_mc2017_realistic_v10
+GT_DATA=94X_dataRun2_ReReco17_forValidation
+GT_DATA_F=94X_dataRun2_ReReco_EOY17_v2
 
 if [ "$ATGC" ]
 then
@@ -107,128 +107,87 @@ fi
 if [ "$DATA" ]
 then
 
-    if [ "$ZZ" ]
-    then
-        echo Creating submission infrastructure for ZZ Data Ntuples as UWVVZZ_DATA_2016B_"$JOBID"
-
-        python Utilities/scripts/submitJobs.py --applyLumiMask --dataEra "Run2016B-03Feb2017_ver2*" --samples MuonEG SingleElectron SingleMuon DoubleMuon DoubleEG --filesPerJob 3 -o /data/nawoods/uwvvZZ_data_2016B_"$JOBID".sh UWVVZZ_DATA_2016B_"$JOBID" Ntuplizer/test/ntuplize_cfg.py channels='zz' isMC=0 eCalib=1 muCalib=1 globalTag="$GT_DATA"
-
-        if [ "$NO_SUB" == '' ]
-        then
-            echo Submitting ZZ Data Ntuples as UWVVZZ_DATA_2016B_"$JOBID"
-            nohup bash /data/nawoods/uwvvZZ_data_2016B_"$JOBID".sh &
-        fi
-    fi
-
-    if [ "$ZL" ]
-    then
-        echo Creating submission infrastructure for Z+L Data Ntuples as UWVVZPLUSL_DATA_2016B_"$JOBID"
-
-        python Utilities/scripts/submitJobs.py --applyLumiMask --dataEra "Run2016B-03Feb2017_ver2*" --samples MuonEG SingleElectron SingleMuon DoubleMuon DoubleEG --filesPerJob 3 -o /data/nawoods/uwvvZPlusL_data_2016B_"$JOBID".sh UWVVZPLUSL_DATA_2016B_"$JOBID" Ntuplizer/test/ntuplize_cfg.py channels='zl' isMC=0 eCalib=1 muCalib=1 globalTag="$GT_DATA"
-
-        if [ "$NO_SUB" == '' ]
-        then
-            echo Submitting Z+L Data Ntuples as UWVVZPLUSL_DATA_2016B_"$JOBID"
-            nohup bash /data/nawoods/uwvvZPlusL_data_2016B_"$JOBID".sh &
-        fi
-    fi
-
-    if [ "$Z" ]
-    then
-        echo Creating submission infrastructure for Single Z Data Ntuples as UWVVSINGLEZ_DATA_2016B_"$JOBID"
-
-        python Utilities/scripts/submitJobs.py --applyLumiMask --dataEra "Run2016B-03Feb2017_ver2*" --samples SingleElectron SingleMuon DoubleMuon DoubleEG --filesPerJob 3 -o /data/nawoods/uwvvSingleZ_data_2016B_"$JOBID".sh UWVVSINGLEZ_DATA_2016B_"$JOBID" Ntuplizer/test/ntuplize_cfg.py channels='z' isMC=0 eCalib=1 muCalib=1 globalTag="$GT_DATA"
-
-        if [ "$NO_SUB" == '' ]
-        then
-            echo Submitting Single Z Data Ntuples as UWVVSINGLEZ_DATA_2016B_"$JOBID"
-            nohup bash /data/nawoods/uwvvSingleZ_data_2016B_"$JOBID".sh &
-        fi
-    fi
-
-    for era in C D E F G
+    for era in B C D E
     do
 
         if [ "$ZZ" ]
         then
-            echo Creating submission infrastructure for ZZ Data Ntuples as UWVVZZ_DATA_2016"$era"_"$JOBID"
+            echo Creating submission infrastructure for ZZ Data Ntuples as UWVVZZ_DATA_2017"$era"_"$JOBID"
 
-            python Utilities/scripts/submitJobs.py --applyLumiMask --dataEra "Run2016""$era""-03Feb2017-v*" --samples MuonEG SingleElectron SingleMuon DoubleMuon DoubleEG --filesPerJob 3 -o /data/nawoods/uwvvZZ_data_2016"$era"_"$JOBID".sh UWVVZZ_DATA_2016"$era"_"$JOBID" Ntuplizer/test/ntuplize_cfg.py channels='zz' isMC=0 eCalib=1 muCalib=1 globalTag="$GT_DATA"
+            python Utilities/scripts/submitJobs.py --applyLumiMask --dataEra "Run2017""$era""-17Nov2017-v1" --samples MuonEG SingleElectron SingleMuon DoubleMuon DoubleEG --filesPerJob 3 -o /data/uhussain/uwvvZZ_data_2017"$era"_"$JOBID".sh UWVVZZ_DATA_2017"$era"_"$JOBID" Ntuplizer/test/ntuplize_cfg.py channels='zz' isMC=0 eCalib=0 muCalib=1 globalTag="$GT_DATA"
 
             if [ "$NO_SUB" == '' ]
             then
-                echo Submitting ZZ Data Ntuples as UWVVZZ_DATA_2016"$era"_"$JOBID"
-                nohup bash /data/nawoods/uwvvZZ_data_2016"$era"_"$JOBID".sh &
+                echo Submitting ZZ Data Ntuples as UWVVZZ_DATA_2017"$era"_"$JOBID"
+                nohup bash /data/uhussain/uwvvZZ_data_2017"$era"_"$JOBID".sh &
             fi
         fi
 
         if [ "$ZL" ]
         then
-            echo Creating submission infrastructure for Z+L Data Ntuples as UWVVZPLUSL_DATA_2016"$era"_"$JOBID"
+            echo Creating submission infrastructure for Z+L Data Ntuples as UWVVZPLUSL_DATA_2017"$era"_"$JOBID"
 
-            python Utilities/scripts/submitJobs.py --applyLumiMask --dataEra "Run2016""$era""-03Feb2017-v*" --samples MuonEG SingleElectron SingleMuon DoubleMuon DoubleEG --filesPerJob 3 -o /data/nawoods/uwvvZPlusL_data_2016"$era"_"$JOBID".sh UWVVZPLUSL_DATA_2016"$era"_"$JOBID" Ntuplizer/test/ntuplize_cfg.py channels='zl' isMC=0 eCalib=1 muCalib=1 globalTag="$GT_DATA"
+            python Utilities/scripts/submitJobs.py --applyLumiMask --dataEra "Run2017""$era""-17Nov2017-v1" --samples MuonEG SingleElectron SingleMuon DoubleMuon DoubleEG --filesPerJob 3 -o /data/uhussain/uwvvZPlusL_data_2017"$era"_"$JOBID".sh UWVVZPLUSL_DATA_2017"$era"_"$JOBID" Ntuplizer/test/ntuplize_cfg.py channels='zl' isMC=0 eCalib=0 muCalib=1 globalTag="$GT_DATA"
 
             if [ "$NO_SUB" == '' ]
             then
-                echo Submitting Z+L Data Ntuples as UWVVZPLUSL_DATA_2016"$era"_"$JOBID"
-                nohup bash /data/nawoods/uwvvZPlusL_data_2016"$era"_"$JOBID".sh &
+                echo Submitting Z+L Data Ntuples as UWVVZPLUSL_DATA_2017"$era"_"$JOBID"
+                nohup bash /data/uhussain/uwvvZPlusL_data_2017"$era"_"$JOBID".sh &
             fi
         fi
 
         if [ "$Z" ]
         then
-            echo Creating submission infrastructure for Single Z Data Ntuples as UWVVSINGLEZ_DATA_2016"$era"_"$JOBID"
+            echo Creating submission infrastructure for Single Z Data Ntuples as UWVVSINGLEZ_DATA_2017"$era"_"$JOBID"
 
-            python Utilities/scripts/submitJobs.py --applyLumiMask --dataEra "Run2016""$era""-03Feb2017-v*" --samples SingleElectron SingleMuon DoubleMuon DoubleEG --filesPerJob 3 -o /data/nawoods/uwvvSingleZ_data_2016"$era"_"$JOBID".sh UWVVSINGLEZ_DATA_2016"$era"_"$JOBID" Ntuplizer/test/ntuplize_cfg.py channels='z' isMC=0 eCalib=1 muCalib=1 globalTag="$GT_DATA"
+            python Utilities/scripts/submitJobs.py --applyLumiMask --dataEra "Run2017""$era""-17Nov2017-v1" --samples SingleElectron SingleMuon DoubleMuon DoubleEG --filesPerJob 3 -o /data/uhussain/uwvvSingleZ_data_2017"$era"_"$JOBID".sh UWVVSINGLEZ_DATA_2017"$era"_"$JOBID" Ntuplizer/test/ntuplize_cfg.py channels='z' isMC=0 eCalib=0 muCalib=1 globalTag="$GT_DATA"
 
             if [ "$NO_SUB" == '' ]
             then
-                echo Submitting Single Z Data Ntuples as UWVVSINGLEZ_DATA_2016"$era"_"$JOBID"
-                nohup bash /data/nawoods/uwvvSingleZ_data_2016"$era"_"$JOBID".sh &
+                echo Submitting Single Z Data Ntuples as UWVVSINGLEZ_DATA_2017"$era"_"$JOBID"
+                nohup bash /data/uhussain/uwvvSingleZ_data_2017"$era"_"$JOBID".sh &
             fi
         fi
     done
 
-
     if [ "$ZZ" ]
     then
-        echo Creating submission infrastructure for ZZ Data Ntuples as UWVVZZ_DATA_2016H_"$JOBID"
+        echo Creating submission infrastructure for ZZ Data Ntuples as UWVVZZ_DATA_2017F_"$JOBID"
 
-        python Utilities/scripts/submitJobs.py --applyLumiMask --dataEra "Run2016H-03Feb2017*" --samples MuonEG SingleElectron SingleMuon DoubleMuon DoubleEG --filesPerJob 2 -o /data/nawoods/uwvvZZ_data_2016H_"$JOBID".sh UWVVZZ_DATA_2016H_"$JOBID" Ntuplizer/test/ntuplize_cfg.py channels='zz' isMC=0 eCalib=1 muCalib=1 globalTag="$GT_DATA_H"
+        python Utilities/scripts/submitJobs.py --applyLumiMask --dataEra "Run2017F-17Nov2017-v1" --samples MuonEG SingleElectron SingleMuon DoubleMuon DoubleEG --filesPerJob 2 -o /data/uhussain/uwvvZZ_data_2017F_"$JOBID".sh UWVVZZ_DATA_2017F_"$JOBID" Ntuplizer/test/ntuplize_cfg.py channels='zz' isMC=0 eCalib=0 muCalib=1 globalTag="$GT_DATA_F"
 
         if [ "$NO_SUB" == '' ]
         then
-            echo Submitting ZZ Data Ntuples as UWVVZZ_DATA_2016H_"$JOBID"
-            nohup bash /data/nawoods/uwvvZZ_data_2016H_"$JOBID".sh &
+            echo Submitting ZZ Data Ntuples as UWVVZZ_DATA_2017F_"$JOBID"
+            nohup bash /data/uhussain/uwvvZZ_data_2017F_"$JOBID".sh &
         fi
     fi
 
     if [ "$ZL" ]
     then
-        echo Creating submission infrastructure for Z+L Data Ntuples as UWVVZPLUSL_DATA_2016H_"$JOBID"
+        echo Creating submission infrastructure for Z+L Data Ntuples as UWVVZPLUSL_DATA_2017F_"$JOBID"
 
-        python Utilities/scripts/submitJobs.py --applyLumiMask --dataEra "Run2016H-03Feb2017*" --samples MuonEG SingleElectron SingleMuon DoubleMuon DoubleEG --filesPerJob 2 -o /data/nawoods/uwvvZPlusL_data_2016H_"$JOBID".sh UWVVZPLUSL_DATA_2016H_"$JOBID" Ntuplizer/test/ntuplize_cfg.py channels='zl' isMC=0 eCalib=1 muCalib=1 globalTag="$GT_DATA_H"
+        python Utilities/scripts/submitJobs.py --applyLumiMask --dataEra "Run2017F-17Nov2017-v1" --samples MuonEG SingleElectron SingleMuon DoubleMuon DoubleEG --filesPerJob 2 -o /data/uhussain/uwvvZPlusL_data_2017F_"$JOBID".sh UWVVZPLUSL_DATA_2017F_"$JOBID" Ntuplizer/test/ntuplize_cfg.py channels='zl' isMC=0 eCalib=0 muCalib=1 globalTag="$GT_DATA_F"
 
         if [ "$NO_SUB" == '' ]
         then
-            echo Submitting Z+L Data Ntuples as UWVVZPLUSL_DATA_2016H_"$JOBID"
-            nohup bash /data/nawoods/uwvvZPlusL_data_2016H_"$JOBID".sh &
+            echo Submitting Z+L Data Ntuples as UWVVZPLUSL_DATA_2017F_"$JOBID"
+            nohup bash /data/uhussain/uwvvZPlusL_data_2017F_"$JOBID".sh &
         fi
     fi
 
     if [ "$Z" ]
     then
-        echo Creating submission infrastructure for Single Z Data Ntuples as UWVVSINGLEZ_DATA_2016H_"$JOBID"
+        echo Creating submission infrastructure for Single Z Data Ntuples as UWVVSINGLEZ_DATA_2017F_"$JOBID"
 
-        python Utilities/scripts/submitJobs.py --applyLumiMask --dataEra "Run2016H-03Feb2017*" --samples SingleElectron SingleMuon DoubleMuon DoubleEG --filesPerJob 2 -o /data/nawoods/uwvvSingleZ_data_2016H_"$JOBID".sh UWVVSINGLEZ_DATA_2016H_"$JOBID" Ntuplizer/test/ntuplize_cfg.py channels='z' isMC=0 eCalib=1 muCalib=1 globalTag="$GT_DATA_H"
+        python Utilities/scripts/submitJobs.py --applyLumiMask --dataEra "Run2017F-17Nov2017-v1" --samples SingleElectron SingleMuon DoubleMuon DoubleEG --filesPerJob 2 -o /data/uhussain/uwvvSingleZ_data_2017F_"$JOBID".sh UWVVSINGLEZ_DATA_2017F_"$JOBID" Ntuplizer/test/ntuplize_cfg.py channels='z' isMC=0 eCalib=0 muCalib=1 globalTag="$GT_DATA_F"
 
         if [ "$NO_SUB" == '' ]
         then
-            echo Submitting Single Z Data Ntuples as UWVVSINGLEZ_DATA_2016H_"$JOBID"
-            nohup bash /data/nawoods/uwvvSingleZ_data_2016H_"$JOBID".sh &
+            echo Submitting Single Z Data Ntuples as UWVVSINGLEZ_DATA_2017F_"$JOBID"
+            nohup bash /data/uhussain/uwvvSingleZ_data_2017F_"$JOBID".sh &
         fi
     fi
-
 fi
 
 if [ "$MC" ]
@@ -239,20 +198,29 @@ then
         echo Creating submission infrastructure for ZZ MC Ntuples as UWVVZZ_MC_"$JOBID"
 
         # signal (include gen info -- except MCFM and Phantom samples, where LHE info is automatically excluded)
-        python Utilities/scripts/submitJobs.py --campaign 'RunIISummer16MiniAODv2-PUMoriond17*_80X_mcRun2_asymptotic_2016_TrancheIV_v6*' --samples 'ZZTo4L_13TeV*pythia8' 'GluGluHToZZTo4L_M125_13TeV_powheg*' 'GluGlu*ZZ*DefaultShower*' 'GluGluToContinToZZTo2e2tau*' 'GluGluToContinToZZTo2mu2tau*' 'ZZJJTo4L*' 'WZZ*' 'ZZZ*' 'ZZTo4L_*Jets_ZZOnShell_13TeV-amcatnloFXFX-madspin-pythia8' 'VBFToHiggs0PMContinToZZTo*' "$EXTRA_SIGNALS" --filesPerJob 2 -o /data/nawoods/uwvvZZ_mc_"$JOBID".sh UWVVZZ_MC_"$JOBID" Ntuplizer/test/ntuplize_cfg.py channels='zz' isMC=1 eCalib=1 muCalib=1 genInfo=1 globalTag="$GT_MC" genLeptonType=dressedHPFS lheWeights=2
+        python Utilities/scripts/submitJobs.py --campaign 'RunIIFall17MiniAOD-94X_mc2017_realistic_*v1' --samples 'GluGluHToZZTo4L_M125_13TeV_powheg*' 'VBF_HToZZTo4L_M125_13TeV_powheg2' 'WplusH_HToZZTo4L_M125_13TeV_powheg2-*' 'WminusH_HToZZTo4L_M125_13TeV_powheg2-*' 'ZH_HToZZ_4LFilter_M125_13TeV_powheg2-*' 'ttH_HToZZ_4LFilter_M125_13TeV_powheg2_*' "$EXTRA_SIGNALS" --filesPerJob 2 -o /data/uhussain/uwvvZZ_mc_"$JOBID".sh UWVVZZ_MC_"$JOBID" Ntuplizer/test/ntuplize_cfg.py channels='zz' isMC=1 eCalib=0 muCalib=1 genInfo=1 globalTag="$GT_MC" genLeptonType=dressedHPFS lheWeights=2
 
         if [ "$NO_SUB" == '' ]
         then
             echo Submitting ZZ MC Ntuples as UWVVZZ_MC_"$JOBID"
-            nohup bash /data/nawoods/uwvvZZ_mc_"$JOBID".sh &
+            nohup bash /data/uhussain/uwvvZZ_mc_"$JOBID".sh &
         fi
 
-        # background (no gen info)
-        python Utilities/scripts/submitJobs.py --campaign 'RunIISummer16MiniAODv2-PUMoriond17_80X_mcRun2_asymptotic_2016_TrancheIV_v6*' --samples 'DYJetsToLL_M-50_TuneCUETP8M1_13TeV-madgraphMLM-pythia8' 'TTTo2L2Nu_TuneCUETP8M2_ttHtranche3_13TeV-powheg-pythia8' 'TTJets_TuneCUETP8M2T4_13TeV-amcatnloFXFX-pythia8' 'WZTo3LNu_TuneCUETP8M1_13TeV-powheg-pythia8' 'WWZ*' 'TTZToLLNuNu_M-10_TuneCUETP8M1_13TeV-amcatnlo-pythia8' --filesPerJob 2 -o /data/nawoods/uwvvZZ_mcNoGen_"$JOBID".sh UWVVZZ_MC_"$JOBID" Ntuplizer/test/ntuplize_cfg.py channels='zz' isMC=1 eCalib=1 muCalib=1 genInfo=0 globalTag="$GT_MC" genLeptonType=dressedHPFS
+        # background with 2017v1 samples (no gen info)
+        python Utilities/scripts/submitJobs.py --campaign 'RunIIFall17MiniAOD-94X_mc2017_realistic_*v1' --samples 'DYJetsToLL_M-50_TuneCP5_13TeV*' 'ZZTo4L_13TeV*pythia8' 'GluGluToContinToZZTo4e*' 'GluGluToContinToZZTo4mu*' 'GluGluToContinToZZTo4tau*' 'GluGluToContinToZZTo2e2tau*' 'GluGluToContinToZZTo2e2mu*' 'GluGluToContinToZZTo2mu2tau*' 'TTJets_TuneCP5_13TeV*' 'TTTo2L2Nu_TuneCP5_PSweights_13TeV*'  --filesPerJob 2 -o /data/uhussain/uwvvZZ_mcV1NoGen_"$JOBID".sh UWVVZZ_MC_"$JOBID" Ntuplizer/test/ntuplize_cfg.py channels='zz' isMC=1 eCalib=0 muCalib=1 genInfo=0 globalTag="$GT_MC" genLeptonType=dressedHPFS
 
         if [ "$NO_SUB" == '' ]
         then
-            nohup bash /data/nawoods/uwvvZZ_mcNoGen_"$JOBID".sh &
+            nohup bash /data/uhussain/uwvvZZ_mcV1NoGen_"$JOBID".sh &
+        fi
+
+
+        # background with 2017v2 (no gen info)
+        python Utilities/scripts/submitJobs.py --campaign 'RunIIFall17MiniAOD-94X_mc2017_realistic_*v2' --samples 'WZTo3LNu_TuneCP5_13TeV-*' 'DYJetsToLL_M-10to50_TuneCP5_13TeV*' 'TTTo2L2Nu_TuneCP5_*' --filesPerJob 2 -o /data/uhussain/uwvvZZ_mcV2NoGen_"$JOBID".sh UWVVZZ_MC_"$JOBID" Ntuplizer/test/ntuplize_cfg.py channels='zz' isMC=1 eCalib=0 muCalib=1 genInfo=0 globalTag="$GT_MC" genLeptonType=dressedHPFS
+
+        if [ "$NO_SUB" == '' ]
+        then
+            nohup bash /data/uhussain/uwvvZZ_mcV2NoGen_"$JOBID".sh &
         fi
 
 
@@ -262,60 +230,60 @@ then
             echo Creating submission infrastructure for ZZ MC Ntuples with Systematic Shifts
 
             # EES+
-            python Utilities/scripts/submitJobs.py --campaign 'RunIISummer16MiniAODv2-PUMoriond17*_80X_mcRun2_asymptotic_2016_TrancheIV_v6*' --samples 'ZZTo4L_13TeV*pythia8' 'GluGluHToZZTo4L_M125_13TeV_powheg*' 'GluGlu*ZZ*DefaultShower*' 'GluGluToContinToZZTo2e2tau*' 'GluGluToContinToZZTo2mu2tau*' 'ZZJJTo4L*' 'WZZ*' 'ZZZ*' 'WWZ*' 'TTZToLLNuNu_M-10_TuneCUETP8M1_13TeV-amcatnlo-pythia8' 'ZZTo4L_*Jets_ZZOnShell_13TeV-amcatnloFXFX-madspin-pythia8' 'VBFToHiggs0PMContinToZZTo*' "$EXTRA_SIGNALS" --filesPerJob 2 -o /data/nawoods/uwvvZZ_mc_eScaleUp_"$JOBID".sh UWVVZZ_MC_ESCALEUP_"$JOBID" Ntuplizer/test/ntuplize_cfg.py channels='eeee,eemm' isMC=1 eCalib=1 muCalib=1 lheWeights=0 eScaleShift=1 globalTag="$GT_MC" genLeptonType=dressedHPFS
+            python Utilities/scripts/submitJobs.py --campaign 'RunIIFall17MiniAOD-94X_mc2017_realistic_*v1' --samples 'ZZTo4L_13TeV*pythia8' 'GluGluHToZZTo4L_M125_13TeV_powheg*' 'GluGlu*ZZ*DefaultShower*' 'GluGluToContinToZZTo2e2tau*' 'GluGluToContinToZZTo2mu2tau*' 'ZZJJTo4L*' 'WZZ*' 'ZZZ*' 'WWZ*' 'TTZToLLNuNu_M-10_TuneCUETP8M1_13TeV-amcatnlo-pythia8' 'ZZTo4L_*Jets_ZZOnShell_13TeV-amcatnloFXFX-madspin-pythia8' 'VBFToHiggs0PMContinToZZTo*' "$EXTRA_SIGNALS" --filesPerJob 2 -o /data/uhussain/uwvvZZ_mc_eScaleUp_"$JOBID".sh UWVVZZ_MC_ESCALEUP_"$JOBID" Ntuplizer/test/ntuplize_cfg.py channels='eeee,eemm' isMC=1 eCalib=0 muCalib=1 lheWeights=0 eScaleShift=1 globalTag="$GT_MC" genLeptonType=dressedHPFS
 
             if [ "$NO_SUB" == '' ]
             then
                 echo Submitting ZZ MC Ntuples with Systematic Shifts
-                nohup bash /data/nawoods/uwvvZZ_mc_eScaleUp_"$JOBID".sh &
+                nohup bash /data/uhussain/uwvvZZ_mc_eScaleUp_"$JOBID".sh &
             fi
 
             # EES-
-            python Utilities/scripts/submitJobs.py --campaign 'RunIISummer16MiniAODv2-PUMoriond17*_80X_mcRun2_asymptotic_2016_TrancheIV_v6*' --samples 'ZZTo4L_13TeV*pythia8' 'GluGluHToZZTo4L_M125_13TeV_powheg*' 'GluGlu*ZZ*DefaultShower*' 'GluGluToContinToZZTo2e2tau*' 'GluGluToContinToZZTo2mu2tau*' 'ZZJJTo4L*' 'WZZ*' 'ZZZ*' 'WWZ*' 'TTZToLLNuNu_M-10_TuneCUETP8M1_13TeV-amcatnlo-pythia8' 'ZZTo4L_*Jets_ZZOnShell_13TeV-amcatnloFXFX-madspin-pythia8' 'VBFToHiggs0PMContinToZZTo*' "$EXTRA_SIGNALS" --filesPerJob 2 -o /data/nawoods/uwvvZZ_mc_eScaleDn_"$JOBID".sh UWVVZZ_MC_ESCALEDN_"$JOBID" Ntuplizer/test/ntuplize_cfg.py channels='eeee,eemm' isMC=1 eCalib=1 muCalib=1 lheWeights=0 eScaleShift=-1 globalTag="$GT_MC" genLeptonType=dressedHPFS
+            python Utilities/scripts/submitJobs.py --campaign 'RunIIFall17MiniAOD-94X_mc2017_realistic_*v1' --samples 'ZZTo4L_13TeV*pythia8' 'GluGluHToZZTo4L_M125_13TeV_powheg*' 'GluGlu*ZZ*DefaultShower*' 'GluGluToContinToZZTo2e2tau*' 'GluGluToContinToZZTo2mu2tau*' 'ZZJJTo4L*' 'WZZ*' 'ZZZ*' 'WWZ*' 'TTZToLLNuNu_M-10_TuneCUETP8M1_13TeV-amcatnlo-pythia8' 'ZZTo4L_*Jets_ZZOnShell_13TeV-amcatnloFXFX-madspin-pythia8' 'VBFToHiggs0PMContinToZZTo*' "$EXTRA_SIGNALS" --filesPerJob 2 -o /data/uhussain/uwvvZZ_mc_eScaleDn_"$JOBID".sh UWVVZZ_MC_ESCALEDN_"$JOBID" Ntuplizer/test/ntuplize_cfg.py channels='eeee,eemm' isMC=1 eCalib=0 muCalib=1 lheWeights=0 eScaleShift=-1 globalTag="$GT_MC" genLeptonType=dressedHPFS
 
             if [ "$NO_SUB" == '' ]
             then
-                nohup bash /data/nawoods/uwvvZZ_mc_eScaleDn_"$JOBID".sh &
+                nohup bash /data/uhussain/uwvvZZ_mc_eScaleDn_"$JOBID".sh &
             fi
 
             # EER+ (rho)
-            python Utilities/scripts/submitJobs.py --campaign 'RunIISummer16MiniAODv2-PUMoriond17*_80X_mcRun2_asymptotic_2016_TrancheIV_v6*' --samples 'ZZTo4L_13TeV*pythia8' 'GluGluHToZZTo4L_M125_13TeV_powheg*' 'GluGlu*ZZ*DefaultShower*' 'GluGluToContinToZZTo2e2tau*' 'GluGluToContinToZZTo2mu2tau*' 'ZZJJTo4L*' 'WZZ*' 'ZZZ*' 'WWZ*' 'TTZToLLNuNu_M-10_TuneCUETP8M1_13TeV-amcatnlo-pythia8' 'ZZTo4L_*Jets_ZZOnShell_13TeV-amcatnloFXFX-madspin-pythia8' 'VBFToHiggs0PMContinToZZTo*' "$EXTRA_SIGNALS" --filesPerJob 2 -o /data/nawoods/uwvvZZ_mc_eRhoResUp_"$JOBID".sh UWVVZZ_MC_ERHORESUP_"$JOBID" Ntuplizer/test/ntuplize_cfg.py channels='eeee,eemm' isMC=1 eCalib=1 muCalib=1 lheWeights=0 eRhoResShift=1 globalTag="$GT_MC" genLeptonType=dressedHPFS
+            python Utilities/scripts/submitJobs.py --campaign 'RunIIFall17MiniAOD-94X_mc2017_realistic_*v1' --samples 'ZZTo4L_13TeV*pythia8' 'GluGluHToZZTo4L_M125_13TeV_powheg*' 'GluGlu*ZZ*DefaultShower*' 'GluGluToContinToZZTo2e2tau*' 'GluGluToContinToZZTo2mu2tau*' 'ZZJJTo4L*' 'WZZ*' 'ZZZ*' 'WWZ*' 'TTZToLLNuNu_M-10_TuneCUETP8M1_13TeV-amcatnlo-pythia8' 'ZZTo4L_*Jets_ZZOnShell_13TeV-amcatnloFXFX-madspin-pythia8' 'VBFToHiggs0PMContinToZZTo*' "$EXTRA_SIGNALS" --filesPerJob 2 -o /data/uhussain/uwvvZZ_mc_eRhoResUp_"$JOBID".sh UWVVZZ_MC_ERHORESUP_"$JOBID" Ntuplizer/test/ntuplize_cfg.py channels='eeee,eemm' isMC=1 eCalib=0 muCalib=1 lheWeights=0 eRhoResShift=1 globalTag="$GT_MC" genLeptonType=dressedHPFS
 
             if [ "$NO_SUB" == '' ]
             then
-                nohup bash /data/nawoods/uwvvZZ_mc_eRhoResUp_"$JOBID".sh &
+                nohup bash /data/uhussain/uwvvZZ_mc_eRhoResUp_"$JOBID".sh &
             fi
 
             # EER- (rho)
-            python Utilities/scripts/submitJobs.py --campaign 'RunIISummer16MiniAODv2-PUMoriond17*_80X_mcRun2_asymptotic_2016_TrancheIV_v6*' --samples 'ZZTo4L_13TeV*pythia8' 'GluGluHToZZTo4L_M125_13TeV_powheg*' 'GluGlu*ZZ*DefaultShower*' 'GluGluToContinToZZTo2e2tau*' 'GluGluToContinToZZTo2mu2tau*' 'ZZJJTo4L*' 'WZZ*' 'ZZZ*' 'WWZ*' 'TTZToLLNuNu_M-10_TuneCUETP8M1_13TeV-amcatnlo-pythia8' 'ZZTo4L_*Jets_ZZOnShell_13TeV-amcatnloFXFX-madspin-pythia8' 'VBFToHiggs0PMContinToZZTo*' "$EXTRA_SIGNALS" --filesPerJob 2 -o /data/nawoods/uwvvZZ_mc_eRhoResDn_"$JOBID".sh UWVVZZ_MC_ERHORESDN_"$JOBID" Ntuplizer/test/ntuplize_cfg.py channels='eeee,eemm' isMC=1 eCalib=1 muCalib=1 lheWeights=0 eRhoResShift=-1 globalTag="$GT_MC" genLeptonType=dressedHPFS
+            python Utilities/scripts/submitJobs.py --campaign 'RunIIFall17MiniAOD-94X_mc2017_realistic_*v1' --samples 'ZZTo4L_13TeV*pythia8' 'GluGluHToZZTo4L_M125_13TeV_powheg*' 'GluGlu*ZZ*DefaultShower*' 'GluGluToContinToZZTo2e2tau*' 'GluGluToContinToZZTo2mu2tau*' 'ZZJJTo4L*' 'WZZ*' 'ZZZ*' 'WWZ*' 'TTZToLLNuNu_M-10_TuneCUETP8M1_13TeV-amcatnlo-pythia8' 'ZZTo4L_*Jets_ZZOnShell_13TeV-amcatnloFXFX-madspin-pythia8' 'VBFToHiggs0PMContinToZZTo*' "$EXTRA_SIGNALS" --filesPerJob 2 -o /data/uhussain/uwvvZZ_mc_eRhoResDn_"$JOBID".sh UWVVZZ_MC_ERHORESDN_"$JOBID" Ntuplizer/test/ntuplize_cfg.py channels='eeee,eemm' isMC=1 eCalib=0 muCalib=1 lheWeights=0 eRhoResShift=-1 globalTag="$GT_MC" genLeptonType=dressedHPFS
 
             if [ "$NO_SUB" == '' ]
             then
-                nohup bash /data/nawoods/uwvvZZ_mc_eRhoResDn_"$JOBID".sh &
+                nohup bash /data/uhussain/uwvvZZ_mc_eRhoResDn_"$JOBID".sh &
             fi
 
             # EER+ (phi)
-            python Utilities/scripts/submitJobs.py --campaign 'RunIISummer16MiniAODv2-PUMoriond17*_80X_mcRun2_asymptotic_2016_TrancheIV_v6*' --samples 'ZZTo4L_13TeV*pythia8' 'GluGluHToZZTo4L_M125_13TeV_powheg*' 'GluGlu*ZZ*DefaultShower*' 'GluGluToContinToZZTo2e2tau*' 'GluGluToContinToZZTo2mu2tau*' 'ZZJJTo4L*' 'WZZ*' 'ZZZ*' 'WWZ*' 'TTZToLLNuNu_M-10_TuneCUETP8M1_13TeV-amcatnlo-pythia8' 'ZZTo4L_*Jets_ZZOnShell_13TeV-amcatnloFXFX-madspin-pythia8' 'VBFToHiggs0PMContinToZZTo*' "$EXTRA_SIGNALS" --filesPerJob 2 -o /data/nawoods/uwvvZZ_mc_ePhiResUp_"$JOBID".sh UWVVZZ_MC_EPHIRESUP_"$JOBID" Ntuplizer/test/ntuplize_cfg.py channels='eeee,eemm' isMC=1 eCalib=1 muCalib=1 lheWeights=0 ePhiResShift=1 globalTag="$GT_MC" genLeptonType=dressedHPFS
+            python Utilities/scripts/submitJobs.py --campaign 'RunIIFall17MiniAOD-94X_mc2017_realistic_*v1' --samples 'ZZTo4L_13TeV*pythia8' 'GluGluHToZZTo4L_M125_13TeV_powheg*' 'GluGlu*ZZ*DefaultShower*' 'GluGluToContinToZZTo2e2tau*' 'GluGluToContinToZZTo2mu2tau*' 'ZZJJTo4L*' 'WZZ*' 'ZZZ*' 'WWZ*' 'TTZToLLNuNu_M-10_TuneCUETP8M1_13TeV-amcatnlo-pythia8' 'ZZTo4L_*Jets_ZZOnShell_13TeV-amcatnloFXFX-madspin-pythia8' 'VBFToHiggs0PMContinToZZTo*' "$EXTRA_SIGNALS" --filesPerJob 2 -o /data/uhussain/uwvvZZ_mc_ePhiResUp_"$JOBID".sh UWVVZZ_MC_EPHIRESUP_"$JOBID" Ntuplizer/test/ntuplize_cfg.py channels='eeee,eemm' isMC=1 eCalib=0 muCalib=1 lheWeights=0 ePhiResShift=1 globalTag="$GT_MC" genLeptonType=dressedHPFS
 
             if [ "$NO_SUB" == '' ]
             then
-                nohup bash /data/nawoods/uwvvZZ_mc_ePhiResUp_"$JOBID".sh &
+                nohup bash /data/uhussain/uwvvZZ_mc_ePhiResUp_"$JOBID".sh &
             fi
 
             # MES/MER+
-            python Utilities/scripts/submitJobs.py --campaign 'RunIISummer16MiniAODv2-PUMoriond17*_80X_mcRun2_asymptotic_2016_TrancheIV_v6*' --samples 'ZZTo4L_13TeV*pythia8' 'GluGluHToZZTo4L_M125_13TeV_powheg*' 'GluGlu*ZZ*DefaultShower*' 'GluGluToContinToZZTo2e2tau*' 'GluGluToContinToZZTo2mu2tau*' 'ZZJJTo4L*' 'WZZ*' 'ZZZ*' 'WWZ*' 'TTZToLLNuNu_M-10_TuneCUETP8M1_13TeV-amcatnlo-pythia8' 'ZZTo4L_*Jets_ZZOnShell_13TeV-amcatnloFXFX-madspin-pythia8' 'VBFToHiggs0PMContinToZZTo*' "$EXTRA_SIGNALS" --filesPerJob 2 -o /data/nawoods/uwvvZZ_mc_mClosureUp_"$JOBID".sh UWVVZZ_MC_MCLOSUREUP_"$JOBID" Ntuplizer/test/ntuplize_cfg.py channels='eemm,mmmm' isMC=1 eCalib=1 muCalib=1 lheWeights=0 mClosureShift=1 globalTag="$GT_MC" genLeptonType=dressedHPFS
+            python Utilities/scripts/submitJobs.py --campaign 'RunIIFall17MiniAOD-94X_mc2017_realistic_*v1' --samples 'ZZTo4L_13TeV*pythia8' 'GluGluHToZZTo4L_M125_13TeV_powheg*' 'GluGlu*ZZ*DefaultShower*' 'GluGluToContinToZZTo2e2tau*' 'GluGluToContinToZZTo2mu2tau*' 'ZZJJTo4L*' 'WZZ*' 'ZZZ*' 'WWZ*' 'TTZToLLNuNu_M-10_TuneCUETP8M1_13TeV-amcatnlo-pythia8' 'ZZTo4L_*Jets_ZZOnShell_13TeV-amcatnloFXFX-madspin-pythia8' 'VBFToHiggs0PMContinToZZTo*' "$EXTRA_SIGNALS" --filesPerJob 2 -o /data/uhussain/uwvvZZ_mc_mClosureUp_"$JOBID".sh UWVVZZ_MC_MCLOSUREUP_"$JOBID" Ntuplizer/test/ntuplize_cfg.py channels='eemm,mmmm' isMC=1 eCalib=0 muCalib=1 lheWeights=0 mClosureShift=1 globalTag="$GT_MC" genLeptonType=dressedHPFS
 
             if [ "$NO_SUB" == '' ]
             then
-                nohup bash /data/nawoods/uwvvZZ_mc_mClosureUp_"$JOBID".sh &
+                nohup bash /data/uhussain/uwvvZZ_mc_mClosureUp_"$JOBID".sh &
             fi
 
             # MES/MER-
-            python Utilities/scripts/submitJobs.py --campaign 'RunIISummer16MiniAODv2-PUMoriond17*_80X_mcRun2_asymptotic_2016_TrancheIV_v6*' --samples 'ZZTo4L_13TeV*pythia8' 'GluGluHToZZTo4L_M125_13TeV_powheg*' 'GluGlu*ZZ*DefaultShower*' 'GluGluToContinToZZTo2e2tau*' 'GluGluToContinToZZTo2mu2tau*' 'ZZJJTo4L*' 'WZZ*' 'ZZZ*' 'WWZ*' 'TTZToLLNuNu_M-10_TuneCUETP8M1_13TeV-amcatnlo-pythia8' 'ZZTo4L_*Jets_ZZOnShell_13TeV-amcatnloFXFX-madspin-pythia8' 'VBFToHiggs0PMContinToZZTo*' "$EXTRA_SIGNALS" --filesPerJob 2 -o /data/nawoods/uwvvZZ_mc_mClosureDn_"$JOBID".sh UWVVZZ_MC_MCLOSUREDN_"$JOBID" Ntuplizer/test/ntuplize_cfg.py channels='eemm,mmmm' isMC=1 eCalib=1 muCalib=1 lheWeights=0 mClosureShift=-1 globalTag="$GT_MC" genLeptonType=dressedHPFS
+            python Utilities/scripts/submitJobs.py --campaign 'RunIIFall17MiniAOD-94X_mc2017_realistic_*v1' --samples 'ZZTo4L_13TeV*pythia8' 'GluGluHToZZTo4L_M125_13TeV_powheg*' 'GluGlu*ZZ*DefaultShower*' 'GluGluToContinToZZTo2e2tau*' 'GluGluToContinToZZTo2mu2tau*' 'ZZJJTo4L*' 'WZZ*' 'ZZZ*' 'WWZ*' 'TTZToLLNuNu_M-10_TuneCUETP8M1_13TeV-amcatnlo-pythia8' 'ZZTo4L_*Jets_ZZOnShell_13TeV-amcatnloFXFX-madspin-pythia8' 'VBFToHiggs0PMContinToZZTo*' "$EXTRA_SIGNALS" --filesPerJob 2 -o /data/uhussain/uwvvZZ_mc_mClosureDn_"$JOBID".sh UWVVZZ_MC_MCLOSUREDN_"$JOBID" Ntuplizer/test/ntuplize_cfg.py channels='eemm,mmmm' isMC=1 eCalib=0 muCalib=1 lheWeights=0 mClosureShift=-1 globalTag="$GT_MC" genLeptonType=dressedHPFS
 
             if [ "$NO_SUB" == '' ]
             then
-                nohup bash /data/nawoods/uwvvZZ_mc_mClosureDn_"$JOBID".sh &
+                nohup bash /data/uhussain/uwvvZZ_mc_mClosureDn_"$JOBID".sh &
             fi
 
         fi
@@ -325,12 +293,12 @@ then
     then
         echo Creating submission infrastructure for Z+L MC Ntuples as UWVVZPLUSL_MC_"$JOBID"
 
-        python Utilities/scripts/submitJobs.py --campaign 'RunIISummer16MiniAODv2-PUMoriond17_*80X_mcRun2_asymptotic_2016_TrancheIV_v6*' --samples 'ZZTo4L_13TeV*' 'GluGlu*ZZ*DefaultShower*' 'DYJetsToLL_M-50_TuneCUETP8M1_13TeV-madgraphMLM-pythia8' 'TTTo2L2Nu_TuneCUETP8M2_ttHtranche3_13TeV-powheg-pythia8' 'WZTo3LNu_TuneCUETP8M1_13TeV-powheg-pythia8' 'DYToLL_*J_13TeV-amcatnloFXFX-pythia8' --filesPerJob 2 -o /data/nawoods/uwvvZPlusL_mc_"$JOBID".sh UWVVZPLUSL_MC_"$JOBID" Ntuplizer/test/ntuplize_cfg.py channels='zl' isMC=1 eCalib=1 muCalib=1 genInfo=0 lheWeights=0 globalTag="$GT_MC"
+        python Utilities/scripts/submitJobs.py --campaign 'RunIIFall17MiniAOD-94X_mc2017_realistic_*v1' --samples 'ZZTo4L_13TeV*' 'GluGlu*ZZ*DefaultShower*' 'DYJetsToLL_M-50_TuneCUETP8M1_13TeV-madgraphMLM-pythia8' 'TTTo2L2Nu_TuneCUETP8M2_ttHtranche3_13TeV-powheg-pythia8' 'WZTo3LNu_TuneCUETP8M1_13TeV-powheg-pythia8' 'DYToLL_*J_13TeV-amcatnloFXFX-pythia8' --filesPerJob 2 -o /data/uhussain/uwvvZPlusL_mc_"$JOBID".sh UWVVZPLUSL_MC_"$JOBID" Ntuplizer/test/ntuplize_cfg.py channels='zl' isMC=1 eCalib=0 muCalib=1 genInfo=0 lheWeights=0 globalTag="$GT_MC"
 
         if [ "$NO_SUB" == '' ]
         then
             echo Submitting Z+L MC Ntuples as UWVVZPLUSL_MC_"$JOBID"
-            nohup bash /data/nawoods/uwvvZPlusL_mc_"$JOBID".sh &
+            nohup bash /data/uhussain/uwvvZPlusL_mc_"$JOBID".sh &
         fi
 
     fi
@@ -339,12 +307,12 @@ then
     then
         echo Creating submission infrastructure for Single Z MC Ntuples as UWVVSINGLEZ_MC_"$JOBID"
 
-        python Utilities/scripts/submitJobs.py --campaign 'RunIISummer16MiniAODv2-PUMoriond17_*80X_mcRun2_asymptotic_2016_TrancheIV_v6*' --samples 'DYJetsToLL_M-50_TuneCUETP8M1_13TeV-madgraphMLM-pythia8' 'TTTo2L2Nu_TuneCUETP8M2_ttHtranche3_13TeV-powheg-pythia8' 'DYToLL_*J_13TeV-amcatnloFXFX-pythia8' 'TTJets_TuneCUETP8M2T4_13TeV-amcatnloFXFX-pythia8' --filesPerJob 2 -o /data/nawoods/uwvvSingleZ_mc_"$JOBID".sh UWVVSINGLEZ_MC_"$JOBID" Ntuplizer/test/ntuplize_cfg.py channels='z' isMC=1 eCalib=1 muCalib=1 genInfo=0 lheWeights=0 globalTag="$GT_MC"
+        python Utilities/scripts/submitJobs.py --campaign 'RunIIFall17MiniAOD-94X_mc2017_realistic_*v1' --samples 'DYJetsToLL_M-50_TuneCUETP8M1_13TeV-madgraphMLM-pythia8' 'TTTo2L2Nu_TuneCUETP8M2_ttHtranche3_13TeV-powheg-pythia8' 'DYToLL_*J_13TeV-amcatnloFXFX-pythia8' 'TTJets_TuneCUETP8M2T4_13TeV-amcatnloFXFX-pythia8' --filesPerJob 2 -o /data/uhussain/uwvvSingleZ_mc_"$JOBID".sh UWVVSINGLEZ_MC_"$JOBID" Ntuplizer/test/ntuplize_cfg.py channels='z' isMC=1 eCalib=0 muCalib=1 genInfo=0 lheWeights=0 globalTag="$GT_MC"
 
         if [ "$NO_SUB" == '' ]
         then
             echo Submitting Single Z MC Ntuples as UWVVSINGLEZ_MC_"$JOBID"
-            nohup bash /data/nawoods/uwvvSingleZ_mc_"$JOBID".sh &
+            nohup bash /data/uhussain/uwvvSingleZ_mc_"$JOBID".sh &
         fi
     fi
 fi

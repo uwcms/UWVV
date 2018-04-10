@@ -38,9 +38,9 @@ def get_das_info(query):
     DBS one. '''
     
     das_command = [
-        'das_client',
-        '--query=%s' % query,
-        '--limit=0' 
+        'dasgoclient',
+        '--query=dataset=%s' % query,
+        '-limit=0' 
         ]
     p = subprocess.Popen(
         das_command,
@@ -52,7 +52,7 @@ def get_das_info(query):
     
     if das_exitcode <> 0:
         raise RuntimeError(
-            'das_client crashed with error:\n%s' % \
+            'dasgoclient crashed with error:\n%s' % \
                 err+out ) #sometimes das sends the crash message to stdout
     return [i.strip() for i in out.split('\n') if i.strip()]
 

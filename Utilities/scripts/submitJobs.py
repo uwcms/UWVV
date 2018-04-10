@@ -42,6 +42,7 @@ def writeFarmoutCommand(cfg, jobid, dataset, fullDataset,
 
     if 'uwlogin' in gethostname():
         scratchDir = '/data'
+        #Jobs17 = 'ZZ2017Jobs'
     else:
         scratchDir = '/nfs_scratch'
 
@@ -59,6 +60,9 @@ def writeFarmoutCommand(cfg, jobid, dataset, fullDataset,
 
     dasFilesCmd = 'file dataset={}'.format(fullDataset)
 
+    #print "submitDir: ",submitDir
+    
+    #print "dagDir: ",dagDir
     # das throws a lot of exceptions, but they're usually transient, so try a
     # few times if needed
     for i in range(5):
@@ -77,7 +81,7 @@ def writeFarmoutCommand(cfg, jobid, dataset, fullDataset,
     inputListFile = os.path.join(dagDir+"inputs", '{}_inputFiles.txt'.format(dataset))
     with open(inputListFile, 'w') as f:
         f.write('\n'.join(dasFiles))
-
+        #print dasFiles
     cmds = [
         'farmoutAnalysisJobs',
         '--infer-cmssw-path',
@@ -103,7 +107,7 @@ def writeFarmoutCommand(cfg, jobid, dataset, fullDataset,
 
         # Prepend with the standard JSON repository. If lumiMask is a full path
         # (starting with '/'), path.join will ignore the first argument.
-        defaultJSONPath = '/afs/cern.ch/cms/CAF/CMSCOMM/COMM_DQM/certification/Collisions16/13TeV'
+        defaultJSONPath = '/afs/cern.ch/cms/CAF/CMSCOMM/COMM_DQM/certification/Collisions17/13TeV'
         lumiMask = os.path.join(defaultJSONPath,
                                 lumiMask)
         cmds.append('lumiMask={}'.format(lumiMask))
@@ -141,7 +145,7 @@ def buildScript(cfg, jobid, scriptFile='',
     if campaign:
         assert not dataEra, "You can't specify a data era and an MC campaign tag."
         datasetStr = '/*/{}/MINIAODSIM'.format(campaign)
-
+        #print "datasetStr", datasetStr
         postfixPattern = _compileRE('(?<=_)(?:(?:backup)|(?:ext\\d))')
 
     # data
@@ -149,13 +153,17 @@ def buildScript(cfg, jobid, scriptFile='',
         assert dataEra, "You must specify a data era or an MC campaign tag."
         datasetStr = '/*/{}/MINIAOD'.format(dataEra)
 
-        postfixPattern = _compileRE('(?<=Run201\\d[B-H]-)[a-zA-Z0-9_-]*')
+        #print "datasetStr", datasetStr
+        postfixPattern = _compileRE('(?<=Run201\\d[B-F]-)[a-zA-Z0-9_-]*')
 
     # das throws a lot of exceptions, but they're usually transient, so try a
     # few times if needed
+    
+    dasDatasetCmd = 'dataset='+datasetStr
+    #print dasDatasetCmd
     for i in range(5):
         try:
-            datasets = get_das_info(datasetStr)
+            datasets = get_das_info(dasDatasetCmd)
         except RuntimeError as ex:
             continue
         else:
@@ -166,6 +174,8 @@ def buildScript(cfg, jobid, scriptFile='',
                            "client.".format(ex.message))
 
     found = set()
+    #print "samples: ", samples
+    #print "datasets: ",datasets
 
     for s in samples:
         matches = [d for d in datasets if fnmatch.fnmatchcase(d.split('/')[1], s)]
@@ -208,7 +218,8 @@ if __name__ == '__main__':
     parser.add_argument('--applyLumiMask', action='store_true',
                         help='Pass the appropriate lumi-mask JSON (data only).')
     parser.add_argument('--lumiMaskJSON', type=str,
-                        default='ReReco/Final/Cert_271036-284044_13TeV_23Sep2016ReReco_Collisions16_JSON.txt', # 36.814/fb
+                        default='ReReco/Cert_294927-306462_13TeV_EOY2017ReReco_Collisions17_JSON.txt', #41.367 /fb (recorded)
+                        #default='ReReco/Final/Cert_271036-284044_13TeV_23Sep2016ReReco_Collisions16_JSON.txt', # 36.814/fb
                         #default='Final/Cert_271036-284044_13TeV_PromptReco_Collisions16_JSON.txt', # 36.42
                         #default='Cert_271036-277148_13TeV_PromptReco_Collisions16_JSON.txt', # 15.9/fb
                         help=('Lumi mask JSON. Assumed to be in the standard '

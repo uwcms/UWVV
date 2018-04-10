@@ -25,13 +25,15 @@ class ElectronCalibration(AnalysisFlowBase):
         step = super(ElectronCalibration, self).makeAnalysisStep(stepName, **inputs)
 
         if stepName == 'preliminary':
-            from EgammaAnalysis.ElectronTools.regressionWeights_cfi import regressionWeights
-            self.process = regressionWeights(self.process)
+            ##For the moment regresion is applied on RECO level so no additional procedure is
+            #needed https://twiki.cern.ch/twiki/bin/view/CMS/Egamma2017DataRecommendations#Overview_of_E_gamma_Energy_Corre
+            #from EgammaAnalysis.ElectronTools.regressionWeights_cfi import regressionWeights
+            #self.process = regressionWeights(self.process)
 
-            from EgammaAnalysis.ElectronTools.regressionApplication_cff import slimmedElectrons as eReg
+            #from EgammaAnalysis.ElectronTools.regressionApplication_cff import slimmedElectrons as eReg
 
-            eReg.src = step.getObjTag('e')
-            step.addModule('electronRegression', eReg, 'e')
+            #eReg.src = step.getObjTag('e')
+            #step.addModule('electronRegression', eReg, 'e')
 
             cutOnSCEta = cms.EDFilter(
                 "PATElectronSelector",
