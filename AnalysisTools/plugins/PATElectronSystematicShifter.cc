@@ -98,11 +98,11 @@ void PATElectronSystematicShifter::produce(edm::Event& iEvent, const edm::EventS
       // float absEta = std::abs(simp.getEta());
       // float et = simp.getNewEnergy() / cosh(absEta);
 
-      //bool isEB = ele.isEB();
-      //float r9 = ele.r9();
-      //float absEta = std::abs(ele.eta());
-      //float et = ele.et();
-      //float et = ele.;
+      bool isEB = ele.isEB();
+      float r9 = ele.r9();
+      float absEta = std::abs(ele.eta());
+      float et = ele.et();
+      unsigned int gainSeed = 1;
 
       float scale = 1.;
 
@@ -111,10 +111,9 @@ void PATElectronSystematicShifter::produce(edm::Event& iEvent, const edm::EventS
           // Temporarily undo because I don't 
           // understand how the gain switch should be passed
           // For the new version
-          float scaleError = 0;
-            //correcter.ScaleCorrectionUncertainty(iEvent.id().run(),
-            //                                     isEB, r9, absEta, et,
-            //                                     );
+          float scaleError = correcter.ScaleCorrectionUncertainty(iEvent.id().run(),
+                                               isEB, r9, absEta, et, gainSeed
+                                               );
 
           // flip sign of shift because we're "undoing" the correction applied
           // to data
@@ -123,9 +122,10 @@ void PATElectronSystematicShifter::produce(edm::Event& iEvent, const edm::EventS
 
       if(rhoResShift != 0. || phiResShift != 0.)
         {
-          float smearSigma = 0;
-            //correcter.getSmearingSigma(iEvent.id().run(), isEB, r9, absEta,
-            //                           et, rhoResShift, phiResShift);
+          // Shift rho and phi 1 sigma down. Shifting both separatly seems silly
+          float smearSigma =
+            correcter.getSmearingSigma(iEvent.id().run(), isEB, r9, absEta,
+                                       et, gainSeed, rhoResShift, phiResShift);
 
           scale = CLHEP::RandGauss::shoot(&engine, scale, smearSigma);
         }
