@@ -52,6 +52,7 @@ private:
   const float scaleShift;
   const float rhoResShift;
   const float phiResShift;
+  const bool shiftCollection;
 
   const EnergyScaleCorrection_class correcter;
 };
@@ -66,6 +67,7 @@ PATElectronSystematicShifter::PATElectronSystematicShifter(const edm::ParameterS
   scaleShift(iConfig.exists("scaleShift") ? iConfig.getParameter<double>("scaleShift") : 0.),
   rhoResShift(iConfig.exists("rhoResShift") ? iConfig.getParameter<double>("rhoResShift") : 0.),
   phiResShift(iConfig.exists("phiResShift") ? iConfig.getParameter<double>("phiResShift") : 0.),
+  shiftCollection(iConfig.exists("shiftCollection") ? iConfig.getParameter<bool>("shiftCollection") : 0.),
   correcter(filename)
 {
   edm::Service<edm::RandomNumberGenerator> rng;
@@ -114,21 +116,30 @@ void PATElectronSystematicShifter::produce(edm::Event& iEvent, const edm::EventS
           if(seedRecHit->checkFlag(EcalRecHit::kHasSwitchToGain6)) gainSeedSC = 6;
           if(seedRecHit->checkFlag(EcalRecHit::kHasSwitchToGain1)) gainSeedSC = 1;
       }
+      ele.addUserFloat("gainSeed", gainSeedSC);
 
       float scale = 1.;
 
+      float scaleError = correcter.ScaleCorrectionUncertainty(iEvent.id().run(),
+                                        isEB, r9, absEta, et, gainSeedSC);
+      ele.addUserFloat("scaleCorrError", scaleError);
       if(scaleShift)
-        {
-          float scaleError = correcter.ScaleCorrectionUncertainty(iEvent.id().run(),
-                                               isEB, r9, absEta, et, gainSeedSC
-                                               );
-
           // flip sign of shift because we're "undoing" the correction applied
           // to data
           scale -= scaleShift * scaleError;
-        }
 
-      if(rhoResShift != 0. || phiResShift != 0.)
+      float smearSigmaUp = correcter.getSmearingSigma(iEvent.id().run(), isEB, r9, absEta,
+                            et, gainSeedSC, 1, 1);
+      float smearSigmaDown = correcter.getSmearingSigma(iEvent.id().run(), isEB, r9, absEta,
+                            et, gainSeedSC, -1, -1);
+      ele.addUserFloat("resSmearSigmaUp", smearSigmaUp);
+      ele.addUserFloat("resSmearSigmaDown", smearSigmaDown);
+      ele.addUserFloat("PtScale_scaleUpResUp", CLHEP::RandGauss::shoot(&engine, 1-scaleError, smearSigmaUp));
+      ele.addUserFloat("PtScale_scaleUpResDown", CLHEP::RandGauss::shoot(&engine, 1-scaleError, smearSigmaDown));
+      ele.addUserFloat("PtScale_scaleDownResUp", CLHEP::RandGauss::shoot(&engine, 1+scaleError, smearSigmaUp));
+      ele.addUserFloat("PtScale_scaleDownResDown", CLHEP::RandGauss::shoot(&engine, 1+scaleError, smearSigmaDown));
+
+      if ((rhoResShift != 0. || phiResShift != 0.) && shiftCollection)
         {
           float smearSigma =
             correcter.getSmearingSigma(iEvent.id().run(), isEB, r9, absEta,
@@ -137,8 +148,10 @@ void PATElectronSystematicShifter::produce(edm::Event& iEvent, const edm::EventS
           scale = CLHEP::RandGauss::shoot(&engine, scale, smearSigma);
         }
 
-      ele.setP4(math::PtEtaPhiMLorentzVector(scale*ele.pt(), ele.eta(),
-                                             ele.phi(), ele.mass()));
+      // Replace the electron collection 
+      if (shiftCollection)
+        ele.setP4(math::PtEtaPhiMLorentzVector(scale*ele.pt(), ele.eta(),
+                                                ele.phi(), ele.mass()));
     }
 
   iEvent.put(std::move(out));

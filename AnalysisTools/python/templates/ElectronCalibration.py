@@ -62,23 +62,27 @@ class ElectronCalibration(AnalysisFlowBase):
 
             step.addModule('calibratedPatElectrons', calibratedPatElectrons, 'e')
 
+            makeNewCollection=False
             if self.electronScaleShift or self.electronRhoResShift or self.electronPhiResShift:
-                self.process.RandomNumberGeneratorService.electronSystematicShift = cms.PSet(
-                    initialSeed = cms.untracked.uint32(345),
-                    )
+                makeNewCollection=True
 
-                shiftMod = cms.EDProducer(
-                    "PATElectronSystematicShifter",
-                    src = step.getObjTag('e'),
-                    recHitCollectionEB = cms.InputTag('reducedEgamma:reducedEBRecHits'),
-                    recHitCollectionEE = cms.InputTag('reducedEgamma:reducedEERecHits'),
-                    correctionFile = cms.string(files[correctionType]),
-                    scaleShift = cms.double(self.electronScaleShift),
-                    rhoResShift = cms.double(self.electronRhoResShift),
-                    phiResShift = cms.double(self.electronPhiResShift),
-                    )
+            self.process.RandomNumberGeneratorService.electronSystematicShift = cms.PSet(
+                initialSeed = cms.untracked.uint32(345),
+                )
 
-                step.addModule('electronSystematicShift', shiftMod, 'e')
+            shiftMod = cms.EDProducer(
+                "PATElectronSystematicShifter",
+                src = step.getObjTag('e'),
+                recHitCollectionEB = cms.InputTag('reducedEgamma:reducedEBRecHits'),
+                recHitCollectionEE = cms.InputTag('reducedEgamma:reducedEERecHits'),
+                correctionFile = cms.string(files[correctionType]),
+                scaleShift = cms.double(self.electronScaleShift),
+                rhoResShift = cms.double(self.electronRhoResShift),
+                phiResShift = cms.double(self.electronPhiResShift),
+                shiftCollection = cms.bool(makeNewCollection),
+                )
+
+            step.addModule('electronSystematicShift', shiftMod, 'e')
 
         if stepName == 'selection':
             # need to re-sort now that we're calibrated
