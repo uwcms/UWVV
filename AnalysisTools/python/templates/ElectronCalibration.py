@@ -49,17 +49,20 @@ class ElectronCalibration(AnalysisFlowBase):
                 )
             
             from EgammaAnalysis.ElectronTools.calibratedPatElectronsRun2_cfi import calibratedPatElectrons
+            from EgammaAnalysis.ElectronTools.calibrationTablesRun2 import files
+            # from EgammaAnalysis.ElectronTools.calibrationTablesRun2 import correctionType
+            # This would give you the default value of Legacy2016_v1 which should be used for
+            # the ReReco, not the ReMiniAOD
+            correctionType = "Moriond17_23Jan"
 
             calibratedPatElectrons.isMC = cms.bool(self.isMC)
             calibratedPatElectrons.electrons = step.getObjTag('e') 
             calibratedPatElectrons.isSynchronization = cms.bool(self.isSync)
+            calibratedPatElectrons.correctionFile = cms.string(files[correctionType])
 
             step.addModule('calibratedPatElectrons', calibratedPatElectrons, 'e')
 
             if self.electronScaleShift or self.electronRhoResShift or self.electronPhiResShift:
-                from EgammaAnalysis.ElectronTools.calibrationTablesRun2 import correctionType
-                from EgammaAnalysis.ElectronTools.calibrationTablesRun2 import files
-
                 self.process.RandomNumberGeneratorService.electronSystematicShift = cms.PSet(
                     initialSeed = cms.untracked.uint32(345),
                     )
