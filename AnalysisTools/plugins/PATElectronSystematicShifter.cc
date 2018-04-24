@@ -25,6 +25,7 @@
 #include "DataFormats/Common/interface/View.h"
 #include "DataFormats/Math/interface/LorentzVector.h"
 #include "EgammaAnalysis/ElectronTools/interface/EnergyScaleCorrection_class.h"
+#include "DataFormats/EcalRecHit/interface/EcalRecHitCollections.h"
 #include "FWCore/ServiceRegistry/interface/Service.h"
 #include "FWCore/Utilities/interface/Exception.h"
 #include "FWCore/Utilities/interface/RandomNumberGenerator.h"
@@ -43,6 +44,8 @@ private:
   virtual void produce(edm::Event& iEvent, const edm::EventSetup& iSetup);
 
   const edm::EDGetTokenT<edm::View<pat::Electron> > electronCollectionToken;
+  const edm::EDGetTokenT<EcalRecHitCollection> recHitCollectionEBToken_;
+  const edm::EDGetTokenT<EcalRecHitCollection> recHitCollectionEEToken_;
   const std::string filename; // files to base the corrections on (same as with CalibratedPatElectronProducerRun2)
 
   // Size of shift, in units of sigma
@@ -57,6 +60,8 @@ private:
 
 PATElectronSystematicShifter::PATElectronSystematicShifter(const edm::ParameterSet& iConfig):
   electronCollectionToken(consumes<edm::View<pat::Electron> >(iConfig.getParameter<edm::InputTag>("src"))),
+  recHitCollectionEBToken_(consumes<EcalRecHitCollection>(iConfig.getParameter<edm::InputTag>("recHitCollectionEB"))),
+  recHitCollectionEEToken_(consumes<EcalRecHitCollection>(iConfig.getParameter<edm::InputTag>("recHitCollectionEE"))),
   filename(iConfig.getParameter<std::string>("correctionFile")),
   scaleShift(iConfig.exists("scaleShift") ? iConfig.getParameter<double>("scaleShift") : 0.),
   rhoResShift(iConfig.exists("rhoResShift") ? iConfig.getParameter<double>("rhoResShift") : 0.),
@@ -80,8 +85,13 @@ void PATElectronSystematicShifter::produce(edm::Event& iEvent, const edm::EventS
   std::unique_ptr<std::vector<pat::Electron> > out = std::make_unique<std::vector<pat::Electron> >();
 
   edm::Handle<edm::View<pat::Electron> > in;
-
   iEvent.getByToken(electronCollectionToken, in);
+
+  edm::Handle<EcalRecHitCollection> recHitCollectionEBHandle;
+  edm::Handle<EcalRecHitCollection> recHitCollectionEEHandle;
+
+  iEvent.getByToken(recHitCollectionEBToken_, recHitCollectionEBHandle);
+  iEvent.getByToken(recHitCollectionEEToken_, recHitCollectionEEHandle);
 
   edm::Service<edm::RandomNumberGenerator> rng;
   CLHEP::HepRandomEngine& engine = rng->getEngine(iEvent.streamID());
@@ -91,18 +101,19 @@ void PATElectronSystematicShifter::produce(edm::Event& iEvent, const edm::EventS
       out->push_back(in->at(iEle));
       pat::Electron& ele = out->back();
 
-      // using simple electron fixes some problems, not sure why...
-      // SimpleElectron simp(ele, 1, true);
-      // bool isEB = simp.isEB();
-      // float r9 = simp.getR9();
-      // float absEta = std::abs(simp.getEta());
-      // float et = simp.getNewEnergy() / cosh(absEta);
-
       bool isEB = ele.isEB();
       float r9 = ele.r9();
       float absEta = std::abs(ele.eta());
       float et = ele.et();
-      unsigned int gainSeed = 1;
+
+      DetId seedDetId = ele.superCluster()->seed()->seed();
+      const EcalRecHitCollection* recHits = (ele.isEB()) ? recHitCollectionEBHandle.product() : recHitCollectionEEHandle.product();
+      EcalRecHitCollection::const_iterator seedRecHit = recHits->find(seedDetId);
+      unsigned int gainSeedSC = 12;
+      if (seedRecHit != recHits->end()) { 
+          if(seedRecHit->checkFlag(EcalRecHit::kHasSwitchToGain6)) gainSeedSC = 6;
+          if(seedRecHit->checkFlag(EcalRecHit::kHasSwitchToGain1)) gainSeedSC = 1;
+      }
 
       float scale = 1.;
 
@@ -112,7 +123,7 @@ void PATElectronSystematicShifter::produce(edm::Event& iEvent, const edm::EventS
           // understand how the gain switch should be passed
           // For the new version
           float scaleError = correcter.ScaleCorrectionUncertainty(iEvent.id().run(),
-                                               isEB, r9, absEta, et, gainSeed
+                                               isEB, r9, absEta, et, gainSeedSC
                                                );
 
           // flip sign of shift because we're "undoing" the correction applied
@@ -122,10 +133,9 @@ void PATElectronSystematicShifter::produce(edm::Event& iEvent, const edm::EventS
 
       if(rhoResShift != 0. || phiResShift != 0.)
         {
-          // Shift rho and phi 1 sigma down. Shifting both separatly seems silly
           float smearSigma =
             correcter.getSmearingSigma(iEvent.id().run(), isEB, r9, absEta,
-                                       et, gainSeed, rhoResShift, phiResShift);
+                                       et, gainSeedSC, rhoResShift, phiResShift);
 
           scale = CLHEP::RandGauss::shoot(&engine, scale, smearSigma);
         }

@@ -49,14 +49,17 @@ class ElectronCalibration(AnalysisFlowBase):
                 )
             
             from EgammaAnalysis.ElectronTools.calibratedPatElectronsRun2_cfi import calibratedPatElectrons
+
             calibratedPatElectrons.isMC = cms.bool(self.isMC)
             calibratedPatElectrons.electrons = step.getObjTag('e') 
             calibratedPatElectrons.isSynchronization = cms.bool(self.isSync)
-            #self.process.calibratedPatElectrons.correctionFile = cms.string(correctionFile),
 
             step.addModule('calibratedPatElectrons', calibratedPatElectrons, 'e')
 
             if self.electronScaleShift or self.electronRhoResShift or self.electronPhiResShift:
+                from EgammaAnalysis.ElectronTools.calibrationTablesRun2 import correctionType
+                from EgammaAnalysis.ElectronTools.calibrationTablesRun2 import files
+
                 self.process.RandomNumberGeneratorService.electronSystematicShift = cms.PSet(
                     initialSeed = cms.untracked.uint32(345),
                     )
@@ -64,7 +67,9 @@ class ElectronCalibration(AnalysisFlowBase):
                 shiftMod = cms.EDProducer(
                     "PATElectronSystematicShifter",
                     src = step.getObjTag('e'),
-                    correctionFile = cms.string(correctionFile),
+                    recHitCollectionEB = cms.InputTag('reducedEgamma:reducedEBRecHits'),
+                    recHitCollectionEE = cms.InputTag('reducedEgamma:reducedEERecHits'),
+                    correctionFile = cms.string(files[correctionType]),
                     scaleShift = cms.double(self.electronScaleShift),
                     rhoResShift = cms.double(self.electronRhoResShift),
                     phiResShift = cms.double(self.electronPhiResShift),
