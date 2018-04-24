@@ -119,9 +119,6 @@ void PATElectronSystematicShifter::produce(edm::Event& iEvent, const edm::EventS
 
       if(scaleShift)
         {
-          // Temporarily undo because I don't 
-          // understand how the gain switch should be passed
-          // For the new version
           float scaleError = correcter.ScaleCorrectionUncertainty(iEvent.id().run(),
                                                isEB, r9, absEta, et, gainSeedSC
                                                );
