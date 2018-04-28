@@ -9,6 +9,24 @@ electronBranches = cms.PSet(
                                  '+pfIsolationVariables.sumPhotonEt'
                                  '-userFloat("rho_fastjet")*userFloat("EffectiveArea")))'
                                  '/pt'),
+        r9 = cms.string('r9'),
+        et = cms.string('et'),
+        gainSeed = cms.string('? hasUserFloat("gainSeed") ? '
+                                  'userFloat("gainSeed") : 0'),
+        scaleCorrError = cms.string('? hasUserFloat("scaleCorrError") ? '
+                                  'userFloat("scaleCorrError") : 0'),
+        resSmearSigmaUp = cms.string('? hasUserFloat("resSmearSigmaUp") ? '
+                                  'userFloat("resSmearSigmaUp") : 0'),
+        resSmearSigmaDown = cms.string('? hasUserFloat("resSmearSigmaDown") ? '
+                                  'userFloat("resSmearSigmaDown") : 0'),
+        PtScale_scaleUpResUp = cms.string('? hasUserFloat("PtScale_scaleUpResUp") ? '
+                                  'userFloat("PtScale_scaleUpResUp") : 0'),
+        PtScale_scaleUpResDown = cms.string('? hasUserFloat("PtScale_scaleUpResDown") ? '
+                                  'userFloat("PtScale_scaleUpResDown") : 0'),
+        PtScale_scaleDownResUp = cms.string('? hasUserFloat("PtScale_scaleDownResUp") ? '
+                                  'userFloat("PtScale_scaleDownResUp") : 0'),
+        PtScale_scaleDownResDown = cms.string('? hasUserFloat("PtScale_scaleDownResDown") ? '
+                                  'userFloat("PtScale_scaleDownResDown") : 0'),
         Rho = cms.string('userFloat("rho_fastjet")'),
         EffectiveArea = cms.string('userFloat("EffectiveArea")'),
         PFChargedIso = cms.string('pfIsolationVariables.sumChargedHadronPt'),
